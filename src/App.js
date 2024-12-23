@@ -1,0 +1,25 @@
+import React, { Suspense } from 'react';
+import Container from '../src/components/Container/Container'
+
+
+// Lazy load components for better performance
+const HomePage = React.lazy(() => import('./components/HomePage/HomePage'));
+const Card = React.lazy(() => import('./components/Card/Card'));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-pink-50 to-white">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-pink-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
+
+const App = () => {
+  return (
+   <Container/>
+  );
+};
+
+export default App;

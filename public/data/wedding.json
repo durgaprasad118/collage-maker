@@ -1,0 +1,102 @@
+{
+    "templates": [
+      {
+        "id": 1,
+        "images": [
+          {
+            "name": "wedding_groom_image",
+            "thumbnail": "../Wedding-Templates/templetes-thumbnail/1.jpeg",
+            "template": "/Wedding-Templates/templates/1.png",
+            "coordinates": {
+              "width_in_px": 139,
+              "height_in_px": 159,
+              "top_in_px": 770,
+              "left_in_px": 30,
+              "width": 25.74,
+              "height": 16.56,
+              "top": 88.49,
+              "left": 18.43,
+              "type": "box"
+            }
+          }
+        ],
+        "texts": [
+          {
+            "name": "wedding_groom_name",
+            "text_configs": {
+              "font_id": "adumu.otf",
+              "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+              "size": 30,
+              "char_limit": 30,
+              "text_alignment": "CENTER",
+              "color": "#efefef"
+            },
+            "coordinates": {
+              "width_in_px": 348,
+              "height_in_px": 94,
+              "top_in_px": 807,
+              "left_in_px": 177,
+              "width": 64.44,
+              "height": 9.79,
+              "top": 88.95,
+              "left": 65
+            }
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "images": [
+          {
+            "name": "wedding_groom_image",
+            "thumbnail": "/Wedding-Templates/templetes-thumbnail/2.jpeg",
+            "template": "/Wedding-Templates/templates/2.png",
+            "coordinates": {
+              "width_in_px": 139,
+              "height_in_px": 159,
+              "top_in_px": 770,
+              "left_in_px": 30,
+              "width": 25.74,
+              "height": 16.56,
+              "top": 88.49,
+              "left": 18.43,
+              "type": "box"
+            }
+          }
+        ],
+        "texts": [
+          {
+            "name": "wedding_groom_name",
+            "text_configs": {
+              "font_id": "adumu.otf",
+              "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+              "size": 30,
+              "char_limit": 30,
+              "text_alignment": "CENTER",
+              "color": "#efefef"
+            },
+            "coordinates": {
+              "width_in_px": 348,
+              "height_in_px": 94,
+              "top_in_px": 807,
+              "left_in_px": 177,
+              "width": 64.44,
+              "height": 9.79,
+              "top": 88.95,
+              "left": 65
+            }
+          }
+        ]
+      }
+    ],
+    "inputFields": [
+      {
+        "text": "name",
+        "type": "text"
+      },
+      {
+        "text": "user_photo",
+        "type": "photo"
+      }
+    ]
+}

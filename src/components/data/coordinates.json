@@ -1,0 +1,147 @@
+{
+
+    "images" : [
+        {
+            "name" : "wedding_groom_image",
+            "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+            "coordinates" : {
+                "width_in_px":165,
+                "height_in_px":208,
+                "top_in_px":375,
+                "left_in_px":54,
+                "width":30.56,
+                "height":21.67,
+                "top":49.9,
+                "left":25.28,
+                "type":"box"
+            }
+        },
+        {
+            "name" : "wedding_bride_image",
+            "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+            "coordinates" : {
+                "width_in_px":161,
+                "height_in_px":208,
+                "top_in_px":368,
+                "left_in_px":333,
+                "width":29.81,
+                "height":21.67,
+                "top":49.16,
+                "left":76.58,
+                "type":"box"
+            }
+        }
+    ],
+    "texts" : [
+        {
+            "name" : "wedding_groom_name",
+            "text_configs" : {
+                "font_id": "adumu.otf",
+                "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+                "size": 30,
+                "char_limit": 30,
+                "text_alignment": "CENTER",
+                "color": "#efefef",
+                "sample_text": "Hi Brochiller!!!"  
+            },
+            "coordinates" : {
+                "width_in_px":447,
+                "height_in_px":53,
+                "top_in_px":597,
+                "left_in_px":47,
+                "width":82.78,
+                "height":5.52,
+                "top":64.95,
+                "left":50.09
+            }
+        },
+        {
+            "name" : "wedding_bride_name",
+            "text_configs" : {
+                "font_id": "adumu.otf",
+                "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+                "size": 30,
+                "char_limit": 30,
+                "text_alignment": "CENTER",
+                "color": "#efefef",
+                "sample_text": "Hi Brochiller!!!"  
+            },
+            "coordinates" : {
+                "width_in_px":447,
+                "height_in_px":53,
+                "top_in_px":701,
+                "left_in_px":46,
+                "width":82.78,
+                "height":5.52,
+                "top":75.78,
+                "left":49.91
+            }
+        },
+        {
+            "name" : "wedding_date",
+            "text_configs" : {
+                "font_id": "adumu.otf",
+                "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+                "size": 30,
+                "char_limit": 30,
+                "text_alignment": "CENTER",
+                "color": "#efefef",
+                "sample_text": "Hi Brochiller!!!"  
+            },
+            "coordinates" : {
+                "width_in_px":447,
+                "height_in_px":50,
+                "top_in_px":776,
+                "left_in_px":47,
+                "width":82.78,
+                "height":5.21,
+                "top":83.44,
+                "left":50.09
+            }
+        },
+        {
+            "name" : "wedding_time",
+            "text_configs" : {
+                "font_id": "adumu.otf",
+                "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+                "size": 30,
+                "char_limit": 30,
+                "text_alignment": "CENTER",
+                "color": "#efefef",
+                "sample_text": "Hi Brochiller!!!"  
+            },
+            "coordinates" : {
+                "width_in_px":447,
+                "height_in_px":50,
+                "top_in_px":830,
+                "left_in_px":50,
+                "width":82.78,
+                "height":5.21,
+                "top":89.06,
+                "left":50.65
+            }
+        },
+        {
+            "name" : "wedding_venue",
+            "text_configs" : {
+                "font_id": "adumu.otf",
+                "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+                "size": 30,
+                "char_limit": 30,
+                "text_alignment": "CENTER",
+                "color": "#efefef",
+                "sample_text": "Hi Brochiller!!!"  
+            },
+            "coordinates" : {
+                "width_in_px":447,
+                "height_in_px":62,
+                "top_in_px":876,
+                "left_in_px":54,
+                "width":82.78,
+                "height":6.46,
+                "top":94.48,
+                "left":51.39
+            }
+        }
+    ]
+}
