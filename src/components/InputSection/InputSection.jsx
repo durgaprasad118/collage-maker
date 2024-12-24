@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import './InputSection.css';
 
-
-const InputSection = () => {
+const InputSection = ({ onClose }) => {
   const [formData, setFormData] = useState({
     brideName: "",
     groomName: "",
@@ -24,102 +23,124 @@ const InputSection = () => {
     setFormData({ ...formData, [name]: file });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data Submitted: ", formData);
+    try {
+      console.log("Form Data Submitted:", formData);
+      onClose?.();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
     <div className="input-section">
-      <form onSubmit={handleSubmit}>
-        <h2>Event Details</h2>
-        {/* Bride Details */}
-        <div>
-          <label htmlFor="brideName">Bride's Name:</label>
-          <input
-            type="text"
-            id="brideName"
-            name="brideName"
-            value={formData.brideName}
-            onChange={handleChange}
-            placeholder="Enter Bride's Name"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="bridePhoto">Bride's Photo:</label>
-          <input
-            type="file"
-            id="bridePhoto"
-            name="bridePhoto"
-            accept="image/*"
-            onChange={handleFileChange}
-            required
-          />
+      {/* Cancel Button */}
+      <button onClick={onClose} className="close-button">
+        &times;
+      </button>
+
+      <form onSubmit={handleSubmit} className="form-container">
+        <h2 className="form-title">Enter Wedding Details</h2>
+
+        <div className="form-grid">
+          {/* Bride Details */}
+          <div className="form-group">
+            <label htmlFor="brideName" className="form-label">Bride's Name</label>
+            <input
+              type="text"
+              id="brideName"
+              name="brideName"
+              value={formData.brideName}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="bridePhoto" className="form-label">Bride's Photo</label>
+            <input
+              type="file"
+              id="bridePhoto"
+              name="bridePhoto"
+              onChange={handleFileChange}
+              accept="image/*"
+              className="form-input"
+              required
+            />
+          </div>
+
+          {/* Groom Details */}
+          <div className="form-group">
+            <label htmlFor="groomName" className="form-label">Groom's Name</label>
+            <input
+              type="text"
+              id="groomName"
+              name="groomName"
+              value={formData.groomName}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="groomPhoto" className="form-label">Groom's Photo</label>
+            <input
+              type="file"
+              id="groomPhoto"
+              name="groomPhoto"
+              onChange={handleFileChange}
+              accept="image/*"
+              className="form-input"
+              required
+            />
+          </div>
         </div>
 
-        {/* Groom Details */}
-        <div>
-          <label htmlFor="groomName">Groom's Name:</label>
-          <input
-            type="text"
-            id="groomName"
-            name="groomName"
-            value={formData.groomName}
-            onChange={handleChange}
-            placeholder="Enter Groom's Name"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="groomPhoto">Groom's Photo:</label>
-          <input
-            type="file"
-            id="groomPhoto"
-            name="groomPhoto"
-            accept="image/*"
-            onChange={handleFileChange}
-            required
-          />
-        </div>
-
-        {/* Event Details */}
-        <div>
-          <label htmlFor="venue">Venue:</label>
+        <div className="form-group">
+          <label htmlFor="venue" className="form-label">Venue</label>
           <input
             type="text"
             id="venue"
             name="venue"
             value={formData.venue}
             onChange={handleChange}
-            placeholder="Enter Venue"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="date">Date:</label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="time">Time:</label>
-          <input
-            type="time"
-            id="time"
-            name="time"
-            value={formData.time}
-            onChange={handleChange}
+            className="form-input"
             required
           />
         </div>
 
-        <button type="submit">Submit</button>
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="date" className="form-label">Date</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="time" className="form-label">Time</label>
+            <input
+              type="time"
+              id="time"
+              name="time"
+              value={formData.time}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <button type="submit" className="save-button">
+          Save
+        </button>
       </form>
     </div>
   );

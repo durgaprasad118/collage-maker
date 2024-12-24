@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import './App.css'; 
 import Container from '../src/components/Container/Container'
 
 
@@ -18,7 +19,9 @@ const LoadingFallback = () => (
 
 const App = () => {
   return (
-   <Container/>
+    <Suspense fallback={<LoadingFallback />}>
+      <Container />
+    </Suspense>
   );
 };
 

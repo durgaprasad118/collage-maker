@@ -1,0 +1,89 @@
+/* Modal Wrapper */
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensures the modal is above all other content */
+  overflow: hidden; /* Prevents background scrolling */
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  backdrop-filter: blur(4px); /* Adds a blur effect for modern browsers */
+  -webkit-backdrop-filter: blur(4px); /* Fallback for WebKit browsers */
+}
+
+/* Modal Container */
+.modal-container {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh; /* Ensures the modal doesn't exceed the viewport height */
+  overflow-y: auto; /* Enables scrolling if content exceeds modal height */
+  background-color: white;
+  border-radius: 16px; /* Rounded corners */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  animation: modalEnter 0.3s ease-out; /* Entry animation */
+  z-index: 1001; /* Ensures it's above the backdrop */
+  padding: 20px;
+  font-family: 'Poppins', sans-serif; /* Consistent typography */
+}
+
+/* Modal Animation */
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px); /* Slightly scaled and shifted */
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0); /* Full visibility and position */
+  }
+}
+
+/* Scrollbar Styling */
+.modal-container::-webkit-scrollbar {
+  width: 8px; /* Narrow scrollbar width */
+}
+
+.modal-container::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light track background */
+  border-radius: 4px;
+}
+
+.modal-container::-webkit-scrollbar-thumb {
+  background: #ffc0cb; /* Soft pink for thumb */
+  border-radius: 4px; /* Rounded edges for smooth look */
+}
+
+.modal-container::-webkit-scrollbar-thumb:hover {
+  background: #ff69b4; /* Brighter pink on hover */
+}
+
+/* Close Button Styling */
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #ff69b4; /* Highlight color for hover */
+}

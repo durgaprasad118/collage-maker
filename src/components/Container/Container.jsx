@@ -1,10 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Header from '../Header/Header'; // Ensure Header exists in the components folder
+import Header from '../Header/Header';
 import HomePage from '../HomePage/HomePage';
 import Card from '../Card/Card';
+import InputSection from '../InputSection/InputSection';
+import './Container.css';
 
-// Loading fallback for lazy-loaded components
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
     <div className="text-center">
@@ -15,26 +16,30 @@ const LoadingFallback = () => (
 );
 
 function Container() {
+  const [isInputSectionOpen, setIsInputSectionOpen] = useState(false);
+
+  const handleEditClick = (e) => {
+    e.stopPropagation();
+    setIsInputSectionOpen(true);
+  };
+
+  const handleCloseInputSection = () => {
+    setIsInputSectionOpen(false);
+  };
+
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white">
-        <Header />
-        <main className="pb-8">
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white relative">
+        
+        <main className="pb-8 relative">
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
-              {/* Home page route */}
               <Route path="/" element={<HomePage />} />
-
-              {/* Wedding card route */}
               <Route path="/card/:id" element={<Card />} />
-
-              {/* Redirect old route pattern to new one */}
               <Route
                 path="/Weddingcard/:id"
                 element={<Navigate to={(location) => `/card/${location.pathname.split('/')[2]}`} replace />}
               />
-
-              {/* Catch all route for 404s */}
               <Route
                 path="*"
                 element={
@@ -53,7 +58,32 @@ function Container() {
                 }
               />
             </Routes>
+            
           </Suspense>
+
+          {/* Edit Button with improved positioning and z-index */}
+          <div className="fixed top-20 right-4 z-30">
+            <button
+              onClick={handleEditClick}
+              className="bg-white px-4 py-2 rounded-lg shadow-md text-pink-600 hover:text-pink-700 flex items-center gap-2 transition-all hover:shadow-lg"
+            >
+              <span className="text-lg">✏️</span>
+              <span>Edit Template</span>
+            </button>
+          </div>
+
+          {/* Modal with improved structure */}
+          {isInputSectionOpen && (
+            <div className="modal-wrapper">
+              <div 
+                className="modal-backdrop"
+                onClick={handleCloseInputSection}
+              />
+              <div className="modal-container">
+                <InputSection onClose={handleCloseInputSection} />
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </Router>

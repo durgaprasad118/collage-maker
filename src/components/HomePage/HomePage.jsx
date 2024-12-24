@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 const HomePage = () => {
   const [currentTemplates, setCurrentTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +16,8 @@ const HomePage = () => {
         if (!response.ok) {
           throw new Error('Failed to fetch templates');
         }
+
+
         const data = await response.json();
         const templates = data.templates;
 
@@ -106,7 +107,6 @@ const HomePage = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-0 left-0 right-0 p-3 text-white text-center">
-                    <span className="text-sm font-medium">Click to customize</span>
                   </div>
                 </div>
               </div>

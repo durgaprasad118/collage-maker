@@ -152,12 +152,12 @@ const Card = () => {
       className="min-h-screen bg-gray-50 py-4 px-2 sm:py-6 sm:px-4 flex justify-center items-center"
     >
       <div className="max-w-md mx-auto">
-        <button
+        {/* <button     /// Navigated to home buttton working well need to give style only header k ander aa rha hai abhi
           onClick={handleBack}
           className="mb-4 px-3 py-1 text-sm text-pink-600 hover:text-pink-700 flex items-center"
         >
           ← Back to Templates
-        </button>
+        </button> */}
 
         <div className="relative bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="relative">
@@ -199,9 +199,10 @@ const Card = () => {
                   textAlign: text.text_configs.text_alignment.toLowerCase()
                 }}
               >
-                {text.text_configs.sample_text || 'Sample Text'}
+              
               </div>
             ))}
+            
           </div>
         </div>
       </div>
