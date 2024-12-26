@@ -4,12 +4,14 @@
   margin: 30px auto; /* Centers the section */
   padding: 20px; /* Inner spacing */
   padding-bottom: 50px; /* Additional padding at the bottom */
-  background: #ffffff; /* White background for contrast */
+  background: #ddd1d1; /* White background for contrast */
   border-radius: 12px; /* Rounded corners */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   font-family: 'Poppins', sans-serif; /* Consistent typography */
   position: relative; /* For positioning child elements like close button */
   box-sizing: border-box; /* Includes padding in width and height calculations */
+  max-height: 90vh; /* Ensures the modal fits within the viewport */
+  overflow-y: auto; /* Enables vertical scrolling if content exceeds the height */
 }
 
 /* Close Button */
@@ -50,6 +52,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
   gap: 15px; /* Space between columns */
+  width: 100%; /* Ensures the grid adapts to the container's width */
+  box-sizing: border-box;
+  overflow: hidden; /* Prevents grid content from overflowing */
 }
 
 /* Input Fields */
@@ -73,6 +78,8 @@
   background-color: #f9f9f9;
   outline: none;
   transition: all 0.3s ease;
+  width: 100%; /* Ensures the input fits within the parent container */
+  box-sizing: border-box; /* Prevents padding from affecting the width */
 }
 
 .form-input:focus {
@@ -102,23 +109,48 @@
   transform: scale(1.05); /* Slightly enlarge the button on hover */
 }
 
-/* Add Bottom Spacing for Full Page Scroll */
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  overflow-y: scroll; /* Ensures smooth vertical scrolling */
+/* Modal Wrapper */
+
+/* Modal Container */
+.modal-container {
+  width: 90%; /* Ensures the modal is responsive */
+  max-width: 600px; /* Maximum width for larger screens */
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  box-sizing: border-box; /* Includes padding in width */
+  position: relative;
+  animation: modalEnter 0.3s ease-out; /* Modal entry animation */
+  overflow: hidden; /* Prevent content overflow */
 }
 
-.input-section::after {
-  content: ''; /* Spacer element */
-  display: block;
-  height: 50px; /* Adds extra space below the section */
+/* Modal Entry Animation */
+
+
+/* Scrollbar Styling */
+.input-section::-webkit-scrollbar {
+  width: 8px; /* Narrow scrollbar */
 }
 
+.input-section::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light background for the scrollbar track */
+  border-radius: 4px;
+}
+
+.input-section::-webkit-scrollbar-thumb {
+  background: #ffc0cb; /* Light pink for the scrollbar thumb */
+  border-radius: 4px; /* Rounded edges for a smoother look */
+}
+
+.input-section::-webkit-scrollbar-thumb:hover {
+  background: #ff69b4; /* Bright pink on hover */
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .input-section {
     padding: 15px; /* Adjust padding for smaller screens */
+    margin: 15px auto; /* Reduce margin for small screens */
   }
 
   .form-grid {
@@ -127,7 +159,7 @@ body {
   }
 
   .form-title {
-    font-size: 20px; /* Adjust font size */
+    font-size: 20px; /* Adjust font size for smaller screens */
   }
 
   .save-button {

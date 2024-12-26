@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 const HomePage = () => {
   const [currentTemplates, setCurrentTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,7 +10,7 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAndSetRandomTemplates = async () => {
+    const fetchAndSetTemplates = async () => {
       try {
         setLoading(true);
         const response = await fetch('/data/wedding.json');
@@ -17,9 +18,13 @@ const HomePage = () => {
           throw new Error('Failed to fetch templates');
         }
 
-
         const data = await response.json();
-        const templates = data.templates;
+        // Transform JSON structure into an array and extract numeric ID
+        const templates = Object.entries(data).map(([id, details]) => ({
+          id: id,
+          numericId: id.replace('id_', ''), // Extract numeric part
+          ...details,
+        }));
 
         // Shuffle and pick templates based on screen size
         const shuffled = templates.sort(() => 0.5 - Math.random());
@@ -27,10 +32,11 @@ const HomePage = () => {
         setCurrentTemplates(shuffled.slice(0, numTemplates));
         setError(null);
       } catch (err) {
+        console.error('Fetch error:', err);
         setError('Failed to load templates. Please try again.');
         if (retryCount < 3) {
           setTimeout(() => {
-            setRetryCount(prev => prev + 1);
+            setRetryCount((prev) => prev + 1);
           }, 2000);
         }
       } finally {
@@ -38,11 +44,13 @@ const HomePage = () => {
       }
     };
 
-    fetchAndSetRandomTemplates();
+    fetchAndSetTemplates();
   }, [retryCount]);
 
   const handleTemplateSelect = (templateId) => {
-    navigate(`/card/${templateId}`);
+    // Extract the numeric part from the template ID
+    const numericId = templateId.replace('id_', '');
+    navigate(`/card/${numericId}`);
   };
 
   const handleRetry = () => {
@@ -101,12 +109,17 @@ const HomePage = () => {
               <div className="relative aspect-[3/4] w-full rounded-lg sm:rounded-xl overflow-hidden">
                 <img
                   src={template.images[0].thumbnail}
-                  alt={`Wedding Template ${template.id}`}
+                  alt={`Wedding Template ${template.numericId}`}
                   className="w-full h-full object-cover transform transition-transform hover:scale-105 duration-500"
                   loading="lazy"
+                  onError={(e) => {
+                    console.error('Error loading thumbnail:', e);
+                    e.target.src = '/placeholder-image.jpg'; // Add a placeholder image if available
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-0 left-0 right-0 p-3 text-white text-center">
+                    Template {template.numericId}
                   </div>
                 </div>
               </div>

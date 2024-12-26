@@ -1,6 +1,5 @@
 import React, { Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Header from '../Header/Header';
 import HomePage from '../HomePage/HomePage';
 import Card from '../Card/Card';
 import InputSection from '../InputSection/InputSection';
@@ -14,6 +13,12 @@ const LoadingFallback = () => (
     </div>
   </div>
 );
+
+// Custom component to handle redirection
+const RedirectToCard = () => {
+  const id = window.location.pathname.split('/')[2]; // Extract the ID from the URL
+  return <Navigate to={`/card/${id}`} replace />;
+};
 
 function Container() {
   const [isInputSectionOpen, setIsInputSectionOpen] = useState(false);
@@ -30,16 +35,12 @@ function Container() {
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white relative">
-        
         <main className="pb-8 relative">
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/card/:id" element={<Card />} />
-              <Route
-                path="/Weddingcard/:id"
-                element={<Navigate to={(location) => `/card/${location.pathname.split('/')[2]}`} replace />}
-              />
+              <Route path="/Weddingcard/:id" element={<RedirectToCard />} />
               <Route
                 path="*"
                 element={
@@ -58,10 +59,9 @@ function Container() {
                 }
               />
             </Routes>
-            
           </Suspense>
 
-          {/* Edit Button with improved positioning and z-index */}
+          {/* Edit Button */}
           <div className="fixed top-20 right-4 z-30">
             <button
               onClick={handleEditClick}
@@ -72,13 +72,10 @@ function Container() {
             </button>
           </div>
 
-          {/* Modal with improved structure */}
+          {/* Modal */}
           {isInputSectionOpen && (
             <div className="modal-wrapper">
-              <div 
-                className="modal-backdrop"
-                onClick={handleCloseInputSection}
-              />
+              <div className="modal-backdrop" onClick={handleCloseInputSection} />
               <div className="modal-container">
                 <InputSection onClose={handleCloseInputSection} />
               </div>

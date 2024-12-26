@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 const Card = () => {
-  const { id } = useParams(); // Extract ID from URL
+  const { id } = useParams(); // Extract ID from the URL
   const navigate = useNavigate(); // For navigation
   const [allTemplates, setAllTemplates] = useState([]); // All templates data
   const [currentTemplate, setCurrentTemplate] = useState(null); // Current template data
@@ -10,37 +10,34 @@ const Card = () => {
   const [error, setError] = useState(null); // Error state
   const [currentIndex, setCurrentIndex] = useState(0); // Current index for templates
   const containerRef = useRef(null); // Reference to container for scroll handling
-  const scrollTimeout = useRef(null); // Timeout for throttling scroll events
+  const isScrolling = useRef(false); // Flag to manage throttling
 
-  // Fetch template data on component mount or ID change
   useEffect(() => {
     const fetchTemplateData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/data/wedding.json');
-        if (!response.ok) throw new Error('Failed to fetch template data');
-        
-        const data = await response.json();
+        const response = await fetch("/data/wedding.json");
 
-        // Adjust paths for images if necessary
-        const templates = data.templates.map(template => ({
-          ...template,
-          images: template.images.map(image => ({
-            ...image,
-            template: image.template.replace('/templates/', '/templetes/'),
-            thumbnail: image.thumbnail.replace('/templates-thumbnail/', '/templetes-thumbnail/')
-          }))
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const templates = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
         }));
 
-        const startIndex = templates.findIndex(t => t.id === parseInt(id, 10));
-        if (startIndex === -1) throw new Error('Template not found');
+        const startIndex = templates.findIndex(
+          (template) => template.id === `id_${id}`
+        );
+        if (startIndex === -1) throw new Error("Template not found.");
 
         setAllTemplates(templates);
-        setCurrentIndex(startIndex);
         setCurrentTemplate(templates[startIndex]);
-        setError(null);
+        setCurrentIndex(startIndex);
       } catch (err) {
-        console.error('Error:', err);
+        console.error("Error fetching templates:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -50,161 +47,123 @@ const Card = () => {
     fetchTemplateData();
   }, [id]);
 
-  // Handle scroll events for navigation between templates
+  // Handle scrolling to navigate templates
   useEffect(() => {
+    const handleScroll = (e) => {
+      if (isScrolling.current) return; // Prevent multiple scroll actions at once
+
+      if (e.deltaY > 0 && currentIndex < allTemplates.length - 1) {
+        isScrolling.current = true; // Set throttling flag
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+        setCurrentTemplate(allTemplates[nextIndex]);
+        navigate(`/card/${nextIndex + 1}`, { replace: true });
+
+        setTimeout(() => {
+          isScrolling.current = false; // Reset throttling flag
+        }, 700); // Adjust throttle delay for smoother interaction
+      } else if (e.deltaY < 0 && currentIndex > 0) {
+        isScrolling.current = true; // Set throttling flag
+        const prevIndex = currentIndex - 1;
+        setCurrentIndex(prevIndex);
+        setCurrentTemplate(allTemplates[prevIndex]);
+        navigate(`/card/${prevIndex + 1}`, { replace: true });
+
+        setTimeout(() => {
+          isScrolling.current = false; // Reset throttling flag
+        }, 700); // Adjust throttle delay for smoother interaction
+      }
+    };
+
     const container = containerRef.current;
-    let touchStart = 0;
-    let touchEnd = 0;
-    let isThrottled = false;
-
-    const handleTouchStart = (e) => {
-      touchStart = e.changedTouches[0].screenY;
-    };
-
-    const handleTouchEnd = (e) => {
-      touchEnd = e.changedTouches[0].screenY;
-      handleSwipe();
-    };
-
-    const handleWheel = (e) => {
-      if (isThrottled) return;
-      isThrottled = true;
-
-      if (e.deltaY > 50 && currentIndex < allTemplates.length - 1) {
-        const nextIndex = currentIndex + 1;
-        setCurrentIndex(nextIndex);
-        setCurrentTemplate(allTemplates[nextIndex]);
-        navigate(`/card/${allTemplates[nextIndex].id}`, { replace: true });
-      } else if (e.deltaY < -50 && currentIndex > 0) {
-        const prevIndex = currentIndex - 1;
-        setCurrentIndex(prevIndex);
-        setCurrentTemplate(allTemplates[prevIndex]);
-        navigate(`/card/${allTemplates[prevIndex].id}`, { replace: true });
-      }
-
-      setTimeout(() => {
-        isThrottled = false;
-      }, 300); // Throttle interval
-    };
-
-    const handleSwipe = () => {
-      const swipeDistance = touchStart - touchEnd;
-      if (swipeDistance > 50 && currentIndex < allTemplates.length - 1) {
-        const nextIndex = currentIndex + 1;
-        setCurrentIndex(nextIndex);
-        setCurrentTemplate(allTemplates[nextIndex]);
-        navigate(`/card/${allTemplates[nextIndex].id}`, { replace: true });
-      } else if (swipeDistance < -50 && currentIndex > 0) {
-        const prevIndex = currentIndex - 1;
-        setCurrentIndex(prevIndex);
-        setCurrentTemplate(allTemplates[prevIndex]);
-        navigate(`/card/${allTemplates[prevIndex].id}`, { replace: true });
-      }
-    };
-
     if (container) {
-      container.addEventListener('wheel', handleWheel);
-      container.addEventListener('touchstart', handleTouchStart);
-      container.addEventListener('touchend', handleTouchEnd);
-
-      return () => {
-        container.removeEventListener('wheel', handleWheel);
-        container.removeEventListener('touchstart', handleTouchStart);
-        container.removeEventListener('touchend', handleTouchEnd);
-      };
+      container.addEventListener("wheel", handleScroll);
     }
-  }, [currentIndex, allTemplates, navigate]);
 
-  const handleBack = () => {
-    navigate('/');
-  };
+    return () => {
+      if (container) {
+        container.removeEventListener("wheel", handleScroll);
+      }
+    };
+  }, [currentIndex, allTemplates, navigate]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-pink-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading template...</p>
-        </div>
+      <div className="min-h-screen flex justify-center items-center">
+        <p>Loading templates...</p>
       </div>
     );
   }
 
-  if (error || !currentTemplate) {
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">{error}</p>
-          <button
-            onClick={handleBack}
-            className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
-          >
-            Back to Templates
-          </button>
-        </div>
+      <div className="min-h-screen flex justify-center items-center">
+        <p>{error}</p>
       </div>
     );
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="min-h-screen bg-gray-50 py-4 px-2 sm:py-6 sm:px-4 flex justify-center items-center"
+      className="min-h-screen flex justify-center items-center"
+      style={{ backgroundColor: "#f4f4f4" }}
     >
-      <div className="max-w-md mx-auto">
-        {/* <button     /// Navigated to home buttton working well need to give style only header k ander aa rha hai abhi
-          onClick={handleBack}
-          className="mb-4 px-3 py-1 text-sm text-pink-600 hover:text-pink-700 flex items-center"
-        >
-          ← Back to Templates
-        </button> */}
+      <div
+        className="image-container"
+        style={{
+          position: "relative",
+          width: "fit-content",
+          margin: "0 auto",
+        }}
+      >
+        {/* Base Template Image */}
+        <img
+          src={currentTemplate.images[0]?.template}
+          alt="Base Template"
+          style={{ position: "relative", zIndex: 1 }}
+        />
 
-        <div className="relative bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="relative">
-            <img
-              src={currentTemplate.images[0].template}
-              alt={`Wedding Template ${currentTemplate.id}`}
-              className="w-full h-auto"
-            />
+        {/* Overlay Images */}
+        {currentTemplate.images.map((image, index) => (
+          <img
+            key={index}
+            src={image.sample_image}
+            alt={image.name}
+            style={{
+              position: "absolute",
+              width: `${image.coordinates.width_in_px}px`,
+              height: `${image.coordinates.height_in_px}px`,
+              top: `${image.coordinates.top_in_px}px`,
+              left: `${image.coordinates.left_in_px}px`,
+              zIndex: 2,
+            }}
+          />
+        ))}
 
-            {/* Overlay Images */}
-            {currentTemplate.images.map((image, index) => (
-              <div
-                key={`image-${index}`}
-                className="absolute"
-                style={{
-                  width: `${image.coordinates.width_in_px}px`,
-                  height: `${image.coordinates.height_in_px}px`,
-                  top: `${image.coordinates.top_in_px}px`,
-                  left: `${image.coordinates.left_in_px}px`
-                }}
-              />
-            ))}
-
-            {/* Text Overlays */}
-            {currentTemplate.texts.map((text, index) => (
-              <div
-                key={`text-${index}`}
-                className="absolute"
-                style={{
-                  width: `${text.coordinates.width_in_px}px`,
-                  height: `${text.coordinates.height_in_px}px`,
-                  top: `${text.coordinates.top_in_px}px`,
-                  left: `${text.coordinates.left_in_px}px`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: `${text.text_configs.size}px`,
-                  color: text.text_configs.color,
-                  textAlign: text.text_configs.text_alignment.toLowerCase()
-                }}
-              >
-              
-              </div>
-            ))}
-            
+        {/* Overlay Texts */}
+        {currentTemplate.texts.map((text, index) => (
+          <div
+            key={index}
+            style={{
+              position: "absolute",
+              width: `${text.coordinates.width_in_px}px`,
+              height: `${text.coordinates.height_in_px}px`,
+              top: `${text.coordinates.top_in_px}px`,
+              left: `${text.coordinates.left_in_px}px`,
+              fontSize: `${text.text_configs.size}px`,
+              color: text.text_configs.color,
+              fontFamily: "CustomFont, Arial, sans-serif",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: text.text_configs.text_alignment.toLowerCase(),
+              zIndex: 3,
+            }}
+          >
+            {text.text_configs.sample_text}
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

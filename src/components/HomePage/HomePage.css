@@ -10,51 +10,93 @@ body {
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 600px;
+  margin: 16px auto;
   padding: 16px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
-  gap: 16px; /* Space between cards */
-}
-
-/* Card Styling */
-.card {
   background-color: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 8px rgba(245, 158, 178, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e91e63;
+}
+
+.header p {
+  font-size: 0.9rem;
+  color: #757575;
+}
+
+.template-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.card {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 12px;
   overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(245, 158, 178, 0.4);
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .card img {
   width: 100%;
-  height: auto;
+  height: 80px;
   object-fit: cover;
 }
 
 .card .overlay {
-  position: relative;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
   color: #fff;
-  padding: 16px;
-  font-size: 14px;
+  padding: 4px;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.retry-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.retry-button:hover {
+  background-color: #d81b60;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .container {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns for smaller screens */
+  .template-box {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .container {
-    grid-template-columns: 1fr; /* Single column for very small screens */
+  .template-box {
+    grid-template-columns: 1fr;
   }
 }
