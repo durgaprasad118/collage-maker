@@ -141,7 +141,6 @@ body {
   transform: translateY(-3px);
 }
 img, video {
-  max-width: 100%;
+  max-width: fit-content;
   height: auto;
-  padding-top: 110px;
 }

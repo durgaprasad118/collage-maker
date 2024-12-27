@@ -87,8 +87,6 @@ button:hover {
   background-color: #d946ef;
 }
 
-
-
 /* Add responsiveness with media queries */
 @media screen and (min-width: 768px) {
   .card {

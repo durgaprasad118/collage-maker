@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import './App.css';
 import Container from '../src/components/Container/Container';
-// Lazy load components for better performance
+
 const HomePage = React.lazy(() => import('./components/HomePage/HomePage'));
 const Card = React.lazy(() => import('./components/Card/Card'));
 
@@ -18,6 +18,7 @@ const LoadingFallback = () => (
 const App = () => {
   return (
     <Suspense fallback={<LoadingFallback />}>
+
       <Container />
     </Suspense>
   );

@@ -6,10 +6,10 @@ import InputSection from '../InputSection/InputSection';
 import './Container.css';
 
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="text-center">
-      <div className="w-16 h-16 border-4 border-pink-300 border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p className="text-gray-600">Loading...</p>
+  <div className="loading-container">
+    <div className="loading-content">
+      <div className="loading-spinner"></div>
+      <p className="loading-text">Loading...</p>
     </div>
   </div>
 );
@@ -34,8 +34,8 @@ function Container() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white relative">
-        <main className="pb-8 relative">
+      <div className="container-wrapper">
+        <main className="main-content">
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -44,14 +44,11 @@ function Container() {
               <Route
                 path="*"
                 element={
-                  <div className="min-h-screen flex items-center justify-center">
-                    <div className="text-center">
-                      <h1 className="text-2xl font-bold text-gray-800 mb-4">Page Not Found</h1>
-                      <p className="text-gray-600 mb-4">The page you're looking for doesn't exist.</p>
-                      <a
-                        href="/"
-                        className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
-                      >
+                  <div className="not-found-container">
+                    <div className="not-found-content">
+                      <h1 className="not-found-title">Page Not Found</h1>
+                      <p className="not-found-text">The page you're looking for doesn't exist.</p>
+                      <a href="/" className="not-found-button">
                         Go Home
                       </a>
                     </div>
@@ -62,13 +59,10 @@ function Container() {
           </Suspense>
 
           {/* Edit Button */}
-          <div className="fixed top-20 right-4 z-30">
-            <button
-              onClick={handleEditClick}
-              className="bg-white px-4 py-2 rounded-lg shadow-md text-pink-600 hover:text-pink-700 flex items-center gap-2 transition-all hover:shadow-lg"
-            >
-              <span className="text-lg">✏️</span>
-              <span>Edit Template</span>
+          <div className="edit-button-container">
+            <button onClick={handleEditClick} className="edit-button">
+              <span className="edit-icon">✏️</span>
+              <span>Edit</span>
             </button>
           </div>
 

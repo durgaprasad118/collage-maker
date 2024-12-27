@@ -4,9 +4,9 @@
   margin: 30px auto; /* Centers the section */
   padding: 20px; /* Inner spacing */
   padding-bottom: 50px; /* Additional padding at the bottom */
-  background: #ddd1d1; /* White background for contrast */
+  background: #FFFFFF; /* White background for contrast */
   border-radius: 12px; /* Rounded corners */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+
   font-family: 'Poppins', sans-serif; /* Consistent typography */
   position: relative; /* For positioning child elements like close button */
   box-sizing: border-box; /* Includes padding in width and height calculations */
@@ -18,7 +18,7 @@
 .close-button {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 25px;
   background: transparent;
   border: none;
   font-size: 34px;
@@ -85,7 +85,7 @@
 .form-input:focus {
   border-color: #ff69b4;
   background-color: #fff;
-  box-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
+  
 }
 
 /* Save Button */
