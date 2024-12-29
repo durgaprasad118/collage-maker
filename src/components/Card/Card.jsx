@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Edit2, X } from 'lucide-react';
+import './Card.css';
 
 const Card = () => {
   const { id } = useParams();
@@ -9,16 +11,21 @@ const Card = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const containerRef = useRef(null);
   const isScrolling = useRef(false);
   
-  // State for custom text inputs
   const [customText, setCustomText] = useState({
     wedding_groom_name: "",
     wedding_bride_name: "",
     wedding_date: "",
     wedding_time: "",
-    wedding_venue: ""
+    wedding_venue: "",
+  });
+
+  const [photos, setPhotos] = useState({
+    groom_photo: null,
+    bride_photo: null
   });
 
   useEffect(() => {
@@ -100,109 +107,49 @@ const Card = () => {
     }));
   };
 
+  const handlePhotoChange = (name, file) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotos(prev => ({
+          ...prev,
+          [name]: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   if (loading) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <p>Loading templates...</p>
-      </div>
-    );
+    return <div className="loading-screen">Loading templates...</div>;
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <p>{error}</p>
-      </div>
-    );
+    return <div className="error-screen">{error}</div>;
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row gap-8 p-8 bg-gray-100">
-      {/* Form Section */}
-      <div className="lg:w-1/3">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-6">Customize Wedding Card</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Groom's Name</label>
-              <input
-                type="text"
-                value={customText.wedding_groom_name}
-                onChange={(e) => handleInputChange("wedding_groom_name", e.target.value)}
-                placeholder="Enter groom's name"
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Bride's Name</label>
-              <input
-                type="text"
-                value={customText.wedding_bride_name}
-                onChange={(e) => handleInputChange("wedding_bride_name", e.target.value)}
-                placeholder="Enter bride's name"
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Wedding Date</label>
-              <input
-                type="text"
-                value={customText.wedding_date}
-                onChange={(e) => handleInputChange("wedding_date", e.target.value)}
-                placeholder="Enter wedding date"
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Wedding Time</label>
-              <input
-                type="text"
-                value={customText.wedding_time}
-                onChange={(e) => handleInputChange("wedding_time", e.target.value)}
-                placeholder="Enter wedding time"
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Venue</label>
-              <input
-                type="text"
-                value={customText.wedding_venue}
-                onChange={(e) => handleInputChange("wedding_venue", e.target.value)}
-                placeholder="Enter venue"
-                className="w-full p-2 border rounded-md"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="card-container">
+      <button className="edit-button" onClick={() => setIsEditModalOpen(true)}>
+        <Edit2 size={20} />
+        Edit
+      </button>
 
       {/* Template Display Section */}
-      <div 
-        ref={containerRef}
-        className="lg:w-2/3 flex justify-center items-center"
-        style={{ backgroundColor: "#f4f4f4" }}
-      >
-        <div
-          className="image-container"
-          style={{
-            position: "relative",
-            width: "fit-content",
-            margin: "0 auto",
-          }}
-        >
+      <div ref={containerRef} className="template-section">
+        <div className="template-container">
           {/* Base Template Image */}
           <img
             src={currentTemplate.images[0]?.template}
             alt="Base Template"
-            style={{ position: "relative", zIndex: 1 }}
+            className="base-template"
           />
 
           {/* Overlay Images */}
           {currentTemplate.images.map((image, index) => (
             <img
               key={index}
-              src={image.sample_image}
+              src={photos[image.name === "wedding_groom_image" ? "groom_photo" : "bride_photo"] || image.sample_image}
               alt={image.name}
               style={{
                 position: "absolute",
@@ -211,6 +158,7 @@ const Card = () => {
                 top: `${image.coordinates.top_in_px}px`,
                 left: `${image.coordinates.left_in_px}px`,
                 zIndex: 0,
+                objectFit: "cover"
               }}
             />
           ))}
@@ -219,20 +167,15 @@ const Card = () => {
           {currentTemplate.texts.map((text, index) => (
             <div
               key={index}
+              className="text-overlay"
               style={{
-                position: "absolute",
                 width: `${text.coordinates.width_in_px}px`,
                 height: `${text.coordinates.height_in_px}px`,
                 top: `${text.coordinates.top_in_px}px`,
                 left: `${text.coordinates.left_in_px}px`,
                 fontSize: `${text.text_configs.size}px`,
                 color: text.text_configs.color,
-                fontFamily: "CustomFont, Arial, sans-serif",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 textAlign: text.text_configs.text_alignment.toLowerCase(),
-                zIndex: 3,
               }}
             >
               {customText[text.name] || text.text_configs.sample_text}
@@ -240,6 +183,110 @@ const Card = () => {
           ))}
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Edit Wedding Card Details</h2>
+              <button className="close-button" onClick={() => setIsEditModalOpen(false)}>
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="photo-inputs">
+                <div className="photo-input">
+                  <label>Groom's Photo</label>
+                  <div className="photo-upload">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handlePhotoChange("groom_photo", e.target.files[0])}
+                    />
+                    {photos.groom_photo && (
+                      <img src={photos.groom_photo} alt="Groom preview" className="photo-preview" />
+                    )}
+                  </div>
+                </div>
+
+                <div className="photo-input">
+                  <label>Bride's Photo</label>
+                  <div className="photo-upload">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handlePhotoChange("bride_photo", e.target.files[0])}
+                    />
+                    {photos.bride_photo && (
+                      <img src={photos.bride_photo} alt="Bride preview" className="photo-preview" />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-inputs">
+                <div className="input-group">
+                  <label>Groom's Name</label>
+                  <input
+                    type="text"
+                    value={customText.wedding_groom_name}
+                    onChange={(e) => handleInputChange("wedding_groom_name", e.target.value)}
+                    placeholder="Enter groom's name"
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label>Bride's Name</label>
+                  <input
+                    type="text"
+                    value={customText.wedding_bride_name}
+                    onChange={(e) => handleInputChange("wedding_bride_name", e.target.value)}
+                    placeholder="Enter bride's name"
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label>Wedding Date</label>
+                  <input
+                    type="date"
+                    value={customText.wedding_date}
+                    onChange={(e) => handleInputChange("wedding_date", e.target.value)}
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label>Wedding Time</label>
+                  <input
+                    type="time"
+                    value={customText.wedding_time}
+                    onChange={(e) => handleInputChange("wedding_time", e.target.value)}
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label>Venue</label>
+                  <textarea
+                    value={customText.wedding_venue}
+                    onChange={(e) => handleInputChange("wedding_venue", e.target.value)}
+                    placeholder="Enter venue details"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button 
+                className="save-button"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,7 +2,6 @@ import React, { Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from '../HomePage/HomePage';
 import Card from '../Card/Card';
-import InputSection from '../InputSection/InputSection';
 import './Container.css';
 
 const LoadingFallback = () => (
@@ -21,17 +20,6 @@ const RedirectToCard = () => {
 };
 
 function Container() {
-  const [isInputSectionOpen, setIsInputSectionOpen] = useState(false);
-
-  const handleEditClick = (e) => {
-    e.stopPropagation();
-    setIsInputSectionOpen(true);
-  };
-
-  const handleCloseInputSection = () => {
-    setIsInputSectionOpen(false);
-  };
-
   return (
     <Router>
       <div className="container-wrapper">
@@ -57,24 +45,6 @@ function Container() {
               />
             </Routes>
           </Suspense>
-
-          {/* Edit Button */}
-          <div className="edit-button-container">
-            <button onClick={handleEditClick} className="edit-button">
-              <span className="edit-icon">✏️</span>
-              <span>Edit</span>
-            </button>
-          </div>
-
-          {/* Modal */}
-          {isInputSectionOpen && (
-            <div className="modal-wrapper">
-              <div className="modal-backdrop" onClick={handleCloseInputSection} />
-              <div className="modal-container">
-                <InputSection onClose={handleCloseInputSection} />
-              </div>
-            </div>
-          )}
         </main>
       </div>
     </Router>

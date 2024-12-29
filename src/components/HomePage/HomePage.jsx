@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../Header/Header';
 import './HomePage.css';
+import Header from '../Header/Header'
 
 const HomePage = () => {
-  const [currentTemplates, setCurrentTemplates] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const sliderRef = useRef(null);
 
   const navigate = useNavigate();
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
 
   useEffect(() => {
     const fetchAndSetTemplates = async () => {
@@ -21,15 +30,14 @@ const HomePage = () => {
         }
 
         const data = await response.json();
-        const templates = Object.entries(data).map(([id, details]) => ({
+        let templates = Object.entries(data).map(([id, details]) => ({
           id: id,
           numericId: id.replace('id_', ''),
           ...details,
         }));
 
-        const shuffled = templates.sort(() => 0.5 - Math.random());
-        const numTemplates = window.innerWidth < 768 ? 2 : 3;
-        setCurrentTemplates(shuffled.slice(0, numTemplates));
+        templates = shuffleArray(templates); // Shuffle the templates for randomness
+        setTemplates(templates);
         setError(null);
       } catch (err) {
         console.error('Fetch error:', err);
@@ -48,13 +56,16 @@ const HomePage = () => {
   }, [retryCount]);
 
   const handleTemplateSelect = (templateId) => {
-    const numericId = templateId.replace('id_', '');
-    navigate(`/card/${numericId}`);
+    navigate(`/card/${templateId.replace('id_', '')}`);
   };
 
   const handleRetry = () => {
     setRetryCount(0);
     setError(null);
+  };
+
+  const handleViewAllClick = () => {
+    navigate('/TemplateLibrary');
   };
 
   if (loading) {
@@ -70,7 +81,9 @@ const HomePage = () => {
     return (
       <div className="error-container">
         <p className="error-text">{error}</p>
-        <button onClick={handleRetry} className="retry-button">Try Again</button>
+        <button onClick={handleRetry} className="retry-button">
+          Try Again
+        </button>
       </div>
     );
   }
@@ -79,34 +92,37 @@ const HomePage = () => {
     <>
     <Header/>
     <div className="homepage-container">
-      <header className="homepage-header">
-        <h1 className="homepage-title">Wedding Cards</h1>
-      </header>
-      <div className="template-gallery" style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center', padding: '16px' }}>
-        {currentTemplates.map((template) => (
-          <div
-            key={template.id}
-            className="template-card"
-            onClick={() => handleTemplateSelect(template.id)}
-            style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', background: '#fff', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', flex: '1', maxWidth: '300px' }}
-          >
-            <div className="template-image-wrapper" style={{ width: '100%', height: 'auto', aspectRatio: '3 / 4', overflow: 'hidden' }}>
+      <section className="section-title">
+        <h2 className="wedding-title">Wedding Cards</h2>
+        <button className="view-all-btn" onClick={handleViewAllClick}>
+          View All
+        </button>
+      </section>
+      <div className="template-gallery-container">
+        <div className="template-gallery" ref={sliderRef}>
+          {templates.map((template) => (
+            <div
+              key={template.id}
+              className="template-card"
+              onClick={() => handleTemplateSelect(template.id)}
+            >
               <img
-                src={template.images[0].thumbnail}
+                src={
+                  template?.images?.[0]?.thumbnail || '/placeholder-image.jpg'
+                }
                 alt={`Wedding Template ${template.numericId}`}
                 className="template-image"
-                style={{ objectFit: 'contain', width: '100%', height: '100%' }}
                 onError={(e) => {
                   e.target.src = '/placeholder-image.jpg';
                 }}
               />
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
     </>
-    );
+  );
 };
 
 export default HomePage;
