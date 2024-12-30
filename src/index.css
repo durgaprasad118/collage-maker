@@ -118,6 +118,21 @@ body {
   transition: border-color 0.3s ease-in-out;
 }
 
+  element.style {
+    position: absolute;
+    width: 184px;
+    height: 50px;
+    top: 699px;
+    left: 302px;
+    font-size: 30px;
+    color: rgb(239, 239, 239);
+    text-align: center;
+    z-index: 9;
+}
+.text-overlay{
+  z-index: 99;
+}
+
 .input-group input:focus {
   border-color: #ec4899;
   outline: none;
@@ -143,4 +158,5 @@ body {
 img, video {
   max-width: fit-content;
   height: auto;
+  position: relative;
 }

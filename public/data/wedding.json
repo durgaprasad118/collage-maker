@@ -43,8 +43,8 @@
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "color": "#57041E",
+            "sample_text": "Manikanta"
           },
           "coordinates": {
             "width_in_px": 234,
@@ -65,8 +65,8 @@
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "color": "#57041E",
+            "sample_text": "Pranaya"
           },
           "coordinates": {
             "width_in_px": 234,
@@ -87,8 +87,8 @@
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "color": "#57041E",
+            "sample_text": ""
           },
           "coordinates": {
             "width_in_px": 233,
@@ -109,8 +109,8 @@
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Time 1 !!!"
+            "color": "#57041E",
+            "sample_text": "24th March 2024, 10:30 AM"
           },
           "coordinates": {
             "width_in_px": 233,
@@ -128,11 +128,11 @@
           "text_configs": {
             "font_id": "adumu.otf",
             "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "size": 20,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "Third floor, Ravi chambers, Kavuri Hills, Madhapur."
           },
           "coordinates": {
             "width_in_px": 233,
@@ -472,8 +472,8 @@
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "color": "#ffffff",
+            "sample_text": "vishwa nath"
           },
           "coordinates": {
             "width_in_px": 184,
@@ -495,7 +495,7 @@
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "deepika"
           },
           "coordinates": {
             "width_in_px": 184,
@@ -512,12 +512,12 @@
           "name": "wedding_date",
           "text_configs": {
             "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
-            "char_limit": 30,
-            "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/roboto.otf",
+            "size": 20,
+            "char_limit": 10,
+            "text_alignment": "right",
+            "color": "#33ff6e",
+            "sample_text": "20-01-2025"
           },
           "coordinates": {
             "width_in_px": 276,
@@ -538,8 +538,8 @@
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "color": "#5deefd",
+            "sample_text": "23:00"
           },
           "coordinates": {
             "width_in_px": 276,
@@ -559,9 +559,9 @@
             "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
             "size": 30,
             "char_limit": 30,
-            "text_alignment": "CENTER",
-            "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "text_alignment": "LEFT",
+            "color": "#ffffff",
+            "sample_text": "kavuri hills madhapur"
           },
           "coordinates": {
             "width_in_px": 276,

@@ -2,14 +2,24 @@
 
 :root {
   --gradient-primary: linear-gradient(135deg, #ff7eb3, #6a11cb, #2575fc);
-  --text-color-light: #FFFFFF;
+  --text-color-light: #91171700;
+}
+
+
+/* Header content container */
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Full-Width Fixed Header */
 .header {
-  background: var(--gradient-primary);
-  color: white;
-  padding: 10px 0;
+  background: linear-gradient(to bottom, rgba(15, 23, 37, 0.5), #0F1725);
+  color: #9CCC65;
+  padding: 5px 0; /* Reduced padding for smaller height */
   text-align: center;
   width: 100%;
   position: fixed;
@@ -25,42 +35,35 @@
   transition: all 0.3s ease;
 }
 
-/* Header content container */
-.header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  position: relative;
-  z-index: 1;
-}
-
 /* Header title styling */
 .header-title {
-  font-family: 'Dancing Script', cursive;
-  font-size: 3rem; /* Increased size for cursive font */
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem; /* Reduced font size */
   font-weight: 700;
   margin: 0;
-  text-transform: capitalize; /* Less aggressive than uppercase */
+  text-transform: capitalize;
   letter-spacing: 2px;
   text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
   animation: 
     titleGlow 3s infinite alternate,
     titleFloating 2s ease-in-out infinite alternate;
-  background: linear-gradient(90deg, #ffffff, #f0f0f0);
+  background: #9CCC65;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 /* Header subtitle styling */
 .header-subtitle {
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.5rem; /* Increased size for readability */
-  margin-top: 5px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.2rem; /* Reduced size */
+  margin-top: 3px;
   opacity: 0.9;
   animation: subtitleWave 2s infinite ease-in-out;
-  color: #fff;
+  color: #9CCC65;
   letter-spacing: 1px;
 }
+
+
 
 /* Animations */
 @keyframes headerSlideDown {
@@ -72,14 +75,7 @@
   }
 }
 
-@keyframes titleGlow {
-  0% {
-    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3), 0 0 8px #ff7eb3, 0 0 16px #ff7eb3;
-  }
-  100% {
-    text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3), 0 0 16px #6a11cb, 0 0 24px #2575fc;
-  }
-}
+
 
 @keyframes titleFloating {
   0% {

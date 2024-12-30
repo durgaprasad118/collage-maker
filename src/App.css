@@ -55,12 +55,15 @@
 .min-h-screen {
   min-height: 100vh;
 }
+img.base-template {
+  z-index: 50;
+}
 
 /* Button Styling */
 button {
   cursor: pointer;
   transition: all 0.3s ease;
-  color: white;
+  color:#9CCC65;
 }
 
 button:hover {
@@ -93,6 +96,7 @@ button:hover {
   .card {
     max-width: 70%; /* Slightly larger on tablets */
     padding: 20px;
+    
   }
   .card-title {
     font-size: 2rem; /* Larger text for tablets */
@@ -100,6 +104,7 @@ button:hover {
   .card-text {
     font-size: 1.2rem;
   }
+  
 }
 
 @media screen and (min-width: 1024px) {

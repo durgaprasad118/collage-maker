@@ -1,8 +1,8 @@
 /* General Styling */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background:#212122;
+  font-family: 'Poppins', sans-serif;;
+  background:#0F1725;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -18,9 +18,9 @@ body {
   text-align: center;
   font-size: 2rem;
   font-weight: bold;
-  color: white;
+  color: #9CCC65;
   margin-bottom: 30px;
-  font-family: cursive;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Template Grid */
@@ -91,6 +91,7 @@ body {
 @media (max-width: 768px) {
   .template-library h1 {
     font-size: 1.8rem;
+    font-family: 'Poppins', sans-serif;
   }
 
   .template-grid {
@@ -110,8 +111,8 @@ body {
 @media (max-width: 480px) {
   .template-library h1 {
     font-size: 1.6rem;
-    color: white;
-    font-family: cursive;
+    color: #9CCC65;
+    font-family: 'Poppins', sans-serif;
   }
 
   .template-grid {

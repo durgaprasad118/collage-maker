@@ -51,7 +51,7 @@ header nav a:hover {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  padding-top: 135px; /* To ensure content starts below the fixed header */
+  padding-top: 8px; /* To ensure content starts below the fixed header */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -74,8 +74,9 @@ header nav a:hover {
 }
 
 .view-all-btn {
-  background-color: #e91e63;
-  color: white;
+  display: flex;
+  align-items: center;
+  color: #9CCC65;
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -83,16 +84,13 @@ header nav a:hover {
   transition: background-color 0.3s ease;
 }
 
-.view-all-btn:hover {
-  background-color: #d81b60;
-}
+
 
 /* Template Gallery Container */
 .template-gallery-container {
   width: 100%;
   overflow-x: auto;
   display: flex;
-  padding: 10px 0;
 }
 
 .template-gallery {

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
+import { SlArrowRight } from "react-icons/sl";
+
 import Header from '../Header/Header'
 
 const HomePage = () => {
@@ -90,14 +92,15 @@ const HomePage = () => {
 
   return (
     <>
-    <Header/>
+ 
     <div className="homepage-container">
-      <section className="section-title">
-        <h2 className="wedding-title">Wedding Cards</h2>
-        <button className="view-all-btn" onClick={handleViewAllClick}>
-          View All
-        </button>
-      </section>
+    <section className="section-title">
+     <h2 className="wedding-title">Wedding Cards</h2>
+      <button className="view-all-btn"onClick={handleViewAllClick}>
+         view all<SlArrowRight className="arrow-icon" />
+     </button>
+    </section>
+
       <div className="template-gallery-container">
         <div className="template-gallery" ref={sliderRef}>
           {templates.map((template) => (
