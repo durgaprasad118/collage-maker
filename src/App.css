@@ -1,7 +1,9 @@
 .App {
   text-align: center;
 }
-
+body{
+  background-color: #0F1725;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -98,8 +100,13 @@ button:hover {
     padding: 20px;
     
   }
+  .template-content {
+    transform: scale(0.8);
+  }
+
   .card-title {
     font-size: 2rem; /* Larger text for tablets */
+    
   }
   .card-text {
     font-size: 1.2rem;

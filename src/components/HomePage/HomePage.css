@@ -1,7 +1,7 @@
 /* General Styling */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'poppins', sans-serif;
   background: #212121;
   min-height: 100vh;
   overflow-x: hidden;
@@ -29,22 +29,6 @@ header h1 {
   margin: 0;
 }
 
-header nav {
-  display: flex;
-  gap: 15px;
-}
-
-header nav a {
-  text-decoration: none;
-  color: #e91e63;
-  font-weight: bold;
-  transition: color 0.3s ease;
-}
-
-header nav a:hover {
-  color: #d81b60;
-}
-
 /* Homepage Container */
 .homepage-container {
   width: 100%;
@@ -59,7 +43,7 @@ header nav a:hover {
 
 /* Section Title */
 .section-title {
-  font-family: cursive;
+  font-family: "Poppins", sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -69,12 +53,14 @@ header nav a:hover {
 
 .wedding-title {
   font-size: 1.8rem;
+  font-family: "Poppins", sans-serif;
   font-weight: bold;
   color:white;
 }
 
 .view-all-btn {
   display: flex;
+  font-family: "Poppins", sans-serif;
   align-items: center;
   color: #9CCC65;
   padding: 8px 16px;
@@ -147,7 +133,7 @@ header nav a:hover {
 }
 
 .bg-gradient-to-b {
-  background: linear-gradient(to bottom, #f6d365, #fda085);
+  background: #212121;
 }
 
 .text-center {
@@ -267,6 +253,7 @@ header nav a:hover {
   .wedding-title {
     font-size: 1.4rem;
     color: white;
+    font-family: "Poppins", sans-serif;
   }
 
   .template-card {

@@ -559,7 +559,7 @@
             "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
             "size": 30,
             "char_limit": 30,
-            "text_alignment": "LEFT",
+            "text_alignment": "CENTER",
             "color": "#ffffff",
             "sample_text": "kavuri hills madhapur"
           },
@@ -572,6 +572,450 @@
             "height": 5.21,
             "top": 88.86,
             "left": 50.92
+          }
+        }
+      ]
+    },
+    "id_5": {
+      "images": [
+        {
+          "thumbnail": "/Wedding-Templates/templetes-thumbnail/5.jpeg",
+          "template": "/Wedding-Templates/templetes/5.png",
+          "name": "wedding_groom_image",
+          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "coordinates": {
+            "width_in_px": 290,
+            "height_in_px": 216,
+            "top_in_px": 364,
+            "left_in_px": 127,
+            "width": 43.89,
+            "height": 20.83,
+            "top": 32.19,
+            "left": 26.75,
+            "type": "box"
+          }
+        },
+        {
+          "name": "wedding_bride_image",
+          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "coordinates": {
+            "width_in_px": 290,
+            "height_in_px": 216,
+            "top_in_px": 12,
+            "left_in_px": 12,
+            "width": 43.89,
+            "height": 20.83,
+            "top": 32.39,
+            "left": 74.35,
+            "type": "box"
+          }
+        }
+      ],
+      "texts": [
+        {
+          "name": "wedding_groom_name",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#c74251",
+            "sample_text": "Raj"
+          },
+          "coordinates": {
+            "width_in_px": 96,
+            "height_in_px": 42,
+            "top_in_px": 607,
+            "left_in_px": 124,
+            "width": 41.11,
+            "height": 5.21,
+            "top": 47.08,
+            "left": 24.25
+          }
+        },
+        {
+          "name": "wedding_bride_name",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#c74251",
+            "sample_text": "Vaishu"
+          },
+          "coordinates": {
+            "width_in_px": 140,
+            "height_in_px": 42,
+            "top_in_px": 609,
+            "left_in_px": 280,
+            "width": 41.11,
+            "height": 5.21,
+            "top": 46.77,
+            "left": 75.56
+          }
+        },
+        {
+          "name": "wedding_date",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#4c3826",
+            "sample_text": "20-01-2025"
+          },
+          "coordinates": {
+            "width_in_px": 245,
+            "height_in_px": 52,
+            "top_in_px": 664,
+            "left_in_px": 158,
+            "width": 32.96,
+            "height": 5.21,
+            "top": 72.92,
+            "left": 50
+          }
+        },
+        {
+          "name": "wedding_time",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 22,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#4c3826",
+            "sample_text": "23:00"
+          },
+          "coordinates": {
+            "width_in_px": 216,
+            "height_in_px": 45,
+            "top_in_px": 705,
+            "left_in_px": 170,
+            "width": 60,
+            "height": 5.21,
+            "top": 81.98,
+            "left": 50.74
+          }
+        },
+        {
+          "name": "wedding_venue",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 25,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#4c3826",
+            "sample_text": "kavuri hills madhapur"
+          },
+          "coordinates": {
+            "width_in_px": 183,
+            "height_in_px": 51,
+            "top_in_px": 794,
+            "left_in_px": 164,
+            "width": 60,
+            "height": 5.21,
+            "top": 92.61,
+            "left": 51.3
+          }
+        }
+      ]
+    }, 
+    "id_6": {
+      "images": [
+        {
+          "thumbnail": "/Wedding-Templates/templetes-thumbnail/6.jpeg",
+          "template": "/Wedding-Templates/templetes/6.png",
+          "name": "wedding_groom_image",
+          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "coordinates": {
+            "width_in_px": 182,
+            "height_in_px": 183,
+            "top_in_px": 444,
+            "left_in_px": 86,
+            "width": 43.89,
+            "height": 20.83,
+            "top": 32.19,
+            "left": 26.75,
+            "type": "box"
+          }
+        },
+        {
+          "name": "wedding_bride_image",
+          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "coordinates": {
+            "width_in_px": 179,
+            "height_in_px": 181,
+            "top_in_px": 444,
+            "left_in_px": 286,
+            "width": 43.89,
+            "height": 20.83,
+            "top": 32.39,
+            "left": 74.35,
+            "type": "box"
+          }
+        }
+      ],
+      "texts": [
+        {
+          "name": "wedding_groom_name",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#ffffff",
+            "sample_text": "Venkat"
+          },
+          "coordinates": {
+            "width_in_px": 266,
+            "height_in_px": 74,
+            "top_in_px": 632,
+            "left_in_px": 10,
+            "width": 41.11,
+            "height": 5.21,
+            "top": 47.08,
+            "left": 24.25
+          }
+        },
+        {
+          "name": "wedding_bride_name",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "Start",
+            "color": "#ffffff",
+            "sample_text": "Priya"
+          },
+          "coordinates": {
+            "width_in_px": 223,
+            "height_in_px": 47,
+            "top_in_px": 650,
+            "left_in_px": 270,
+            "width": 41.11,
+            "height": 5.21,
+            "top": 46.77,
+            "left": 75.56
+          }
+        },
+        {
+          "name": "wedding_date",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#ffffff",
+            "sample_text": "Hi Brochiller!!!"
+          },
+          "coordinates": {
+            "width_in_px": 335,
+            "height_in_px": 37,
+            "top_in_px": 753,
+            "left_in_px": 120,
+            "width": 32.96,
+            "height": 5.21,
+            "top": 72.92,
+            "left": 50
+          }
+        },
+        {
+          "name": "wedding_time",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#ffffff",
+            "sample_text": "23:00"
+          },
+          "coordinates": {
+            "width_in_px": 311,
+            "height_in_px": 28,
+            "top_in_px": 784,
+            "left_in_px": 129,
+            "width": 60,
+            "height": 5.21,
+            "top": 81.98,
+            "left": 50.74
+          }
+        },
+        {
+          "name": "wedding_venue",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#ffffff",
+            "sample_text": "kavuri hills madhapur"
+          },
+          "coordinates": {
+            "width_in_px": 364,
+            "height_in_px": 75,
+            "top_in_px": 857,
+            "left_in_px": 102,
+            "width": 60,
+            "height": 5.21,
+            "top": 92.61,
+            "left": 51.3
+          }
+        }
+      ]
+    },
+    "id_7": {
+      "images": [
+        {
+          "thumbnail": "/Wedding-Templates/templetes-thumbnail/7.jpeg",
+          "template": "/Wedding-Templates/templetes/7.png",
+          "name": "wedding_groom_image",
+          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "coordinates": {
+            "width_in_px": 170,
+            "height_in_px": 340,
+            "top_in_px": 186,
+            "left_in_px": 92,
+            "width": 43.89,
+            "height": 20.83,
+            "top": 32.19,
+            "left": 26.75,
+            "type": "box"
+          }
+        },
+        {
+          "name": "wedding_bride_image",
+          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "coordinates": {
+            "width_in_px": 173,
+            "height_in_px": 338,
+            "top_in_px": 186,
+            "left_in_px": 290,
+            "width": 43.89,
+            "height": 20.83,
+            "top": 32.39,
+            "left": 74.35,
+            "type": "box"
+          }
+        }
+      ],
+      "texts": [
+        {
+          "name": "wedding_groom_name",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#d0203c",
+            "sample_text": "Sureshwasham"
+          },
+          "coordinates": {
+            "width_in_px": 307,
+            "height_in_px": 74,
+            "top_in_px": 540,
+            "left_in_px": 163,
+            "width": 41.11,
+            "height": 5.21,
+            "top": 47.08,
+            "left": 24.25
+          }
+        },
+        {
+          "name": "wedding_bride_name",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#d0203c",
+            "sample_text": "Savanthi"
+          },
+          "coordinates": {
+            "width_in_px": 288,
+            "height_in_px": 60,
+            "top_in_px": 660,
+            "left_in_px": 148,
+            "width": 41.11,
+            "height": 5.21,
+            "top": 46.77,
+            "left": 75.56
+          }
+        },
+        {
+          "name": "wedding_date",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#5e450b",
+            "sample_text": "20-01-2025"
+          },
+          "coordinates": {
+            "width_in_px": 269,
+            "height_in_px": 32,
+            "top_in_px": 780,
+            "left_in_px": 141,
+            "width": 32.96,
+            "height": 5.21,
+            "top": 72.92,
+            "left": 50
+          }
+        },
+        {
+          "name": "wedding_time",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 30,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#5e450b",
+            "sample_text": "23:00"
+          },
+          "coordinates": {
+            "width_in_px": 248,
+            "height_in_px": 26,
+            "top_in_px": 811,
+            "left_in_px": 150,
+            "width": 60,
+            "height": 5.21,
+            "top": 81.98,
+            "left": 50.74
+          }
+        },
+        {
+          "name": "wedding_venue",
+          "text_configs": {
+            "font_id": "adumu.otf",
+            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "size": 25,
+            "char_limit": 30,
+            "text_alignment": "CENTER",
+            "color": "#5e450b",
+            "sample_text": "kavuri hills madhapur"
+          },
+          "coordinates": {
+            "width_in_px": 279,
+            "height_in_px": 70,
+            "top_in_px": 876,
+            "left_in_px": 132,
+            "width": 60,
+            "height": 5.21,
+            "top": 92.61,
+            "left": 51.3
           }
         }
       ]

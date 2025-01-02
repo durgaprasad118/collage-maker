@@ -1,7 +1,14 @@
+// Card.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Edit2, X } from 'lucide-react';
-import './Card.css';
+import { Edit2, X, Download, Share2 } from "lucide-react";
+import html2canvas from "html2canvas";
+import "./Card.css";
+
+// Import SVG icons
+import shareIcon from "../../assets/icons/Share_Icon.svg";
+import downloadIcon from "../../assets/icons/Download_Icon.svg";
+import editIcon from "../../assets/icons/Edit_Icon.svg";
 
 const Card = () => {
   const { id } = useParams();
@@ -17,6 +24,10 @@ const Card = () => {
   const [slideDirection, setSlideDirection] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const prevTemplateRef = useRef(null);
+  const goToHomePage = () => {
+    navigate("/"); // Navigates to the home page
+  };
+  
 
   const [customText, setCustomText] = useState({
     wedding_groom_name: "",
@@ -30,6 +41,24 @@ const Card = () => {
     groom_photo: null,
     bride_photo: null,
   });
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "Wedding Card",
+          text: "Check out this wedding card!",
+          url: window.location.href,
+        });
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        const url = window.location.href;
+        await navigator.clipboard.writeText(url);
+        alert("Link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
 
   useEffect(() => {
     const metaTag = document.querySelector("meta[name='viewport']");
@@ -59,14 +88,17 @@ const Card = () => {
     const fetchTemplateData = async () => {
       try {
         const response = await fetch("/data/wedding.json");
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         const templates = Object.keys(data).map((key) => ({
           id: key,
           ...data[key],
         }));
 
-        const startIndex = templates.findIndex((template) => template.id === `id_${id}`);
+        const startIndex = templates.findIndex(
+          (template) => template.id === `id_${id}`
+        );
         if (startIndex === -1) throw new Error("Template not found.");
 
         setAllTemplates(templates);
@@ -86,13 +118,13 @@ const Card = () => {
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     if (isScrolling.current || isAnimating) return;
 
     if (deltaY > 0 && currentIndex < allTemplates.length - 1) {
       isScrolling.current = true;
       setIsAnimating(true);
-      setSlideDirection('up');
+      setSlideDirection("up");
       prevTemplateRef.current = currentTemplate;
 
       setTimeout(() => {
@@ -100,17 +132,17 @@ const Card = () => {
         setCurrentIndex(nextIndex);
         setCurrentTemplate(allTemplates[nextIndex]);
         navigate(`/card/${nextIndex + 1}`, { replace: true });
-      }, 350);
+      }, 100);
 
       setTimeout(() => {
         setSlideDirection(null);
         setIsAnimating(false);
         isScrolling.current = false;
-      }, 700);
+      }, 1000);
     } else if (deltaY < 0 && currentIndex > 0) {
       isScrolling.current = true;
       setIsAnimating(true);
-      setSlideDirection('down');
+      setSlideDirection("down");
       prevTemplateRef.current = currentTemplate;
 
       setTimeout(() => {
@@ -118,13 +150,13 @@ const Card = () => {
         setCurrentIndex(prevIndex);
         setCurrentTemplate(allTemplates[prevIndex]);
         navigate(`/card/${prevIndex + 1}`, { replace: true });
-      }, 350);
+      }, 100);
 
       setTimeout(() => {
         setSlideDirection(null);
         setIsAnimating(false);
         isScrolling.current = false;
-      }, 700);
+      }, 1000);
     }
   };
 
@@ -147,8 +179,12 @@ const Card = () => {
     const container = containerRef.current;
     if (container) {
       container.addEventListener("wheel", handleWheel, { passive: false });
-      container.addEventListener("touchstart", handleTouchStart, { passive: false });
-      container.addEventListener("touchmove", handleTouchMove, { passive: false });
+      container.addEventListener("touchstart", handleTouchStart, {
+        passive: false,
+      });
+      container.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
     }
 
     return () => {
@@ -180,6 +216,55 @@ const Card = () => {
     }
   };
 
+  const handleDownload = async () => {
+    const templateContent = document.querySelector(".template-content");
+    if (!templateContent) return;
+
+    try {
+      // Wait for images to load
+      const images = templateContent.getElementsByTagName("img");
+      await Promise.all(
+        [...images].map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+
+      // Create canvas with proper settings
+      const canvas = await html2canvas(templateContent, {
+        useCORS: true,
+        allowTaint: true,
+        scrollY: -window.scrollY,
+        scrollX: -window.scrollX,
+        scale: window.devicePixelRatio,
+        logging: false,
+        backgroundColor: null,
+        onclone: (clonedDoc) => {
+          const clonedTemplate = clonedDoc.querySelector(".template-content");
+          if (clonedTemplate) {
+            clonedTemplate.style.opacity = "1";
+            clonedTemplate.style.transform = "none";
+          }
+        },
+      });
+
+      // Convert and download
+      const image = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = `wedding-card-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert("Failed to download the image. Please try again.");
+    }
+  };
+
   const renderTemplateContent = (template) => (
     <div className="template-content">
       <img
@@ -191,8 +276,11 @@ const Card = () => {
         <img
           key={index}
           src={
-            photos[image.name === "wedding_groom_image" ? "groom_photo" : "bride_photo"] ||
-            image.sample_image
+            photos[
+              image.name === "wedding_groom_image"
+                ? "groom_photo"
+                : "bride_photo"
+            ] || image.sample_image
           }
           alt={image.name}
           style={{
@@ -232,18 +320,27 @@ const Card = () => {
   }
 
   return (
-    <div className="main-container">
+    <div className={`main-container ${isEditModalOpen ? "modal-open" : ""}`}>
       <div ref={containerRef} className="template-wrapper">
         {isAnimating && prevTemplateRef.current && (
-          <div className={`template-positioning ${slideDirection === 'up' ? 'slide-up-exit' : 'slide-down-exit'}`}>
+          <div
+            className={`template-positioning ${
+              slideDirection === "up" ? "slide-up-exit" : "slide-down-exit"
+            }`}
+          >
             {renderTemplateContent(prevTemplateRef.current)}
           </div>
         )}
-        
-        <div className={`template-positioning ${
-          slideDirection === 'up' ? 'slide-up-enter' : 
-          slideDirection === 'down' ? 'slide-down-enter' : ''
-        }`}>
+
+        <div
+          className={`template-positioning ${
+            slideDirection === "up"
+              ? "slide-up-enter"
+              : slideDirection === "down"
+              ? "slide-down-enter"
+              : ""
+          }`}
+        >
           {renderTemplateContent(currentTemplate)}
         </div>
       </div>
@@ -253,7 +350,10 @@ const Card = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Edit Wedding Card Details</h2>
-              <button className="close-button" onClick={() => setIsEditModalOpen(false)}>
+              <button
+                className="close-button"
+                onClick={() => setIsEditModalOpen(false)}
+              >
                 <X size={24} />
               </button>
             </div>
@@ -266,7 +366,9 @@ const Card = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => handlePhotoChange("groom_photo", e.target.files[0])}
+                      onChange={(e) =>
+                        handlePhotoChange("groom_photo", e.target.files[0])
+                      }
                     />
                     {photos.groom_photo && (
                       <img
@@ -284,7 +386,9 @@ const Card = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => handlePhotoChange("bride_photo", e.target.files[0])}
+                      onChange={(e) =>
+                        handlePhotoChange("bride_photo", e.target.files[0])
+                      }
                     />
                     {photos.bride_photo && (
                       <img
@@ -303,7 +407,9 @@ const Card = () => {
                   <input
                     type="text"
                     value={customText.wedding_groom_name}
-                    onChange={(e) => handleInputChange("wedding_groom_name", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("wedding_groom_name", e.target.value)
+                    }
                     placeholder="Enter groom's name"
                   />
                 </div>
@@ -313,7 +419,9 @@ const Card = () => {
                   <input
                     type="text"
                     value={customText.wedding_bride_name}
-                    onChange={(e) => handleInputChange("wedding_bride_name", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("wedding_bride_name", e.target.value)
+                    }
                     placeholder="Enter bride's name"
                   />
                 </div>
@@ -323,7 +431,9 @@ const Card = () => {
                   <input
                     type="date"
                     value={customText.wedding_date}
-                    onChange={(e) => handleInputChange("wedding_date", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("wedding_date", e.target.value)
+                    }
                   />
                 </div>
 
@@ -332,7 +442,9 @@ const Card = () => {
                   <input
                     type="time"
                     value={customText.wedding_time}
-                    onChange={(e) => handleInputChange("wedding_time", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("wedding_time", e.target.value)
+                    }
                   />
                 </div>
 
@@ -340,7 +452,9 @@ const Card = () => {
                   <label>Venue</label>
                   <textarea
                     value={customText.wedding_venue}
-                    onChange={(e) => handleInputChange("wedding_venue", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("wedding_venue", e.target.value)
+                    }
                     placeholder="Enter venue details"
                   />
                 </div>
@@ -348,7 +462,10 @@ const Card = () => {
             </div>
 
             <div className="modal-footer">
-              <button className="save-button" onClick={() => setIsEditModalOpen(false)}>
+              <button
+                className="save-button"
+                onClick={() => setIsEditModalOpen(false)}
+              >
                 Save Changes
               </button>
             </div>
@@ -356,10 +473,23 @@ const Card = () => {
         </div>
       )}
 
-      <button className="edit-button" onClick={() => setIsEditModalOpen(true)}>
-        <Edit2 size={20} />
-        Edit
-      </button>
+      <div className="button-container">
+        <button className="floating-button share-button" onClick={goToHomePage}>
+          <span>Home</span>
+        </button>
+        <button
+          className="floating-button download-button"
+          onClick={handleDownload}
+        >
+          <img src={downloadIcon} alt="Download" className="icon" />
+        </button>
+        <button
+          className="floating-button edit-button"
+          onClick={() => setIsEditModalOpen(true)}
+        >
+          <img src={editIcon} alt="Edit" className="icon" />
+        </button>
+      </div>
     </div>
   );
 };
