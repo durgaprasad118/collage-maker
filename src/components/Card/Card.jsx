@@ -1,12 +1,16 @@
-// Card.jsx
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Edit2, X, Download, Share2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import "./Card.css";
+import TinosRegular from "../../assets/fonts/Tinos-Regular.ttf";
+import MontserratSemiBold from "../../assets/fonts/Montserrat-SemiBold.ttf";
+import MontserratRegular from "../../assets/fonts/Montserrat-Regular.ttf";
+import AbrilFatface from "../../assets/fonts/AbrilFatface-Regular.ttf";
+import Allura from "../../assets/fonts/Allura-Regular.ttf";
+import TimesNewRoman from "../../assets/fonts/Times-New-Roman-Regular.ttf";
 
 // Import SVG icons
-import shareIcon from "../../assets/icons/Share_Icon.svg";
 import downloadIcon from "../../assets/icons/Download_Icon.svg";
 import editIcon from "../../assets/icons/Edit_Icon.svg";
 
@@ -18,16 +22,26 @@ const Card = () => {
   const [error, setError] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   const containerRef = useRef(null);
   const isScrolling = useRef(false);
   const touchStartRef = useRef(null);
   const [slideDirection, setSlideDirection] = useState(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const prevTemplateRef = useRef(null);
-  const goToHomePage = () => {
-    navigate("/"); // Navigates to the home page
+  const getOrdinalSuffix = (day) => {
+    if (day > 3 && day < 21) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
   };
-  
 
   const [customText, setCustomText] = useState({
     wedding_groom_name: "",
@@ -40,26 +54,171 @@ const Card = () => {
   const [photos, setPhotos] = useState({
     groom_photo: null,
     bride_photo: null,
+    couple_photo: null,
   });
-  const handleShare = async () => {
+  const [inputValues, setInputValues] = useState({
+    wedding_date: "",
+    wedding_time: "",
+  });
+
+  const preloadFonts = async () => {
+    const fonts = [
+      { name: "Tinos-Regular", url: TinosRegular },
+      { name: "Montserrat-SemiBold", url: MontserratSemiBold },
+      { name: "Montserrat-Regular", url: MontserratRegular },
+      { name: "AbrilFatface-Regular", url: AbrilFatface },
+      { name: "Allura-Regular", url: Allura },
+      { name: "Times-New-Roman-Regular", url: TimesNewRoman },
+    ];
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "Wedding Card",
-          text: "Check out this wedding card!",
-          url: window.location.href,
+      const fontPromises = fonts.map(async (font) => {
+        const fontFace = new FontFace(font.name, `url(${font.url})`);
+        return fontFace.load().then((loadedFont) => {
+          document.fonts.add(loadedFont);
+          return loadedFont;
         });
-      } else {
-        // Fallback for browsers that don't support Web Share API
-        const url = window.location.href;
-        await navigator.clipboard.writeText(url);
-        alert("Link copied to clipboard!");
-      }
+      });
+
+      await Promise.all(fontPromises);
+      setFontsLoaded(true);
     } catch (error) {
-      console.error("Error sharing:", error);
+      console.error("Failed to preload fonts:", error);
+      setFontsLoaded(true); // Fallback
     }
   };
 
+  useEffect(() => {
+    preloadFonts();
+  }, []);
+
+  const goToHomePage = () => {
+    navigate("/");
+  };
+  const handleInputChange = (name, value) => {
+    if (name === "wedding_date") {
+      setInputValues((prev) => ({
+        ...prev,
+        wedding_date: value,
+      }));
+
+      if (value) {
+        const date = new Date(value);
+        const dayName = date.toLocaleString("en-US", { weekday: "long" });
+        const monthName = date.toLocaleString("en-US", { month: "long" });
+        const day = date.getDate();
+        const ordinalSuffix = getOrdinalSuffix(day);
+        const formattedDate = `${dayName}, ${monthName} ${day}${ordinalSuffix}`;
+
+        setCustomText((prev) => ({
+          ...prev,
+          wedding_date: formattedDate,
+        }));
+      }
+    } else if (name === "wedding_time") {
+      setInputValues((prev) => ({
+        ...prev,
+        wedding_time: value,
+      }));
+
+      if (value) {
+        const [hours, minutes] = value.split(":");
+        const time = new Date();
+        time.setHours(hours, minutes);
+        const formattedTime = time
+          .toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .toLowerCase();
+
+        setCustomText((prev) => ({
+          ...prev,
+          wedding_time: formattedTime,
+        }));
+      }
+    } else {
+      setCustomText((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handlePhotoChange = (name, file) => {
+    if (file) {
+      // Add file size check
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
+        alert("Please choose an image under 5MB");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const img = new Image();
+        img.onload = () => {
+          setPhotos((prev) => ({
+            ...prev,
+            [name]: reader.result,
+          }));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDownload = async () => {
+    // Wait for fonts to be loaded
+    await document.fonts.ready;
+
+    const templateContent = document.querySelector(".template-content");
+    if (!templateContent) return;
+
+    try {
+      const images = templateContent.getElementsByTagName("img");
+      await Promise.all(
+        [...images].map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+
+      const canvas = await html2canvas(templateContent, {
+        useCORS: true,
+        allowTaint: true,
+        scrollY: -window.scrollY,
+        scrollX: -window.scrollX,
+        scale: window.devicePixelRatio * 2, // Increased scale for better quality
+        logging: false,
+        backgroundColor: null,
+        onclone: (clonedDoc) => {
+          const clonedTemplate = clonedDoc.querySelector(".template-content");
+          if (clonedTemplate) {
+            clonedTemplate.style.opacity = "1";
+            clonedTemplate.style.transform = "none";
+          }
+        },
+      });
+
+      const image = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = `wedding-card-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert("Failed to download the image. Please try again.");
+    }
+  };
+
+  // Viewport management
   useEffect(() => {
     const metaTag = document.querySelector("meta[name='viewport']");
     const originalContent = metaTag ? metaTag.getAttribute("content") : null;
@@ -84,6 +243,7 @@ const Card = () => {
     };
   }, []);
 
+  // Template data fetching
   useEffect(() => {
     const fetchTemplateData = async () => {
       try {
@@ -113,6 +273,7 @@ const Card = () => {
     fetchTemplateData();
   }, [id]);
 
+  // Scroll handling
   const handleScroll = (deltaY, e) => {
     if (e) {
       e.preventDefault();
@@ -160,6 +321,7 @@ const Card = () => {
     }
   };
 
+  // Scroll and touch event listeners
   useEffect(() => {
     const handleWheel = (e) => {
       handleScroll(e.deltaY, e);
@@ -196,125 +358,91 @@ const Card = () => {
     };
   }, [currentIndex, allTemplates, navigate, currentTemplate, isAnimating]);
 
-  const handleInputChange = (name, value) => {
-    setCustomText((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const renderTemplateContent = (template) => {
+    // Check if template has single or double image layout
+    const isSingleImageTemplate = template?.images?.length === 1;
 
-  const handlePhotoChange = (name, file) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotos((prev) => ({
-          ...prev,
-          [name]: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDownload = async () => {
-    const templateContent = document.querySelector(".template-content");
-    if (!templateContent) return;
-
-    try {
-      // Wait for images to load
-      const images = templateContent.getElementsByTagName("img");
-      await Promise.all(
-        [...images].map((img) => {
-          if (img.complete) return Promise.resolve();
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        })
-      );
-
-      // Create canvas with proper settings
-      const canvas = await html2canvas(templateContent, {
-        useCORS: true,
-        allowTaint: true,
-        scrollY: -window.scrollY,
-        scrollX: -window.scrollX,
-        scale: window.devicePixelRatio,
-        logging: false,
-        backgroundColor: null,
-        onclone: (clonedDoc) => {
-          const clonedTemplate = clonedDoc.querySelector(".template-content");
-          if (clonedTemplate) {
-            clonedTemplate.style.opacity = "1";
-            clonedTemplate.style.transform = "none";
-          }
-        },
-      });
-
-      // Convert and download
-      const image = canvas.toDataURL("image/png", 1.0);
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = `wedding-card-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Download failed:", error);
-      alert("Failed to download the image. Please try again.");
-    }
-  };
-
-  const renderTemplateContent = (template) => (
-    <div className="template-content">
-      <img
-        src={template?.images[0]?.template}
-        alt="Base Template"
-        className="base-template"
-      />
-      {template?.images.map((image, index) => (
+    return (
+      <div className="template-content">
         <img
-          key={index}
-          src={
-            photos[
-              image.name === "wedding_groom_image"
-                ? "groom_photo"
-                : "bride_photo"
-            ] || image.sample_image
-          }
-          alt={image.name}
-          style={{
-            position: "absolute",
-            width: `${image.coordinates.width_in_px}px`,
-            height: `${image.coordinates.height_in_px}px`,
-            top: `${image.coordinates.top_in_px}px`,
-            left: `${image.coordinates.left_in_px}px`,
-            zIndex: 0,
-            objectFit: "cover",
-          }}
+          src={template?.images[0]?.template}
+          alt="Base Template"
+          className="base-template"
         />
-      ))}
-      {template?.texts.map((text, index) => (
-        <div
-          key={index}
-          className="text-overlay"
-          style={{
-            position: "absolute",
-            width: `${text.coordinates.width_in_px}px`,
-            height: `${text.coordinates.height_in_px}px`,
-            top: `${text.coordinates.top_in_px}px`,
-            left: `${text.coordinates.left_in_px}px`,
-            fontSize: `${text.text_configs.size}px`,
-            color: text.text_configs.color,
-            textAlign: text.text_configs.text_alignment.toLowerCase(),
-          }}
-        >
-          {customText[text.name] || text.text_configs.sample_text}
-        </div>
-      ))}
-    </div>
-  );
+        {template?.images.map((image, index) => {
+          // Determine which photo to use based on template type
+          let photoToUse;
+          if (isSingleImageTemplate) {
+            photoToUse = photos.couple_photo;
+          } else {
+            photoToUse =
+              image.name === "wedding_groom_image"
+                ? photos.groom_photo
+                : photos.bride_photo;
+          }
 
+          return (
+            <img
+              key={index}
+              src={photoToUse || image.sample_image}
+              alt={image.name}
+              style={{
+                position: "absolute",
+                width: `${image.coordinates.width_in_px}px`,
+                height: `${image.coordinates.height_in_px}px`,
+                top: `${image.coordinates.top_in_px}px`,
+                left: `${image.coordinates.left_in_px}px`,
+                zIndex: 0,
+                objectFit: "cover",
+              }}
+            />
+          );
+        })}
+        {template?.texts.map((text, index) => {
+          const getFontFamily = (fontId) => {
+            if (!fontId) return "Tinos-Regular, sans-serif";
+            const fontName = fontId.replace(".ttf", "");
+            return `${fontName}, sans-serif`;
+          };
+
+          return (
+            <div
+              key={index}
+              className="text-overlay"
+              style={{
+                position: "absolute",
+                width: `${text.coordinates.width_in_px}px`,
+                height: `${text.coordinates.height_in_px}px`,
+                top: `${text.coordinates.top_in_px}px`,
+                left: `${text.coordinates.left_in_px}px`,
+                fontSize: `${text.text_configs.size}px`,
+                color: text.text_configs.color,
+                textAlign: text.text_configs.text_alignment.toLowerCase(),
+                fontFamily: getFontFamily(text.text_configs.font_id),
+                textRendering: "optimizeLegibility",
+                WebkitFontSmoothing: "antialiased",
+                MozOsxFontSmoothing: "grayscale",
+              }}
+            >
+              {customText[text.name] || text.text_configs.sample_text}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Loading state
+  if (!fontsLoaded) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="loading-text">Loading resources...</p>
+      </div>
+    );
+  }
+
+  // Error state
   if (error) {
     return <div className="error-screen">{error}</div>;
   }
@@ -359,47 +487,96 @@ const Card = () => {
             </div>
 
             <div className="modal-body">
-              <div className="photo-inputs">
-                <div className="photo-input">
-                  <label>Groom's Photo</label>
-                  <div className="photo-upload">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handlePhotoChange("groom_photo", e.target.files[0])
-                      }
-                    />
-                    {photos.groom_photo && (
-                      <img
-                        src={photos.groom_photo}
-                        alt="Groom preview"
-                        className="photo-preview"
-                      />
-                    )}
-                  </div>
-                </div>
+              {/* Only render photo inputs if template has images */}
+              {currentTemplate?.images?.length > 0 && (
+                <div className="photo-inputs">
+                  {(() => {
+                    // Count actual image fields
+                    const imageFields = currentTemplate.images.filter((img) =>
+                      img.name.includes("image")
+                    );
 
-                <div className="photo-input">
-                  <label>Bride's Photo</label>
-                  <div className="photo-upload">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handlePhotoChange("bride_photo", e.target.files[0])
-                      }
-                    />
-                    {photos.bride_photo && (
-                      <img
-                        src={photos.bride_photo}
-                        alt="Bride preview"
-                        className="photo-preview"
-                      />
-                    )}
-                  </div>
+                    if (imageFields.length === 1) {
+                      // Single image case - show Couple Photo
+                      return (
+                        <div className="photo-input">
+                          <label>Couple Photo</label>
+                          <div className="photo-upload">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) =>
+                                handlePhotoChange(
+                                  "couple_photo",
+                                  e.target.files[0]
+                                )
+                              }
+                            />
+                            {photos.couple_photo && (
+                              <img
+                                src={photos.couple_photo}
+                                alt="Couple preview"
+                                className="photo-preview"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      // Two images case - show Groom and Bride photos
+                      return (
+                        <>
+                          <div className="photo-input">
+                            <label>Groom's Photo</label>
+                            <div className="photo-upload">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                  handlePhotoChange(
+                                    "groom_photo",
+                                    e.target.files[0]
+                                  )
+                                }
+                              />
+                              {photos.groom_photo && (
+                                <img
+                                  src={photos.groom_photo}
+                                  alt="Groom preview"
+                                  className="photo-preview"
+                                />
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="photo-input">
+                            <label>Bride's Photo</label>
+                            <div className="photo-upload">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                  handlePhotoChange(
+                                    "bride_photo",
+                                    e.target.files[0]
+                                  )
+                                }
+                              />
+                              {photos.bride_photo && (
+                                <img
+                                  src={photos.bride_photo}
+                                  alt="Bride preview"
+                                  className="photo-preview"
+                                />
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      );
+                    }
+                  })()}
                 </div>
-              </div>
+              )}
 
               <div className="text-inputs">
                 <div className="input-group">
@@ -430,7 +607,7 @@ const Card = () => {
                   <label>Wedding Date</label>
                   <input
                     type="date"
-                    value={customText.wedding_date}
+                    value={inputValues.wedding_date}
                     onChange={(e) =>
                       handleInputChange("wedding_date", e.target.value)
                     }
@@ -441,7 +618,7 @@ const Card = () => {
                   <label>Wedding Time</label>
                   <input
                     type="time"
-                    value={customText.wedding_time}
+                    value={inputValues.wedding_time}
                     onChange={(e) =>
                       handleInputChange("wedding_time", e.target.value)
                     }
@@ -460,7 +637,6 @@ const Card = () => {
                 </div>
               </div>
             </div>
-
             <div className="modal-footer">
               <button
                 className="save-button"

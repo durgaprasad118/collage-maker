@@ -5,7 +5,7 @@
           "thumbnail": "/Wedding-Templates/templetes-thumbnail/1.jpeg",
           "template": "../Wedding-Templates/templetes/1.png",
           "name": "wedding_groom_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/groom.jpg",
           "coordinates": {
             "width_in_px": 169,
             "height_in_px": 248,
@@ -20,7 +20,7 @@
         },
         {
           "name": "wedding_bride_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/bride.jpg",
           "coordinates": {
             "width_in_px": 169,
             "height_in_px": 248,
@@ -38,8 +38,7 @@
         {
           "name": "wedding_groom_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -60,8 +59,7 @@
         {
           "name": "wedding_bride_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -82,13 +80,12 @@
         {
           "name": "wedding_date",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#57041E",
-            "sample_text": ""
+            "sample_text": "24th March 2024"
           },
           "coordinates": {
             "width_in_px": 233,
@@ -104,13 +101,12 @@
         {
           "name": "wedding_time",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#57041E",
-            "sample_text": "24th March 2024, 10:30 AM"
+            "sample_text": "10:30 AM"
           },
           "coordinates": {
             "width_in_px": 233,
@@ -126,8 +122,7 @@
         {
           "name": "wedding_venue",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 20,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -153,7 +148,7 @@
           "thumbnail": "/Wedding-Templates/templetes-thumbnail/2.jpeg",
           "template": "/Wedding-Templates/templetes/2.png",
           "name": "wedding_groom_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/groom.jpg",
           "coordinates": {
             "width_in_px": 237,
             "height_in_px": 200,
@@ -168,7 +163,7 @@
         },
         {
           "name": "wedding_bride_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/bride.jpg",
           "coordinates": {
             "width_in_px": 237,
             "height_in_px": 200,
@@ -186,13 +181,12 @@
         {
           "name": "wedding_groom_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "Raj"
           },
           "coordinates": {
             "width_in_px": 222,
@@ -208,13 +202,12 @@
         {
           "name": "wedding_bride_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "Samantha"
           },
           "coordinates": {
             "width_in_px": 222,
@@ -230,13 +223,12 @@
         {
           "name": "wedding_date",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "23-04-2001"
           },
           "coordinates": {
             "width_in_px": 178,
@@ -252,13 +244,12 @@
         {
           "name": "wedding_time",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "22:30"
           },
           "coordinates": {
             "width_in_px": 324,
@@ -274,13 +265,12 @@
         {
           "name": "wedding_venue",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "kavuri hills madhapur"
           },
           "coordinates": {
             "width_in_px": 324,
@@ -301,12 +291,12 @@
           "thumbnail": "/Wedding-Templates/templetes-thumbnail/3.jpeg",
           "template": "/Wedding-Templates/templetes/3.png",
           "name": "wedding_groom_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/couple.png",
           "coordinates": {
             "width_in_px": 404,
             "height_in_px": 240,
             "top_in_px": 363,
-            "left_in_px": 72,
+            "left_in_px": 115,
             "width": 74.81,
             "height": 25,
             "top": 50.31,
@@ -319,18 +309,17 @@
         {
           "name": "wedding_groom_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "font_id": "Tinos-Regular.ttf",
+            "size": 40,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "Pawan"
           },
           "coordinates": {
             "width_in_px": 185,
             "height_in_px": 50,
-            "top_in_px": 624,
+            "top_in_px": 621,
             "left_in_px": 62,
             "width": 34.26,
             "height": 5.21,
@@ -341,13 +330,12 @@
         {
           "name": "wedding_bride_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "font_id": "Tinos-Regular.ttf",
+            "size": 40,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#efefef",
-            "sample_text": "Hi Brochiller!!!"
+            "sample_text": "Samantha"
           },
           "coordinates": {
             "width_in_px": 185,
@@ -363,8 +351,7 @@
         {
           "name": "wedding_date",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -385,8 +372,7 @@
         {
           "name": "wedding_time",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -407,8 +393,7 @@
         {
           "name": "wedding_venue",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -434,7 +419,7 @@
           "thumbnail": "/Wedding-Templates/templetes-thumbnail/4.jpeg",
           "template": "/Wedding-Templates/templetes/4.png",
           "name": "wedding_groom_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/groom.jpg",
           "coordinates": {
             "width_in_px": 159,
             "height_in_px": 345,
@@ -449,7 +434,7 @@
         },
         {
           "name": "wedding_bride_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/bride.jpg",
           "coordinates": {
             "width_in_px": 159,
             "height_in_px": 345,
@@ -467,8 +452,7 @@
         {
           "name": "wedding_groom_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -489,8 +473,8 @@
         {
           "name": "wedding_bride_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
+
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -511,8 +495,7 @@
         {
           "name": "wedding_date",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/roboto.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 20,
             "char_limit": 10,
             "text_alignment": "right",
@@ -533,8 +516,7 @@
         {
           "name": "wedding_time",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -555,8 +537,7 @@
         {
           "name": "wedding_venue",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Tinos-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -582,7 +563,7 @@
           "thumbnail": "/Wedding-Templates/templetes-thumbnail/5.jpeg",
           "template": "/Wedding-Templates/templetes/5.png",
           "name": "wedding_groom_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/couple.png",
           "coordinates": {
             "width_in_px": 290,
             "height_in_px": 216,
@@ -594,31 +575,17 @@
             "left": 26.75,
             "type": "box"
           }
-        },
-        {
-          "name": "wedding_bride_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
-          "coordinates": {
-            "width_in_px": 290,
-            "height_in_px": 216,
-            "top_in_px": 12,
-            "left_in_px": 12,
-            "width": 43.89,
-            "height": 20.83,
-            "top": 32.39,
-            "left": 74.35,
-            "type": "box"
-          }
         }
       ],
       "texts": [
         {
           "name": "wedding_groom_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
-            "char_limit": 30,
+            "font_id": "Times-New-Roman-Regular.ttf",
+  
+            "size": 45 ,
+           
+            "char_limit":30,
             "text_alignment": "CENTER",
             "color": "#c74251",
             "sample_text": "Raj"
@@ -637,9 +604,8 @@
         {
           "name": "wedding_bride_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "font_id": "Times-New-Roman-Regular.ttf",
+            "size": 45,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#c74251",
@@ -659,8 +625,7 @@
         {
           "name": "wedding_date",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Times-New-Roman-Regular.ttf",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -681,8 +646,7 @@
         {
           "name": "wedding_time",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Times-New-Roman-Regular.ttf",
             "size": 22,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -703,8 +667,7 @@
         {
           "name": "wedding_venue",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Times-New-Roman-Regular.ttf",
             "size": 25,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -730,7 +693,7 @@
           "thumbnail": "/Wedding-Templates/templetes-thumbnail/6.jpeg",
           "template": "/Wedding-Templates/templetes/6.png",
           "name": "wedding_groom_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/groom.jpg",
           "coordinates": {
             "width_in_px": 182,
             "height_in_px": 183,
@@ -745,7 +708,7 @@
         },
         {
           "name": "wedding_bride_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/bride.jpg",
           "coordinates": {
             "width_in_px": 179,
             "height_in_px": 181,
@@ -763,8 +726,8 @@
         {
           "name": "wedding_groom_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Montserrat-SemiBold.ttf",
+            
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -785,8 +748,8 @@
         {
           "name": "wedding_bride_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Montserrat-SemiBold.ttf",
+          
             "size": 30,
             "char_limit": 30,
             "text_alignment": "Start",
@@ -807,8 +770,8 @@
         {
           "name": "wedding_date",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Montserrat-Regular",
+            
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -829,8 +792,8 @@
         {
           "name": "wedding_time",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Montserrat-Regular",
+           
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -851,8 +814,7 @@
         {
           "name": "wedding_venue",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Montserrat-Regular",
             "size": 30,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -878,7 +840,7 @@
           "thumbnail": "/Wedding-Templates/templetes-thumbnail/7.jpeg",
           "template": "/Wedding-Templates/templetes/7.png",
           "name": "wedding_groom_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/groom.jpg",
           "coordinates": {
             "width_in_px": 170,
             "height_in_px": 340,
@@ -893,7 +855,7 @@
         },
         {
           "name": "wedding_bride_image",
-          "sample_image": "https://dev-files2.brochill.app/2023/12/07/12/3dkgFnJhe.png",
+          "sample_image": "/Wedding-Templates/default-images/bride.jpg",
           "coordinates": {
             "width_in_px": 173,
             "height_in_px": 338,
@@ -911,9 +873,9 @@
         {
           "name": "wedding_groom_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "font_id": "Allura-Regular.ttf",
+            
+            "size": 45,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#d0203c",
@@ -933,9 +895,9 @@
         {
           "name": "wedding_bride_name",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "font_id": "Allura-Regular.ttf",
+           
+            "size": 45,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#d0203c",
@@ -955,9 +917,9 @@
         {
           "name": "wedding_date",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "font_id": "Times-New-Roman-Regular.ttf",
+          
+            "size": 25,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#5e450b",
@@ -977,9 +939,9 @@
         {
           "name": "wedding_time",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
-            "size": 30,
+            "font_id": "Times-New-Roman-Regular.ttf",
+           
+            "size": 25,
             "char_limit": 30,
             "text_alignment": "CENTER",
             "color": "#5e450b",
@@ -999,8 +961,7 @@
         {
           "name": "wedding_venue",
           "text_configs": {
-            "font_id": "adumu.otf",
-            "font_url": "https://dev-files2.brochill.app/fonts/2023/06/12/16/adumu.otf",
+            "font_id": "Times-New-Roman-Regular.ttf",
             "size": 25,
             "char_limit": 30,
             "text_alignment": "CENTER",
@@ -1010,7 +971,7 @@
           "coordinates": {
             "width_in_px": 279,
             "height_in_px": 70,
-            "top_in_px": 876,
+            "top_in_px": 860,
             "left_in_px": 132,
             "width": 60,
             "height": 5.21,
