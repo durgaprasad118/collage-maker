@@ -38,7 +38,7 @@ const TemplateLibrary = () => {
 
   return (
     <div className="template-library">
-      <h1>All Templates</h1>
+      <h1>Wedding Templates</h1>
       <div className="template-grid">
         {templates.map((template) => (
           <div key={template.id} onClick={() => navigate(`/card/${template.numericId}`)}>

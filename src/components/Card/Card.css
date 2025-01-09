@@ -66,6 +66,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .template-wrapper {
@@ -74,13 +76,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
 }
 
 .template-positioning {
   position: absolute;
   display: flex;
   justify-content: center;
+  background-color: #0F1725;
   padding-top: 5px;
   padding-bottom: 35px;
   align-items: center;
@@ -99,9 +101,12 @@
   opacity: 1;
 }
 
+
+
 .base-template {
-  display: block;
-  z-index: 50;
+  width: auto;
+  height: auto;
+  object-fit: contain !important;
 }
 
 .text-overlay {
@@ -513,6 +518,7 @@
     border-radius: 20px 20px 0 0;
     max-height: 90vh;
     margin: 0;
+    overflow-x: hidden;
   }
   .template-content {
     transform: scale(0.75);

@@ -4,7 +4,6 @@ body {
   font-family: 'Poppins', sans-serif;;
   background:#0F1725;
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
 /* Template Library Container */

@@ -1,42 +1,49 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Header from '../src/components/Header/Header'
 
 // Lazy-loaded components
 const HomePage = React.lazy(() => import('./components/HomePage/HomePage'));
 const Card = React.lazy(() => import('./components/Card/Card'));
+const BirthdayCard = React.lazy(() => import('./components/BirthdayCard/BirthdayCard'));
 const TemplateLibrary = React.lazy(() => import('./components/TemplateLibrary/TemplateLibrary'));
 
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-pink-50 to-white">
+  <div className="min-h-screen flex items-center justify-center bg-[#0F1725]">
     <div className="text-center">
-      <div className="w-16 h-16 border-4 border-pink-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-      <p className="text-gray-600">Loading...</p>
+      <div className="w-16 h-16 border-4 border-[#9CCC65] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-white">Loading...</p>
     </div>
   </div>
 );
 
 const App = () => {
   return (
-    <Router>
+    <BrowserRouter>
       <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/card/:id" element={<Card />} />
-          <Route path="/TemplateLibrary" element={<TemplateLibrary />} />
-          <Route
-            path="*"
-            element={
-              <div className="not-found-container">
-                <h1>404 - Page Not Found</h1>
-                <a href="/">Go Back to Home</a>
-              </div>
-            }
-          />
-        </Routes>
+        <div className="bg-[#0F1725] min-h-screen">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/card/:id" element={<Card />} />
+            <Route path="/birthday/:id" element={<BirthdayCard />} />
+            <Route path="/TemplateLibrary" element={<TemplateLibrary />} />
+            <Route
+              path="*"
+              element={
+                <div className="min-h-screen flex items-center justify-center text-white">
+                  <div className="text-center">
+                    <h1 className="text-2xl mb-4">404 - Page Not Found</h1>
+                    <a href="/" className="text-[#9CCC65] hover:underline">
+                      Go Back to Home
+                    </a>
+                  </div>
+                </div>
+              }
+            />
+          </Routes>
+        </div>
       </Suspense>
-    </Router>
+    </BrowserRouter>
   );
 };
 

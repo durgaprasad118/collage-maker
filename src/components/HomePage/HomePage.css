@@ -1,11 +1,4 @@
 /* General Styling */
-body {
-  margin: 0;
-  font-family: 'poppins', sans-serif;
-  background: #212121;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
 
 /* Header Styling */
 header {
@@ -31,7 +24,6 @@ header h1 {
 
 /* Homepage Container */
 .homepage-container {
-  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
@@ -44,6 +36,7 @@ header h1 {
 /* Section Title */
 .section-title {
   font-family: "Poppins", sans-serif;
+  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -249,6 +242,9 @@ header h1 {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 0px;
+    overflow-x: hidden;
+    overflow-y: hidden;
   }
 
   .wedding-title {
@@ -258,7 +254,8 @@ header h1 {
   }
 
   .template-card {
-    width: 120px;
+    width: 105px;
     height: 200px;
   }
+  
 }
