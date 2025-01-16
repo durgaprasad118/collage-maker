@@ -2,7 +2,7 @@
   "id_1": {
     "images": [
       {
-       "thumbnail": "/Birthday-Templates/templetes-thumbnail/1.jpeg",
+        "thumbnail": "/Birthday-Templates/templetes-thumbnail/1.jpeg",
         "template": "../Birthday-Templates/templetes/1.png",
         "name": "birthday_person",
         "sample_image": "/Birthday-Templates/default-images/Sample.jpg",
@@ -106,112 +106,111 @@
       }
     ]
   },
-    "id_2": {
-        "images": [
-          {
-           "thumbnail": "/Birthday-Templates/templetes-thumbnail/2.jpeg",
-            "template": "../Birthday-Templates/templetes/2.png",
-            "name": "birthday_person",
-            "sample_image": "/Birthday-Templates/default-images/Sample2.jpg",
-            "coordinates": {
-              "width_in_px": 317,
-              "height_in_px": 318,
-              "top_in_px": 182,
-              "left_in_px": 108,
-              "width": 50,
-              "height": 25,
-              "top": 10,
-              "left": 10,
-              "type": "box"
-            }
-          }
-        ],
-        "texts": [
-          {
-            "name": "birthday_name",
-            "text_configs": {
-              "font_id": "Arial-Bold.ttf",
-              "size": 40,
-              "char_limit": 50,
-              "text_alignment": "CENTER",
-              "color": "#e565ac",
-              "sample_text": "Birthday_person_name"
-            },
-            "coordinates": {
-              "width_in_px": 416,
-              "height_in_px": 53,
-              "top_in_px": 540,
-              "left_in_px": 60,
-              "width": 60,
-              "height": 10,
-              "top": 20,
-              "left": 20
-            }
-          },
-          {
-            "name": "birthday_date",
-            "text_configs": {
-              "font_id": "Times-New-Roman-Regular.ttf",
-              "size": 30,
-              "char_limit": 30,
-              "text_alignment": "CENTER",
-              "color": "#414041",
-              "sample_text": "1st January 2025"
-            },
-            "coordinates": {
-              "width_in_px": 276,
-              "height_in_px": 36,
-              "top_in_px": 679,
-              "left_in_px": 136,
-              "width": 50,
-              "height": 8,
-              "top": 30,
-              "left": 25
-            }
-          },
-          {
-            "name": "birthday_time",
-            "text_configs": {
-              "font_id": "Times-New-Roman-Regular.ttf",
-              "size": 30,
-              "char_limit": 20,
-              "text_alignment": "CENTER",
-              "color": "#414041",
-              "sample_text": "6:00 PM"
-            },
-            "coordinates": {
-              "width_in_px": 389,
-              "height_in_px": 34,
-              "top_in_px": 713,
-              "left_in_px": 60,
-              "width": 50,
-              "height": 8,
-              "top": 35,
-              "left": 25
-            }
-          },
-          {
-            "name": "birthday_venue",
-            "text_configs": {
-              "font_id": "Times-New-Roman-Regular.ttf",
-              "size": 25,
-              "char_limit": 100,
-              "text_alignment": "CENTER",
-              "color": "#414041",
-              "sample_text": "Main Hall, City Convention Center, Downtown"
-            },
-            "coordinates": {
-              "width_in_px": 344,
-              "height_in_px": 77,
-              "top_in_px": 780,
-              "left_in_px": 94,
-              "width": 60,
-              "height": 10,
-              "top": 40,
-              "left": 20
-            }
-          }
-        ]
+  "id_2": {
+    "images": [
+      {
+        "thumbnail": "/Birthday-Templates/templetes-thumbnail/2.jpeg",
+        "template": "../Birthday-Templates/templetes/2.png",
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/Sample2.jpg",
+        "coordinates": {
+          "width_in_px": 317,
+          "height_in_px": 318,
+          "top_in_px": 182,
+          "left_in_px": 108,
+          "width": 50,
+          "height": 25,
+          "top": 10,
+          "left": 10,
+          "type": "box"
+        }
       }
+    ],
+    "texts": [
+      {
+        "name": "birthday_name",
+        "text_configs": {
+          "font_id": "Arial-Bold.ttf",
+          "size": 40,
+          "char_limit": 50,
+          "text_alignment": "CENTER",
+          "color": "#e565ac",
+          "sample_text": "Birthday_person_name"
+        },
+        "coordinates": {
+          "width_in_px": 416,
+          "height_in_px": 53,
+          "top_in_px": 540,
+          "left_in_px": 60,
+          "width": 60,
+          "height": 10,
+          "top": 20,
+          "left": 20
+        }
+      },
+      {
+        "name": "birthday_date",
+        "text_configs": {
+          "font_id": "Times-New-Roman-Regular.ttf",
+          "size": 30,
+          "char_limit": 30,
+          "text_alignment": "CENTER",
+          "color": "#414041",
+          "sample_text": "1st January 2025"
+        },
+        "coordinates": {
+          "width_in_px": 276,
+          "height_in_px": 36,
+          "top_in_px": 679,
+          "left_in_px": 136,
+          "width": 50,
+          "height": 8,
+          "top": 30,
+          "left": 25
+        }
+      },
+      {
+        "name": "birthday_time",
+        "text_configs": {
+          "font_id": "Times-New-Roman-Regular.ttf",
+          "size": 30,
+          "char_limit": 20,
+          "text_alignment": "CENTER",
+          "color": "#414041",
+          "sample_text": "6:00 PM"
+        },
+        "coordinates": {
+          "width_in_px": 389,
+          "height_in_px": 34,
+          "top_in_px": 713,
+          "left_in_px": 60,
+          "width": 50,
+          "height": 8,
+          "top": 35,
+          "left": 25
+        }
+      },
+      {
+        "name": "birthday_venue",
+        "text_configs": {
+          "font_id": "Times-New-Roman-Regular.ttf",
+          "size": 25,
+          "char_limit": 100,
+          "text_alignment": "CENTER",
+          "color": "#414041",
+          "sample_text": "Main Hall, City Convention Center, Downtown"
+        },
+        "coordinates": {
+          "width_in_px": 344,
+          "height_in_px": 77,
+          "top_in_px": 780,
+          "left_in_px": 94,
+          "width": 60,
+          "height": 10,
+          "top": 40,
+          "left": 20
+        }
+      }
+    ]
   }
-  
+}

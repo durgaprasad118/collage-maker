@@ -7,17 +7,21 @@ import Header from '../Header/Header';
 const HomePage = () => {
   const [weddingTemplates, setWeddingTemplates] = useState([]);
   const [birthdayTemplates, setBirthdayTemplates] = useState([]);
+  const [collageTemplates, setCollageTemplates] = useState([]);
   const [loading, setLoading] = useState({
     wedding: true,
-    birthday: true
+    birthday: true,
+    collage: true
   });
   const [error, setError] = useState({
     wedding: null,
-    birthday: null
+    birthday: null,
+    collage: null
   });
   const [retryCount, setRetryCount] = useState({
     wedding: 0,
-    birthday: 0
+    birthday: 0,
+    collage: 0
   });
   const sliderRef = useRef(null);
   const navigate = useNavigate();
@@ -32,13 +36,13 @@ const HomePage = () => {
   };
 
   const fetchTemplates = async (type) => {
+  
     try {
-      setLoading(prev => ({ ...prev, [type]: true }));
       const response = await fetch(`/data/${type}.json`);
       if (!response.ok) {
         throw new Error(`Failed to fetch ${type} templates`);
       }
-
+  
       const data = await response.json();
       let templates = Object.entries(data).map(([id, details]) => ({
         id: id,
@@ -46,13 +50,19 @@ const HomePage = () => {
         type: type,
         ...details,
       }));
-
+  
       templates = shuffleArray(templates);
       
-      if (type === 'wedding') {
-        setWeddingTemplates(templates);
-      } else {
-        setBirthdayTemplates(templates);
+      switch(type) {
+        case 'wedding':
+          setWeddingTemplates(templates);
+          break;
+        case 'birthday':
+          setBirthdayTemplates(templates);
+          break;
+        case 'collage':
+          setCollageTemplates(templates);
+          break;
       }
       
       setError(prev => ({ ...prev, [type]: null }));
@@ -79,15 +89,19 @@ const HomePage = () => {
   useEffect(() => {
     fetchTemplates('wedding');
     fetchTemplates('birthday');
-  }, [retryCount.wedding, retryCount.birthday]);
+    fetchTemplates('collage');
+  }, [retryCount.wedding, retryCount.birthday, retryCount.collage]);
 
   const handleTemplateSelect = (template) => {
-    if (template.type === 'birthday') {
-      // Remove the 'id_' prefix from the ID for proper routing
-      const numericId = template.id.replace('id_', '');
-      navigate(`/birthday/${numericId}`);
-    } else {
-      navigate(`/card/${template.numericId}`);
+    switch(template.type) {
+      case 'birthday':
+        navigate(`/birthday/${template.numericId}`);
+        break;
+      case 'collage':
+        navigate(`/collage/${template.numericId}`);
+        break;
+      default:
+        navigate(`/card/${template.numericId}`);
     }
   };
 
@@ -97,33 +111,39 @@ const HomePage = () => {
   };
 
   const handleViewAllClick = (type) => {
-    if (type === 'birthday') {
-      navigate('/BirthdayLibrary');
-    } else {
-      navigate('/TemplateLibrary');
+    switch(type) {
+      case 'birthday':
+        navigate('/BirthdayLibrary');
+        break;
+      case 'collage':
+        navigate('/CollageLibrary');
+        break;
+      default:
+        navigate('/TemplateLibrary');
     }
   };
 
-  const renderTemplateSection = (type, templates) => {
-    if (loading[type]) {
-      return (
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p className="loading-text">Loading {type} templates...</p>
-        </div>
-      );
-    }
+  const ShimmerEffect = () => (
+    <div className="template-gallery-container">
+      <div className="template-gallery">
+        {[1, 2, 3].map((_, index) => (
+          <div key={index} className="template-card shimmer-card">
+            <div className="shimmer-wrapper">
+              <div className="shimmer-animation"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
-    if (error[type]) {
-      return (
-        <div className="error-container">
-          <p className="error-text">{error[type]}</p>
-          <button onClick={() => handleRetry(type)} className="retry-button">
-            Try Again
-          </button>
-        </div>
-      );
-    }
+  const renderTemplateSection = (type, templates) => {
+    const getTemplateImagePath = (template) => {
+      if (type === 'collage') {
+        return template?.images?.[0]?.thumbnail?.replace('/Wedding-Templates/', '/Collage-Templates/') || '/placeholder-image.jpg';
+      }
+      return template?.images?.[0]?.thumbnail || '/placeholder-image.jpg';
+    };
 
     return (
       <>
@@ -133,27 +153,38 @@ const HomePage = () => {
             view all<SlArrowRight className="arrow-icon" />
           </button>
         </section>
-
-        <div className="template-gallery-container">
-          <div className="template-gallery" ref={sliderRef}>
-            {templates.map((template) => (
-              <div
-                key={template.id}
-                className="template-card"
-                onClick={() => handleTemplateSelect(template)}
-              >
-                <img
-                  src={template?.images?.[0]?.thumbnail || '/placeholder-image.jpg'}
-                  alt={`${type.charAt(0).toUpperCase() + type.slice(1)} Template ${template.numericId}`}
-                  className="template-image"
-                  onError={(e) => {
-                    e.target.src = '/placeholder-image.jpg';
-                  }}
-                />
-              </div>
-            ))}
+  
+        {loading[type] ? (
+          <ShimmerEffect />
+        ) : error[type] ? (
+          <div className="error-container">
+            <p className="error-text">{error[type]}</p>
+            <button onClick={() => handleRetry(type)} className="retry-button">
+              Try Again
+            </button>
           </div>
-        </div>
+        ) : (
+          <div className="template-gallery-container">
+            <div className="template-gallery" ref={sliderRef}>
+              {templates.map((template) => (
+                <div
+                  key={template.id}
+                  className="template-card"
+                  onClick={() => handleTemplateSelect(template)}
+                >
+                  <img
+                    src={getTemplateImagePath(template)}
+                    alt={`${type.charAt(0).toUpperCase() + type.slice(1)} Template ${template.numericId}`}
+                    className="template-image"
+                    onError={(e) => {
+                      e.target.src = '/placeholder-image.jpg';
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </>
     );
   };
@@ -162,6 +193,7 @@ const HomePage = () => {
     <div className="homepage-container">
       {renderTemplateSection('wedding', weddingTemplates)}
       {renderTemplateSection('birthday', birthdayTemplates)}
+      {renderTemplateSection('collage', collageTemplates)}
     </div>
   );
 };

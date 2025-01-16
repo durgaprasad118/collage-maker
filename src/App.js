@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import CollageCard from './components/CollageCard/CollageCard';
 import './App.css';
 
 // Lazy-loaded components
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/card/:id" element={<Card />} />
             <Route path="/birthday/:id" element={<BirthdayCard />} />
             <Route path="/TemplateLibrary" element={<TemplateLibrary />} />
+            <Route path="/collage/:id" element={<CollageCard />} />
             <Route
               path="*"
               element={

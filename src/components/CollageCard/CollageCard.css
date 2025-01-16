@@ -1,65 +1,4 @@
-@font-face {
-  font-family: 'Tinos-Regular';
-  src: url('../../assets/fonts/Tinos-Regular.ttf') format('truetype');
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Montserrat-SemiBold';
-  src: url('../../assets/fonts/Montserrat-SemiBold.ttf') format('truetype');
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Montserrat-Regular';
-  src: url('../../assets/fonts/Montserrat-Regular.ttf') format('truetype');
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'AbrilFatface';
-  src: url('../../assets/fonts/AbrilFatface-Regular.ttf') format('truetype');
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Allura';
-  src: url('../../assets/fonts/Allura-Regular.ttf') format('truetype');
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Times-New-Roman';
-  src: url('../../assets/fonts/Times-New-Roman-Regular.ttf') format('truetype');
-  font-display: swap;
-}
-
-
-/* Add loading styles */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #0F1725;
-  color: white;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: #9CCC65;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Main Container */
 .main-container {
   min-height: 100vh;
   background-color: #0f1725;
@@ -77,6 +16,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  touch-action: none;
 }
 
 .template-positioning {
@@ -102,20 +43,31 @@
   opacity: 1;
 }
 
-
-
 .base-template {
   width: auto;
   height: auto;
   object-fit: contain !important;
+  padding-bottom: 50px;
 }
 
-.text-overlay {
+/* Loading Styles */
+.loading-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: "Poppins", sans-serif;
-  z-index: 99;
+  height: 100vh;
+  background-color: #0F1725;
+  color: white;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #9CCC65;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 /* Button Container */
@@ -183,7 +135,7 @@
   transition: opacity 0.3s ease;
 }
 
-/* Enhanced Modal Styles */
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -200,172 +152,126 @@
 }
 
 .modal-content {
-  background: #ffffff;
-  border-radius: 20px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 85vh;
+  background: #1a2234;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 90vh;
   overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  bottom: 0;
   animation: slideUp 0.3s ease-out;
 }
 
 .modal-header {
   padding: 1.25rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #2a3144;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 10;
 }
 
 .modal-header h2 {
   margin: 0;
   font-size: 1.4rem;
   font-weight: 600;
-  color: #2d3748;
+  color: white;
+  font-family: "Poppins", sans-serif;
 }
 
 .close-button {
   background: none;
   border: none;
-  color: #6b7280;
+  color: #9CCC65;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.2s;
 }
 
-.close-button:hover {
-  background: #f3f4f6;
-  color: #1f2937;
-}
-
-/* Enhanced Form Styles */
+/* Photo Upload Section */
 .modal-body {
   padding: 1.5rem;
-  background: #fff;
 }
 
 .photo-inputs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
-  margin-bottom: 2rem;
+  padding: 0.5rem;
 }
 
 .photo-input {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  background: #242b3d;
+  padding: 1rem;
+  border-radius: 12px;
 }
 
 .photo-input label {
-  font-size: 0.95rem;
-  font-weight: 500;
   color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .photo-upload {
-  border: 2px dashed #e2e8f0;
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 1.25rem;
+  position: relative;
+  border: 2px dashed #9CCC65;
+  border-radius: 8px;
+  padding: 1rem;
   text-align: center;
-  transition: all 0.2s ease;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.upload-prompt {
+  color: #9CCC65;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.photo-input input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
   cursor: pointer;
 }
 
-.photo-upload:hover {
-  border-color: #4f46e5;
-  background: #f8f8ff;
-}
-
 .photo-preview {
-  max-width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-top: 0.75rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.text-inputs {
-  display: grid;
-  gap: 1.25rem;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.input-group label {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #4a5568;
-}
-
-.input-group input,
-.input-group textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  color: #2d3748;
-  background: #f8fafc;
-  transition: all 0.2s ease;
-}
-
-.input-group input:focus,
-.input-group textarea:focus {
-  outline: none;
-  border-color: #4f46e5;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.input-group textarea {
-  min-height: 100px;
-  resize: vertical;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 0.75rem;
 }
 
 .modal-footer {
   padding: 1.25rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #2a3144;
   display: flex;
   justify-content: flex-end;
-  background: #ffffff;
-  position: sticky;
-  bottom: 0;
 }
 
 .save-button {
+  background: #9CCC65;
   color: white;
-  background-color: yellowgreen;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 0.75rem 2rem;
   font-size: 0.95rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
+  width: 100%;
+  font-family: "Poppins", sans-serif;
 }
 
-.save-button:hover {
-  background: #4338ca;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
-}
-
-/* Carousel Animation Classes */
+/* Animation Classes */
 .slide-up-enter {
   transform: translateY(100%);
   animation: slideUpEnter 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -387,6 +293,21 @@
 }
 
 /* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 @keyframes slideUpEnter {
   from {
     transform: translateY(100%);
@@ -430,47 +351,20 @@
     opacity: 0;
   }
 }
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Error State */
+.error-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #0F1725;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  padding: 1rem;
+  text-align: center;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Scrollbar Styles */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
-}
-
-/* Responsive Styles */
+/* Mobile Responsive Styles */
 @media (max-width: 480px) {
   .button-container {
     gap: 50vw;
@@ -493,18 +387,14 @@
     padding: 8px 20px;
   }
 
-  .template-content {
-    transform: scale(0.7);
-  }
-
   .photo-inputs {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-}
-
-.main-container.modal-open .button-container {
-  pointer-events: none; /* Prevent interactions during animation */
+  
+  .photo-preview {
+    height: 120px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -514,45 +404,8 @@
   }
 
   .modal-content {
-    width: 100%;
-    max-width: 100%;
     border-radius: 20px 20px 0 0;
-    max-height: 90vh;
     margin: 0;
-    overflow-x: hidden;
-  }
-  .template-content {
-    transform: scale(0.75);
-    margin: 0 auto;
-  }
-
-  .modal-header {
-    padding: 1rem;
-  }
-
-  .modal-body {
-    padding: 1rem;
-  }
-
-  .photo-inputs {
-    margin-bottom: 1.5rem;
-  }
-
-  .photo-preview {
-    height: 140px;
-  }
-
-  .input-group input,
-  .input-group textarea {
-    font-size: 16px;
-  }
-
-  .modal-footer {
-    padding: 1rem;
-  }
-
-  .save-button {
-    width: 100%;
   }
 
   .button-container {
@@ -570,5 +423,11 @@
 
   .share-button span {
     font-size: 14px;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
   }
 }
