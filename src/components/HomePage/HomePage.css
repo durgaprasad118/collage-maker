@@ -99,14 +99,31 @@ header h1 {
 .view-all-btn {
   display: flex;
   font-family: "Poppins", sans-serif;
-  color: white;
+  color: #00DA4B;
   align-items: center;
-  background-color: #9CCC65;
-  padding: 8px 16px;
+  background: none;
+  padding: 8px 0;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 15px;
+  transition: transform 0.3s ease;
+}
+
+.view-all-btn:hover {
+  transform: translateX(4px);
+}
+
+.view-all-btn .arrow-icon {
+  width: 14px;
+  height: 14px;
+  color: #00DA4B;
+  margin-left: 0px;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.view-all-btn:hover .arrow-icon {
+  transform: translateX(2px);
 }
 
 

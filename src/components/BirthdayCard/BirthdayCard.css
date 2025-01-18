@@ -49,7 +49,7 @@
     width: 40px;
     height: 40px;
     border: 4px solid rgba(255, 255, 255, 0.1);
-    border-left-color: #9CCC65;
+    border-left-color: #00DA4B;
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -194,7 +194,6 @@
   }
   
   .modal-content {
-    background: #ffffff;
     border-radius: 20px;
     width: 90%;
     max-width: 500px;
@@ -207,7 +206,6 @@
   
   .modal-header {
     padding: 1.25rem;
-    border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -221,7 +219,7 @@
     margin: 0;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #8BBA54;
+    color: white;
   }
   
   /* Form Styles */
@@ -246,12 +244,12 @@
   .photo-input label {
     font-size: 0.95rem;
     font-weight: 500;
-    color: #8BBA54;
+    color: white;
   }
   
   .photo-upload {
-    border: 2px dashed #e2e8f0;
-    background: #262626;
+    border: 2px dashed #404040;
+    background: #404040;
     border-radius: 12px;
     padding: 1.25rem;
     text-align: center;
@@ -260,7 +258,7 @@
   }
   
   .photo-upload:hover {
-    border-color: #9CCC65;
+    border-color: #00DA4B;
     background: #f8f8ff;
   }
   
@@ -287,26 +285,24 @@
   .input-group label {
     font-size: 0.95rem;
     font-weight: 500;
-    color: #8BBA54;
+    color: #00DA4B;
   }
   
   .input-group input,
   .input-group textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1.5px solid #e2e8f0;
+    border: 1.5px solid #404040;
     border-radius: 10px;
     font-size: 0.95rem;
-    color: #2d3748;
-    background: #f8fafc;
+    color: white;
     transition: all 0.2s ease;
   }
   
   .input-group input:focus,
   .input-group textarea:focus {
     outline: none;
-    border-color: #9CCC65;
-    background: #ffffff;
+    border-color:#00DA4B;
     box-shadow: 0 0 0 3px rgba(156, 204, 101, 0.1);
   }
   
@@ -326,7 +322,7 @@
   }
   
   .save-button {
-    background: #9CCC65;
+    background: #00DA4B;
     color: white;
     border: none;
     border-radius: 10px;
@@ -522,7 +518,7 @@
     }
   
     .template-content {
-      transform: scale(0.7);
+      transform: scale(0.8);
     }
 
     .template-wrapper {
@@ -597,7 +593,7 @@
     }
   
     .template-content {
-      transform: scale(0.75);
+      transform: scale(0.8);
       margin: 0 auto;
       padding-bottom: 30px;
     }
