@@ -221,7 +221,7 @@
     margin: 0;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #2d3748;
+    color: #8BBA54;
   }
   
   /* Form Styles */
@@ -246,12 +246,12 @@
   .photo-input label {
     font-size: 0.95rem;
     font-weight: 500;
-    color: #4a5568;
+    color: #8BBA54;
   }
   
   .photo-upload {
     border: 2px dashed #e2e8f0;
-    background: #f8fafc;
+    background: #262626;
     border-radius: 12px;
     padding: 1.25rem;
     text-align: center;
@@ -287,7 +287,7 @@
   .input-group label {
     font-size: 0.95rem;
     font-weight: 500;
-    color: #4a5568;
+    color: #8BBA54;
   }
   
   .input-group input,
@@ -599,15 +599,18 @@
     .template-content {
       transform: scale(0.75);
       margin: 0 auto;
-      padding-bottom: 110px;
+      padding-bottom: 30px;
     }
   
     .modal-header {
       padding: 1rem;
+      background-color: #262626;
+     
     }
   
     .modal-body {
       padding: 1rem;
+      background-color: #1A1A1A;
     }
   
     .photo-inputs {
@@ -621,10 +624,13 @@
     .input-group input,
     .input-group textarea {
       font-size: 16px;
+      background-color: #404040;
+      box-sizing: border-box;
     }
   
     .modal-footer {
       padding: 1rem;
+      background-color: #262626;
     }
   
     .save-button {

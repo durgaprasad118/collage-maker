@@ -704,7 +704,7 @@ const Card = () => {
             {renderTemplateContent(prevTemplateRef.current)}
           </div>
         )}
-
+  
         <div
           className={`template-positioning ${
             slideDirection === "up"
@@ -717,7 +717,7 @@ const Card = () => {
           {renderTemplateContent(currentTemplate)}
         </div>
       </div>
-
+  
       {isEditModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -727,173 +727,197 @@ const Card = () => {
                 <X size={24} />
               </button>
             </div>
-
+  
             <div className="modal-body">
               {currentTemplate?.images?.length > 0 && (
-                <div className="photo-inputs">
+                <div className="input-sections">
                   {(() => {
                     const imageFields = currentTemplate.images.filter((img) =>
                       img.name.includes("image")
                     );
-
+  
                     if (imageFields.length === 1) {
                       return (
-                        <div className="photo-input">
-                          <label>Couple Photo</label>
-                          <div className="photo-upload">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) =>
-                                handlePhotoChange(
-                                  "couple_photo",
-                                  e.target.files[0]
-                                )
-                              }
-                            />
-                            {photos.couple_photo && (
-                              <img
-                                src={photos.couple_photo}
-                                alt="Couple preview"
-                                className="photo-preview"
+                        <div className="section">
+                          <div className="photo-input">
+                            <label>Couple Photo</label>
+                            <div className="photo-upload">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                  handlePhotoChange(
+                                    "couple_photo",
+                                    e.target.files[0]
+                                  )
+                                }
                               />
-                            )}
+                              {photos.couple_photo && (
+                                <img
+                                  src={photos.couple_photo}
+                                  alt="Couple preview"
+                                  className="photo-preview"
+                                />
+                              )}
+                            </div>
+                          </div>
+  
+                          <div className="input-group">
+                            <label>Couple Names</label>
+                            <input
+                              type="text"
+                              value={customText.wedding_groom_name}
+                              onChange={(e) =>
+                                handleInputChange("wedding_groom_name", e.target.value)
+                              }
+                              placeholder="Enter groom's name"
+                            />
+                            <input
+                              type="text"
+                              value={customText.wedding_bride_name}
+                              onChange={(e) =>
+                                handleInputChange("wedding_bride_name", e.target.value)
+                              }
+                              placeholder="Enter bride's name"
+                            />
                           </div>
                         </div>
                       );
                     } else {
                       return (
                         <>
-                          <div className="photo-input">
-                            <label>Groom's Photo</label>
-                            <div className="photo-upload">
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) =>
-                                  handlePhotoChange(
-                                    "groom_photo",
-                                    e.target.files[0]
-                                  )
-                                }
-                              />
-                              {photos.groom_photo && (
-                                <img
-                                  src={photos.groom_photo}
-                                  alt="Groom preview"
-                                  className="photo-preview"
+                          <div className="section">
+                            <div className="photo-input">
+                              <label>Groom's Photo</label>
+                              <div className="photo-upload">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handlePhotoChange(
+                                      "groom_photo",
+                                      e.target.files[0]
+                                    )
+                                  }
                                 />
-                              )}
+                                {photos.groom_photo && (
+                                  <img
+                                    src={photos.groom_photo}
+                                    alt="Groom preview"
+                                    className="photo-preview"
+                                  />
+                                )}
+                              </div>
+                            </div>
+  
+                            <div className="input-group">
+                              <label>Groom's Name</label>
+                              <input
+                                type="text"
+                                value={customText.wedding_groom_name}
+                                onChange={(e) =>
+                                  handleInputChange("wedding_groom_name", e.target.value)
+                                }
+                                placeholder="Enter groom's name"
+                              />
                             </div>
                           </div>
-                          
-
-                          <div className="photo-input">
-                            <label>Bride's Photo</label>
-                            <div className="photo-upload">
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) =>
-                                  handlePhotoChange(
-                                    "bride_photo",
-                                    e.target.files[0]
-                                  )
-                                }
-                              />
-                              {photos.bride_photo && (
-                                <img
-                                  src={photos.bride_photo}
-                                  alt="Bride preview"
-                                  className="photo-preview"
+  
+                          <div className="section">
+                            <div className="photo-input">
+                              <label>Bride's Photo</label>
+                              <div className="photo-upload">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handlePhotoChange(
+                                      "bride_photo",
+                                      e.target.files[0]
+                                    )
+                                  }
                                 />
-                              )}
+                                {photos.bride_photo && (
+                                  <img
+                                    src={photos.bride_photo}
+                                    alt="Bride preview"
+                                    className="photo-preview"
+                                  />
+                                )}
+                              </div>
+                            </div>
+  
+                            <div className="input-group">
+                              <label>Bride's Name</label>
+                              <input
+                                type="text"
+                                value={customText.wedding_bride_name}
+                                onChange={(e) =>
+                                  handleInputChange("wedding_bride_name", e.target.value)
+                                }
+                                placeholder="Enter bride's name"
+                              />
                             </div>
                           </div>
                         </>
                       );
                     }
                   })()}
+  
+                  <div className="section wedding-details">
+                    <div className="input-group">
+                      <label>Wedding Date</label>
+                      <input
+                        type="date"
+                        value={inputValues.wedding_date}
+                        onChange={(e) =>
+                          handleInputChange("wedding_date", e.target.value)
+                        }
+                      />
+                    </div>
+  
+                    <div className="input-group">
+                      <label>Wedding Time</label>
+                      <input
+                        type="time"
+                        value={inputValues.wedding_time}
+                        onChange={(e) =>
+                          handleInputChange("wedding_time", e.target.value)
+                        }
+                      />
+                    </div>
+  
+                    <div className="input-group">
+                      <label>Venue</label>
+                      <textarea
+                        value={customText.wedding_venue}
+                        onChange={(e) =>
+                          handleInputChange("wedding_venue", e.target.value)
+                        }
+                        placeholder="Enter venue details"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
-
-              <div className="text-inputs">
-                <div className="input-group">
-                  <label>Groom's Name</label>
-                  <input
-                    type="text"
-                    value={customText.wedding_groom_name}
-                    onChange={(e) =>
-                      handleInputChange("wedding_groom_name", e.target.value)
-                    }
-                    placeholder="Enter groom's name"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label>Bride's Name</label>
-                  <input
-                    type="text"
-                    value={customText.wedding_bride_name}
-                    onChange={(e) =>
-                      handleInputChange("wedding_bride_name", e.target.value)
-                    }
-                    placeholder="Enter bride's name"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label>Wedding Date</label>
-                  <input
-                    type="date"
-                    value={inputValues.wedding_date}
-                    onChange={(e) =>
-                      handleInputChange("wedding_date", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label>Wedding Time</label>
-                  <input
-                    type="time"
-                    value={inputValues.wedding_time}
-                    onChange={(e) =>
-                      handleInputChange("wedding_time", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label>Venue</label>
-                  <textarea
-                    value={customText.wedding_venue}
-                    onChange={(e) =>
-                      handleInputChange("wedding_venue", e.target.value)
-                    }
-                    placeholder="Enter venue details"
-                  />
-                </div>
-              </div>
             </div>
+  
             <div className="modal-footer">
-              <button
-                className="save-button"
-                onClick={handleModalClose}
-              >
+              <button className="save-button" onClick={handleModalClose}>
                 Save Changes
               </button>
             </div>
           </div>
         </div>
       )}
-
+  
       <div className="button-container">
         <button
           className="floating-button edit-button"
           onClick={() => setIsEditModalOpen(true)}
         >
-          <img src={editIcon} alt="Edit" className="icon" /></button>
+          <img src={editIcon} alt="Edit" className="icon" />
+        </button>
         <button
           className="floating-button share-button"
           onClick={handleWhatsAppShare}
@@ -914,7 +938,6 @@ const Card = () => {
             Share
           </span>
         </button>
-
         <button
           className="floating-button download-button"
           onClick={handleDownload}
@@ -925,5 +948,5 @@ const Card = () => {
     </div>
   );
 };
-
-export default Card;
+  
+  export default Card;

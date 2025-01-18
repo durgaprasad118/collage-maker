@@ -183,7 +183,6 @@
   transition: opacity 0.3s ease;
 }
 
-/* Enhanced Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -199,8 +198,9 @@
   padding: 1rem;
 }
 
+/* Modal Content Container */
 .modal-content {
-  background: #ffffff;
+  background: #1a1a1a;
   border-radius: 20px;
   width: 90%;
   max-width: 500px;
@@ -211,15 +211,16 @@
   animation: slideUp 0.3s ease-out;
 }
 
+/* Modal Header */
 .modal-header {
   padding: 1.25rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #404040;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: sticky;
   top: 0;
-  background-color: white;
+  background: #262626;
   z-index: 10;
 }
 
@@ -227,13 +228,13 @@
   margin: 0;
   font-size: 1.4rem;
   font-weight: 600;
-  color: #2d3748;
+  color: white;
 }
 
 .close-button {
   background: none;
   border: none;
-  color: #6b7280;
+  color: #9CCC65;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
@@ -241,94 +242,117 @@
 }
 
 .close-button:hover {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: rgba(156, 204, 101, 0.1);
+  transform: rotate(90deg);
 }
 
-/* Enhanced Form Styles */
+/* Modal Body */
 .modal-body {
   padding: 1.5rem;
-  background: #fff;
+  background: #1a1a1a;
+  color: white;
+  overflow-x: hidden;
 }
 
-.photo-inputs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.photo-input {
+.input-sections {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.5rem;
+  width: 100%;
 }
 
-.photo-input label {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: white;
-}
-
-.photo-upload {
-  border: 2px dashed #e2e8f0;
-  background: #f8fafc;
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: #262626;
   border-radius: 12px;
-  padding: 1.25rem;
-  text-align: center;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.photo-upload:hover {
-  border-color: #4f46e5;
-  background: #f8f8ff;
-}
-
-.photo-preview {
+  width: 100%;
   max-width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-top: 0.75rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.text-inputs {
-  display: grid;
-  gap: 1.25rem;
+  box-sizing: border-box;
 }
 
 .input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 .input-group label {
-  font-size: 0.95rem;
+  color: #9CCC65;
   font-weight: 500;
-  color: #4a5568;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 0.9rem;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: white;
+  background: #333333;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.photo-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.photo-upload {
+  border: 2px dashed #404040;
+  background: #333333;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.photo-preview {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+}
+/* Input Group Styles */
+.input-group {
+  width: 100%;
+}
+
+.input-group label {
+  color: #9CCC65;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .input-group input,
 .input-group textarea {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  border: 1px solid #404040;
+  border-radius: 8px;
   font-size: 0.95rem;
-  color: #2d3748;
-  background: #f8fafc;
-  transition: all 0.2s ease;
+  color: white;
+  background: #333333;
+  margin-bottom: 0.5rem;
 }
 
 .input-group input:focus,
 .input-group textarea:focus {
   outline: none;
-  border-color: #4f46e5;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: #9CCC65;
+  background: #404040;
 }
 
 .input-group textarea {
@@ -336,33 +360,34 @@
   resize: vertical;
 }
 
+/* Modal Footer */
 .modal-footer {
   padding: 1.25rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #404040;
   display: flex;
   justify-content: flex-end;
-  background: #ffffff;
+  background: #262626;
   position: sticky;
   bottom: 0;
 }
 
 .save-button {
-  color: white;
-  background-color: yellowgreen;
+  background: #9CCC65;
+  color: #1a1a1a;
   border: none;
   border-radius: 10px;
   padding: 0.75rem 2rem;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 2px 4px rgba(156, 204, 101, 0.2);
 }
 
 .save-button:hover {
-  background: #4338ca;
+  background: #8bba54;
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 4px 6px rgba(156, 204, 101, 0.3);
 }
 
 /* Carousel Animation Classes */
@@ -495,6 +520,7 @@
 
   .template-content {
     transform: scale(0.7);
+    background-color: #0F1725;
   }
 
   .photo-inputs {
@@ -537,6 +563,11 @@
   .photo-inputs {
     margin-bottom: 1.5rem;
   }
+  
+  .section {
+    padding: .75rem;
+  }
+
 
   .photo-preview {
     height: 140px;
@@ -545,6 +576,7 @@
   .input-group input,
   .input-group textarea {
     font-size: 16px;
+    padding: 0.5rem;
   }
 
   .modal-footer {

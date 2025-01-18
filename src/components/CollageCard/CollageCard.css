@@ -84,7 +84,7 @@
   padding: 0 16px;
 }
 
-/* Individual Buttons */
+/* Buttons */
 .floating-button {
   padding: 12px;
   border-radius: 50%;
@@ -93,28 +93,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #3b3c41;
+  background: rgba(59, 60, 65, 0.95);
+  backdrop-filter: blur(8px);
   color: white;
   width: 48px;
   height: 48px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .floating-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.floating-button:active {
-  transform: translateY(0);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .share-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #3b3c41;
+  background: rgba(59, 60, 65, 0.95);
+  backdrop-filter: blur(8px);
   color: white;
   border-radius: 24px;
   padding: 8px 24px;
@@ -125,150 +123,459 @@
 .share-button span {
   font-size: 14px;
   font-weight: 500;
+  font-family: 'Poppins', sans-serif;
   white-space: nowrap;
 }
 
-/* Hide buttons when modal is open */
-.modal-open .button-container {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-/* Modal Styles */
+/* Modern Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(15, 23, 37, 0.85);
-  backdrop-filter: blur(8px);
+  background-color: rgba(15, 23, 37, 0.95);
+  backdrop-filter: blur(12px);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   z-index: 1000;
-  padding: 1rem;
 }
 
 .modal-content {
-  background: #1a2234;
-  border-radius: 20px 20px 0 0;
+  background: linear-gradient(180deg, #1a2234 0%, #151b2b 100%);
+  border-radius: 24px 24px 0 0;
   width: 100%;
-  max-width: 100%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
-  position: fixed;
-  bottom: 0;
-  animation: slideUp 0.3s ease-out;
+  position: relative;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
-  padding: 1.25rem;
-  border-bottom: 1px solid #2a3144;
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 34, 52, 0.95);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.4rem;
+.header-content h2 {
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: white;
-  font-family: "Poppins", sans-serif;
+  margin: 0;
 }
 
-.close-button {
-  background: none;
-  border: none;
-  color: #9CCC65;
-  cursor: pointer;
-  padding: 0.5rem;
-}
-
-/* Photo Upload Section */
-.modal-body {
-  padding: 1.5rem;
-}
-
-.photo-inputs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-  padding: 0.5rem;
-}
-
-.photo-input {
-  background: #242b3d;
-  padding: 1rem;
+.upload-status {
+  background: rgba(156, 204, 101, 0.1);
+  border: 1px solid rgba(156, 204, 101, 0.2);
   border-radius: 12px;
+  padding: 12px 16px;
+  margin: 16px;
 }
 
-.photo-input label {
-  color: white;
-  font-family: "Poppins", sans-serif;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-.photo-upload {
-  position: relative;
-  border: 2px dashed #9CCC65;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-  min-height: 150px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.upload-prompt {
+.status-text {
   color: #9CCC65;
   font-size: 14px;
-  margin-bottom: 8px;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
 }
 
-.photo-input input[type="file"] {
-  position: absolute;
+.modal-body {
+  padding: 0 16px 16px 16px;
+}
+
+.upload-all-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.upload-info {
+  color: #ffffff;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.multi-upload-container {
+  position: relative;
+  margin-top: 12px;
+}
+
+.upload-zone {
+  border: 2px dashed rgba(156, 204, 101, 0.5);
+  border-radius: 16px;
+  padding: 32px 20px;
+  text-align: center;
+  background: rgba(156, 204, 101, 0.05);
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  border-color: #9CCC65;
+  background: rgba(156, 204, 101, 0.1);
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.separator span {
+  padding: 0 16px;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.photo-slot {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.photo-preview-container {
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  cursor: pointer;
+  position: relative;
 }
 
 .photo-preview {
   width: 100%;
-  height: 140px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 8px;
-  margin-top: 0.75rem;
+}
+
+.remove-photo-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ff4d4d;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
 }
 
 .modal-footer {
-  padding: 1.25rem;
-  border-top: 1px solid #2a3144;
-  display: flex;
-  justify-content: flex-end;
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 34, 52, 0.95);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  bottom: 0;
 }
 
 .save-button {
   background: #9CCC65;
-  color: white;
+  color: #ffffff;
   border: none;
-  border-radius: 8px;
-  padding: 0.75rem 2rem;
-  font-size: 0.95rem;
-  font-weight: 500;
+  border-radius: 12px;
+  padding: 14px;
   width: 100%;
-  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-button:hover {
+  background: #8BC34A;
+  transform: translateY(-1px);
+}
+
+.close-button {
+  background: rgba(156, 204, 101, 0.1);
+  border: none;
+  color: #9CCC65;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background: rgba(156, 204, 101, 0.2);
+  transform: scale(1.05);
+}
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.photo-slot {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.photo-preview-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.photo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.remove-photo-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.remove-photo-btn:hover {
+  background: rgba(220, 38, 38, 0.8);
+  transform: scale(1.1);
+}
+
+.photo-upload-slot {
+  width: 100%;
+  height: 100%;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.photo-upload-slot:hover {
+  border-color: #9CCC65;
+  background: #f1f5f9;
+}
+
+.upload-placeholder {
+  text-align: center;
+  color: #64748b;
+}
+
+.upload-placeholder span {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.upload-placeholder p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+/* Upload Section Styles */
+.modal-body {
+  padding: 24px;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.header-content h2 {
+  margin: 0 0 4px 0;
+}
+
+.photo-status {
+  margin: 0;
+  font-size: 14px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.upload-status {
+  background: red;
+  padding: 8px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-text {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.upload-instructions {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.multi-upload-container {
+  position: relative;
+  margin: 16px 0;
+}
+
+.upload-zone {
+  border: 2px dashed rgba(156, 204, 101, 0.5);
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  background: rgba(156, 204, 101, 0.05);
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  border-color: #9CCC65;
+  background: rgba(156, 204, 101, 0.1);
+}
+
+.multi-file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.upload-icon {
+  font-size: 32px;
+  color: #9CCC65;
+  margin-bottom: 12px;
+}
+
+.upload-zone p {
+  margin: 8px 0;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+}
+
+.upload-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.preview-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 34, 52, 0.95);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  bottom: 0;
+}
+
+.save-button {
+  background: #9CCC65;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-button:hover {
+  background: #8BC34A;
+  transform: translateY(-1px);
 }
 
 /* Animation Classes */
@@ -351,28 +658,48 @@
     opacity: 0;
   }
 }
+
 /* Error State */
 .error-screen {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
   background-color: #0F1725;
   color: white;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   padding: 1rem;
   text-align: center;
 }
 
-/* Mobile Responsive Styles */
+.retry-button {
+  margin-top: 16px;
+  padding: 12px 24px;
+  background: #9CCC65;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  background: #8BC34A;
+  transform: translateY(-1px);
+}
+
+/* Responsive Styles */
 @media (max-width: 480px) {
   .button-container {
-    gap: 50vw;
+    gap: 40px;
     bottom: 16px;
   }
 
   .template-content {
     transform: scale(0.8);
+    background-color: #0F1725;
   }
 
   .floating-button,
@@ -387,32 +714,27 @@
     padding: 8px 20px;
   }
 
-  .photo-inputs {
+  .preview-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 12px;
   }
-  
-  .photo-preview {
-    height: 120px;
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .upload-zone {
+    padding: 24px 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.1rem;
   }
 }
 
 @media (max-width: 768px) {
-  .modal-overlay {
-    padding: 0;
-    align-items: flex-end;
-  }
-
-  .modal-content {
-    border-radius: 20px 20px 0 0;
-    margin: 0;
-  }
-
   .button-container {
-    position: fixed;
-    gap: 80px;
-    bottom: 20px;
-    padding: 0 12px;
+    gap: 60px;
   }
 
   .share-button {
@@ -424,10 +746,27 @@
   .share-button span {
     font-size: 14px;
   }
-  
+
   .modal-header,
-  .modal-body,
   .modal-footer {
-    padding: 1rem;
+    padding: 16px;
   }
+}
+
+/* Scrollbar Styling */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(156, 204, 101, 0.3);
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 204, 101, 0.5);
 }
