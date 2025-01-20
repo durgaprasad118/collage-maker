@@ -131,26 +131,5 @@
       }
     ]
   }
-  ,
-  "id_3": {
-    "images": [
-      {
-        "thumbnail": "/Collage-Templates/templetes-thumbnail/3.jpeg",
-        "template":"/Collage-Templates/templetes/3.png",
-        "name": "wedding_groom_image",
-        "sample_image": "/Collage-Templates/default-images/Sample4.jpg",
-        "coordinates": {
-          "width_in_px": 404,
-          "height_in_px": 240,
-          "top_in_px": 369,
-          "left_in_px": 80,
-          "width": 74.81,
-          "height": 25,
-          "top": 50.31,
-          "left": 50.73,
-          "type": "box"
-        }
-      }
-    ]
-  }
+
 }

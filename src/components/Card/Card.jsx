@@ -763,7 +763,7 @@ const Card = () => {
                           </div>
   
                           <div className="input-group">
-                            <label>Couple Names</label>
+                            <label>Couple Name's</label>
                             <input
                               type="text"
                               value={customText.wedding_groom_name}

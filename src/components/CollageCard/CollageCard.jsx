@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { X, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
+import ZoomableImage from './ZoomableImage';
 
 import "./CollageCard.css";
 
