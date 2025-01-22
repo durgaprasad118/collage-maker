@@ -244,13 +244,15 @@
   .photo-input label {
     font-size: 0.95rem;
     font-weight: 500;
-    color: white;
+    color: #00DA4B;
   }
   
   .photo-upload {
-    border: 2px dashed #404040;
+    border: 2px dashed #00DA4B;
     background: #404040;
     border-radius: 12px;
+    text-decoration: underline;
+    color: #00DA4B;
     padding: 1.25rem;
     text-align: center;
     transition: all 0.2s ease;

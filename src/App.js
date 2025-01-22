@@ -10,14 +10,13 @@ const BirthdayCard = React.lazy(() => import('./components/BirthdayCard/Birthday
 const TemplateLibrary = React.lazy(() => import('./components/TemplateLibrary/TemplateLibrary'));
 
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-[#0F1725]">
-    <div className="text-center">
-      <div className="w-16 h-16 border-4 border-[#9CCC65] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-      <p className="text-white">Loading...</p>
+  <div className="loading-screen">
+    <div className="loading-content">
+      <div className="loading-spinner"></div>
+      <p className="loading-text">Loading...</p>
     </div>
   </div>
 );
-
 const App = () => {
   return (
     <BrowserRouter>

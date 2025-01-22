@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {X} from "lucide-react";
+import {X,Trash2} from "lucide-react";
 import html2canvas from "html2canvas";
+import CropModal from "../CropModal/CropModal";
 import './BirthdayCard.css';
 
 // Font imports
@@ -16,7 +17,58 @@ import TimesNewRoman from "../../assets/fonts/Times-New-Roman-Regular.ttf";
 import downloadIcon from "../../assets/icons/Download_Icon.svg";
 import editIcon from "../../assets/icons/Edit_Icon.svg";
 
+
+const compressImage = (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Calculate new dimensions while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        const maxDimension = 1920;
+
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let quality = 0.8;
+        let output = canvas.toDataURL("image/jpeg", quality);
+        let size = new Blob([output]).size;
+
+        while (size > 5 * 1024 * 1024 && quality > 0.1) {
+          quality -= 0.1;
+          output = canvas.toDataURL("image/jpeg", quality);
+          size = new Blob([output]).size;
+        }
+
+        resolve(output);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+
 // Image Storage Service (same as Card.jsx)
+// Update the ImageStorageService object by adding the removeImage method
 const ImageStorageService = {
   saveImage: async (key, imageData) => {
     try {
@@ -35,13 +87,28 @@ const ImageStorageService = {
       console.error('Error getting image:', error);
       return null;
     }
+  },
+
+  // Add this new method
+  removeImage: async (key) => {
+    try {
+      localStorage.removeItem(`birthday_image_${key}`);
+      return true;
+    } catch (error) {
+      console.error('Error removing image:', error);
+      return false;
+    }
   }
 };
 
 const BirthdayCard = () => {
+
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImage, setCropImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
+  
   // Initialize states
   const [customText, setCustomText] = useState({
     birthday_name: "",
@@ -114,6 +181,102 @@ const BirthdayCard = () => {
   const touchScrollThreshold = 120;
   const scrollCooldown = 500;
 
+
+  const handleCroppedImage = async (croppedImage) => {
+    try {
+      let blob;
+      
+      if (croppedImage instanceof Blob) {
+        blob = croppedImage;
+      } else if (typeof croppedImage === 'string' && croppedImage.startsWith('data:')) {
+        const response = await fetch(croppedImage);
+        blob = await response.blob();
+      } else {
+        throw new Error('Invalid image format received from crop');
+      }
+  
+      if (!blob.type.startsWith('image/')) {
+        throw new Error('Invalid image type');
+      }
+  
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read blob'));
+        reader.readAsDataURL(blob);
+      });
+  
+      const base64Data = await base64Promise;
+  
+      let imageData = base64Data;
+      if (blob.size > 5 * 1024 * 1024) {
+        imageData = await compressImage(new Blob([blob]));
+      }
+  
+      const saveResult = await ImageStorageService.saveImage('person_photo', imageData);
+  
+      if (!saveResult) {
+        throw new Error('Failed to save image to storage');
+      }
+  
+      setPhotos(prev => ({
+        ...prev,
+        person_photo: imageData
+      }));
+  
+      setPhotoMetadata(prev => ({
+        ...prev,
+        person_photo: true
+      }));
+  
+      setShowCropModal(false);
+      setCropImage(null);
+  
+    } catch (error) {
+      console.error('Detailed cropping error:', error);
+      
+      let errorMessage = 'Error saving cropped image. ';
+      if (error.message.includes('storage')) {
+        errorMessage += 'Storage is full. Please free up some space and try again.';
+      } else if (error.message.includes('Invalid image')) {
+        errorMessage += 'Please ensure you are uploading a valid image file.';
+      } else {
+        errorMessage += 'Please try again with a smaller image.';
+      }
+      
+      alert(errorMessage);
+      
+      setShowCropModal(false);
+      setCropImage(null);
+    }
+  };
+  const handlePhotoRemove = useCallback(async (photoKey) => {
+    try {
+      // Remove image from localStorage
+      await ImageStorageService.removeImage(photoKey);
+  
+      // Update photos state
+      setPhotos(prev => {
+        const newPhotos = { ...prev };
+        delete newPhotos[photoKey];
+        return newPhotos;
+      });
+  
+      // Update metadata
+      setPhotoMetadata(prev => {
+        const newMetadata = {
+          ...prev,
+          [photoKey]: false
+        };
+        localStorage.setItem('birthday_card_metadata', JSON.stringify(newMetadata));
+        return newMetadata;
+      });
+  
+    } catch (error) {
+      console.error('Error removing photo:', error);
+      alert('Error removing photo. Please try again.');
+    }
+  }, []);
   // Save data function
   const saveData = useCallback(async () => {
     try {
@@ -228,13 +391,9 @@ const BirthdayCard = () => {
     }
 
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        setPhotos(prev => ({ ...prev, [name]: reader.result }));
-        await ImageStorageService.saveImage(name, reader.result);
-        setPhotoMetadata(prev => ({ ...prev, [name]: true }));
-      };
-      reader.readAsDataURL(file);
+      const imageUrl = URL.createObjectURL(file);
+      setCropImage(imageUrl);
+      setShowCropModal(true);
     } catch (error) {
       console.error('Error handling photo:', error);
       alert('Error uploading photo. Please try again.');
@@ -432,19 +591,36 @@ const BirthdayCard = () => {
                 <div className="photo-input">
                   <label>Birthday Person's Photo</label>
                   <div className="photo-upload">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handlePhotoChange("person_photo", e.target.files[0])}
-                    />
-                    {photos.person_photo && (
-                      <img
-                        src={photos.person_photo}
-                        alt="Preview"
-                        className="photo-preview"
-                      />
-                    )}
-                  </div>
+  <label className="upload-label" htmlFor="person-photo-input">
+    {photos.person_photo ? "Change Image" : "Upload Image"}
+  </label>
+  <input
+    id="person-photo-input"
+    type="file"
+    accept="image/*"
+    onChange={(e) =>
+      handlePhotoChange("person_photo", e.target.files[0])
+    }
+    style={{ display: "none" }} // Hides the input for custom styling
+  />
+  {photos.person_photo && (
+    <div className="photo-preview-container">
+      <img
+        src={photos.person_photo}
+        alt="Preview"
+        className="photo-preview"
+      />
+      <button
+        className="remove-photo-btn"
+        onClick={() => handlePhotoRemove("person_photo")}
+        aria-label="Remove person photo"
+      >
+        <Trash2 size={20} />
+      </button>
+    </div>
+  )}
+</div>
+
                 </div>
               </div>
             )}
@@ -628,6 +804,16 @@ const BirthdayCard = () => {
           <img src={downloadIcon} alt="Download" className="icon" />
         </button>
       </div>
+      {showCropModal && (
+        <CropModal
+          image={cropImage}
+          onCropComplete={handleCroppedImage}
+          onClose={() => {
+            setShowCropModal(false);
+            setCropImage(null);
+          }}
+        />
+      )}
     </div>
   );
 };

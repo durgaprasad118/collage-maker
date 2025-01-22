@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Edit2, X, Download, Share2 } from "lucide-react";
+import { Edit2, X, Download, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
+import CropModal from "../CropModal/CropModal";
 import "./Card.css";
 
 // Font imports
@@ -18,17 +19,20 @@ import editIcon from "../../assets/icons/Edit_Icon.svg";
 
 // Image Storage Service
 const ImageStorageService = {
-  dbName: 'WeddingCardDB',
-  storeName: 'cardImages',
+  dbName: "WeddingCardDB",
+  storeName: "cardImages",
   version: 1,
 
   initDB: () => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(ImageStorageService.dbName, ImageStorageService.version);
-      
+      const request = indexedDB.open(
+        ImageStorageService.dbName,
+        ImageStorageService.version
+      );
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve(request.result);
-      
+
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
         if (!db.objectStoreNames.contains(ImageStorageService.storeName)) {
@@ -37,28 +41,57 @@ const ImageStorageService = {
       };
     });
   },
+  // Add this method to ImageStorageService
+  removeImage: async (key) => {
+    try {
+      const db = await ImageStorageService.initDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+          [ImageStorageService.storeName],
+          "readwrite"
+        );
+        const store = transaction.objectStore(ImageStorageService.storeName);
 
+        const request = store.delete(key);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+      });
+    } catch (error) {
+      console.error("Error removing image from IndexedDB:", error);
+      throw error;
+    }
+  },
   saveImage: async (key, imageData) => {
     try {
       // First compress the image
-      const compressedImage = await ImageStorageService.compressImage(imageData, 800);
-      
+      const compressedImage = await ImageStorageService.compressImage(
+        imageData,
+        800
+      );
+
       // Then start a new transaction
       const db = await ImageStorageService.initDB();
       return new Promise((resolve, reject) => {
-        const transaction = db.transaction([ImageStorageService.storeName], 'readwrite');
+        const transaction = db.transaction(
+          [ImageStorageService.storeName],
+          "readwrite"
+        );
         const store = transaction.objectStore(ImageStorageService.storeName);
-        
+
         const request = store.put(compressedImage, key);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
-        
+
         // Handle transaction completion
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
       });
     } catch (error) {
-      console.error('Error in saveImage:', error);
+      console.error("Error in saveImage:", error);
       throw error;
     }
   },
@@ -67,15 +100,18 @@ const ImageStorageService = {
     try {
       const db = await ImageStorageService.initDB();
       return new Promise((resolve, reject) => {
-        const transaction = db.transaction([ImageStorageService.storeName], 'readonly');
+        const transaction = db.transaction(
+          [ImageStorageService.storeName],
+          "readonly"
+        );
         const store = transaction.objectStore(ImageStorageService.storeName);
         const request = store.get(key);
-        
+
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error('Error in getImage:', error);
+      console.error("Error in getImage:", error);
       throw error;
     }
   },
@@ -85,34 +121,37 @@ const ImageStorageService = {
       const img = new Image();
       img.src = base64String;
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
         let width = img.width;
         let height = img.height;
-        
+
         if (width > maxWidth) {
           height = Math.round((height * maxWidth) / width);
           width = maxWidth;
         }
-        
+
         canvas.width = width;
         canvas.height = height;
-        
+
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
       };
       img.onerror = () => {
-        console.error('Error loading image for compression');
+        console.error("Error loading image for compression");
         resolve(base64String); // Fallback to original
       };
     });
-  }
+  },
 };
 
 const Card = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImage, setCropImage] = useState(null);
+  const [currentPhotoKey, setCurrentPhotoKey] = useState(null);
 
   // Initialize all states
   const [customText, setCustomText] = useState({
@@ -161,12 +200,125 @@ const Card = () => {
   const scrollThreshold = 120;
   const touchScrollThreshold = 120;
   const scrollCooldown = 500;
+  const handleCroppedImage = async (croppedImage) => {
+    try {
+      let blob;
 
+      if (croppedImage instanceof Blob) {
+        blob = croppedImage;
+      } else if (
+        typeof croppedImage === "string" &&
+        croppedImage.startsWith("data:")
+      ) {
+        const response = await fetch(croppedImage);
+        blob = await response.blob();
+      } else {
+        throw new Error("Invalid image format received from crop");
+      }
+
+      if (!blob.type.startsWith("image/")) {
+        throw new Error("Invalid image type");
+      }
+
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Failed to read blob"));
+        reader.readAsDataURL(blob);
+      });
+
+      const base64Data = await base64Promise;
+
+      try {
+        // Save to IndexedDB
+        await ImageStorageService.saveImage(currentPhotoKey, base64Data);
+
+        // Update UI with compressed image from IndexedDB
+        const savedImage = await ImageStorageService.getImage(currentPhotoKey);
+
+        // Update states
+        setPhotos((prev) => ({
+          ...prev,
+          [currentPhotoKey]: savedImage,
+        }));
+
+        setPhotoMetadata((prev) => {
+          const newMetadata = {
+            ...prev,
+            [currentPhotoKey]: true,
+          };
+          localStorage.setItem(
+            "wedding_card_metadata",
+            JSON.stringify(newMetadata)
+          );
+          return newMetadata;
+        });
+      } catch (error) {
+        console.error("Error saving to IndexedDB:", error);
+        throw new Error("Failed to save image");
+      }
+
+      // Clear modal state
+      setShowCropModal(false);
+      setCropImage(null);
+      setCurrentPhotoKey(null);
+    } catch (error) {
+      console.error("Detailed cropping error:", error);
+
+      let errorMessage = "Error saving cropped image. ";
+      if (error.message.includes("storage")) {
+        errorMessage +=
+          "Storage is full. Please free up some space and try again.";
+      } else if (error.message.includes("Invalid image")) {
+        errorMessage += "Please ensure you are uploading a valid image file.";
+      } else {
+        errorMessage += "Please try again with a smaller image.";
+      }
+
+      alert(errorMessage);
+
+      // Clean up modal state
+      setShowCropModal(false);
+      setCropImage(null);
+      setCurrentPhotoKey(null);
+    }
+  };
+
+  // Add this function in your Card component
+  const handlePhotoRemove = useCallback(async (photoKey) => {
+    try {
+      // Remove from IndexedDB
+      await ImageStorageService.removeImage(photoKey);
+
+      // Update photos state
+      setPhotos((prev) => {
+        const newPhotos = { ...prev };
+        delete newPhotos[photoKey];
+        return newPhotos;
+      });
+
+      // Update metadata
+      setPhotoMetadata((prev) => {
+        const newMetadata = {
+          ...prev,
+          [photoKey]: false,
+        };
+        localStorage.setItem(
+          "wedding_card_metadata",
+          JSON.stringify(newMetadata)
+        );
+        return newMetadata;
+      });
+    } catch (error) {
+      console.error("Error removing photo:", error);
+      alert("Error removing photo. Please try again.");
+    }
+  }, []);
   // Save data function
   const saveData = useCallback(async () => {
     try {
       localStorage.setItem(
-        'wedding_card_text',
+        "wedding_card_text",
         JSON.stringify({
           customText,
           inputValues,
@@ -174,11 +326,11 @@ const Card = () => {
       );
 
       localStorage.setItem(
-        'wedding_card_metadata',
+        "wedding_card_metadata",
         JSON.stringify(photoMetadata)
       );
     } catch (error) {
-      console.error('Error saving data:', error);
+      console.error("Error saving data:", error);
     }
   }, [customText, inputValues, photoMetadata]);
 
@@ -186,7 +338,7 @@ const Card = () => {
   const loadSavedData = useCallback(async () => {
     try {
       // Load metadata first
-      const savedMetadata = localStorage.getItem('wedding_card_metadata');
+      const savedMetadata = localStorage.getItem("wedding_card_metadata");
       const metadata = savedMetadata ? JSON.parse(savedMetadata) : null;
 
       if (metadata) {
@@ -197,14 +349,14 @@ const Card = () => {
           if (exists) {
             const photo = await ImageStorageService.getImage(key);
             if (photo) {
-              setPhotos(prev => ({ ...prev, [key]: photo }));
+              setPhotos((prev) => ({ ...prev, [key]: photo }));
             }
           }
         }
       }
 
       // Load text data
-      const savedTextData = localStorage.getItem('wedding_card_text');
+      const savedTextData = localStorage.getItem("wedding_card_text");
       if (savedTextData) {
         const textData = JSON.parse(savedTextData);
         if (textData.customText) {
@@ -215,7 +367,7 @@ const Card = () => {
         }
       }
     } catch (error) {
-      console.error('Error loading saved data:', error);
+      console.error("Error loading saved data:", error);
     }
   }, []);
 
@@ -233,10 +385,14 @@ const Card = () => {
   const getOrdinalSuffix = useCallback((day) => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
     }
   }, []);
 
@@ -244,118 +400,117 @@ const Card = () => {
   const handlePhotoChange = useCallback(async (name, file) => {
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Please choose an image under 5MB");
-      return;
-    }
-
     try {
+      // Convert file to base64
       const reader = new FileReader();
-      
-      reader.onload = async () => {
+      reader.onload = async (e) => {
         try {
-          // Update UI immediately
-          setPhotos(prev => ({ ...prev, [name]: reader.result }));
-          
-          // Save to IndexedDB
-          await ImageStorageService.saveImage(name, reader.result);
-          
-          // Update metadata
-          const newMetadata = { ...photoMetadata, [name]: true };
-          setPhotoMetadata(newMetadata);
-          
-          // Save metadata
-          localStorage.setItem(
-            'wedding_card_metadata',
-            JSON.stringify(newMetadata)
-          );
+          let imageData = e.target.result;
 
-          // Get the compressed saved image
-          const savedImage = await ImageStorageService.getImage(name);
-          if (savedImage) {
-            setPhotos(prev => ({ ...prev, [name]: savedImage }));
+          // If image is larger than 5MB, compress it
+          if (file.size > 5 * 1024 * 1024) {
+            try {
+              // Using a larger maxWidth for initial compression to maintain quality
+              imageData = await ImageStorageService.compressImage(
+                imageData,
+                1200
+              );
+              console.log("Image compressed successfully");
+            } catch (compressionError) {
+              console.error("Error compressing image:", compressionError);
+              // Continue with original image if compression fails
+            }
           }
+
+          setCurrentPhotoKey(name);
+          setCropImage(imageData);
+          setShowCropModal(true);
         } catch (error) {
-          console.error('Error processing image:', error);
-          alert('Error processing image. Please try again.');
+          console.error("Error processing image:", error);
+          alert("Error processing image. Please try again.");
         }
       };
 
       reader.onerror = () => {
-        alert('Error reading file. Please try again.');
+        throw new Error("Error reading file");
       };
-      
+
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Error handling photo:', error);
-      alert('Error uploading photo. Please try again.');
+      console.error("Error handling photo:", error);
+      alert("Error uploading photo. Please try again.");
     }
-  }, [photoMetadata]);
+  }, []);
 
   // Input handlers with auto-save
-  const handleInputChange = useCallback((name, value) => {
-    if (name === "wedding_date") {
-      setInputValues(prev => {
-        const newInputValues = {
-          ...prev,
-          wedding_date: value
-        };
-        return newInputValues;
-      });
-
-      if (value) {
-        const date = new Date(value);
-        const dayName = date.toLocaleString("en-US", { weekday: "long" });
-        const monthName = date.toLocaleString("en-US", { month: "long" });
-        const day = date.getDate();
-        const ordinalSuffix = getOrdinalSuffix(day);
-        const formattedDate = `${dayName}, ${monthName} ${day}${ordinalSuffix}`;
-
-        setCustomText(prev => {
-          const newCustomText = {
+  const handleInputChange = useCallback(
+    (name, value) => {
+      if (name === "wedding_date") {
+        setInputValues((prev) => {
+          const newInputValues = {
             ...prev,
-            wedding_date: formattedDate
+            wedding_date: value,
           };
-          return newCustomText;
+          return newInputValues;
         });
-      }
-    } else if (name === "wedding_time") {
-      setInputValues(prev => {
-        const newInputValues = {
-          ...prev,
-          wedding_time: value
-        };
-        return newInputValues;
-      });
 
-      if (value) {
-        const [hours, minutes] = value.split(":");
-        const time = new Date();
-        time.setHours(hours, minutes);
-        const formattedTime = time.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true
-        }).toLowerCase();
+        if (value) {
+          const date = new Date(value);
+          const dayName = date.toLocaleString("en-US", { weekday: "long" });
+          const monthName = date.toLocaleString("en-US", { month: "long" });
+          const day = date.getDate();
+          const ordinalSuffix = getOrdinalSuffix(day);
+          const formattedDate = `${dayName}, ${monthName} ${day}${ordinalSuffix}`;
 
-        setCustomText(prev => {
-          const newCustomText = {
+          setCustomText((prev) => {
+            const newCustomText = {
+              ...prev,
+              wedding_date: formattedDate,
+            };
+            return newCustomText;
+          });
+        }
+      } else if (name === "wedding_time") {
+        setInputValues((prev) => {
+          const newInputValues = {
             ...prev,
-            wedding_time: formattedTime
+            wedding_time: value,
           };
-          return newCustomText;
+          return newInputValues;
         });
-      }
-    } else {
-      setCustomText(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
 
-    // Save after any change
-    saveData();
-  }, [getOrdinalSuffix, saveData]);
+        if (value) {
+          const [hours, minutes] = value.split(":");
+          const time = new Date();
+          time.setHours(hours, minutes);
+          const formattedTime = time
+            .toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })
+            .toLowerCase();
+
+          setCustomText((prev) => {
+            const newCustomText = {
+              ...prev,
+              wedding_time: formattedTime,
+            };
+            return newCustomText;
+          });
+        }
+      } else {
+        setCustomText((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
+
+      // Save after any change
+      saveData();
+    },
+    [getOrdinalSuffix, saveData]
+  );
 
   // Navigation handlers
   const goToHomePage = useCallback(() => {
@@ -372,7 +527,7 @@ const Card = () => {
       { name: "Allura-Regular", url: Allura },
       { name: "Times-New-Roman-Regular", url: TimesNewRoman },
     ];
-    
+
     try {
       const fontPromises = fonts.map(async (font) => {
         const fontFace = new FontFace(font.name, `url(${font.url})`);
@@ -398,18 +553,20 @@ const Card = () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
 
-    html2canvas(captureDiv, { scale: 8 }).then((canvas) => {
-      const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = jpgDataUrl;
-      downloadLink.download = "wedding-invitation.jpg";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    }).catch(error => {
-      console.error('Error generating image:', error);
-      alert('Error generating image. Please try again.');
-    });
+    html2canvas(captureDiv, { scale: 8 })
+      .then((canvas) => {
+        const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = jpgDataUrl;
+        downloadLink.download = "wedding-invitation.jpg";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      })
+      .catch((error) => {
+        console.error("Error generating image:", error);
+        alert("Error generating image. Please try again.");
+      });
   }, []);
 
   // WhatsApp share handler
@@ -418,31 +575,44 @@ const Card = () => {
     if (!captureDiv) return;
 
     try {
-      const canvas = await html2canvas(captureDiv, { 
+      const canvas = await html2canvas(captureDiv, {
         scale: 4,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null 
+        backgroundColor: null,
       });
 
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
-      const file = new File([blob], 'wedding-invitation.jpg', { type: 'image/jpeg' });
+      const blob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", 0.8)
+      );
+      const file = new File([blob], "wedding-invitation.jpg", {
+        type: "image/jpeg",
+      });
 
-      const message = `🎊 *Wedding Invitation* 🎊\n\n${customText.wedding_bride_name || "[Bride Name]"} & ${customText.wedding_groom_name || "[Groom Name]"}\n\n📅 ${customText.wedding_date || "Date TBA"}\n⏰ ${customText.wedding_time || "Time TBA"}\n📍 ${customText.wedding_venue || "Venue TBA"}\n\nYour presence will make our day special! 💑`;
+      const message = `🎊 *Wedding Invitation* 🎊\n\n${
+        customText.wedding_bride_name || "[Bride Name]"
+      } & ${customText.wedding_groom_name || "[Groom Name]"}\n\n📅 ${
+        customText.wedding_date || "Date TBA"
+      }\n⏰ ${customText.wedding_time || "Time TBA"}\n📍 ${
+        customText.wedding_venue || "Venue TBA"
+      }\n\nYour presence will make our day special! 💑`;
 
       const shareData = {
         files: [file],
-        text: message
+        text: message,
       };
 
       if (navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else {
-        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        window.open(
+          `https://wa.me/?text=${encodeURIComponent(message)}`,
+          "_blank"
+        );
       }
     } catch (error) {
-      console.error('Error sharing:', error);
-      alert('Unable to share. Please try again.');
+      console.error("Error sharing:", error);
+      alert("Unable to share. Please try again.");
     }
   }, [customText]);
 
@@ -451,7 +621,8 @@ const Card = () => {
     const metaTag = document.querySelector("meta[name='viewport']");
     const originalContent = metaTag?.getAttribute("content");
 
-    const newContent = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+    const newContent =
+      "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
 
     if (metaTag) {
       metaTag.setAttribute("content", newContent);
@@ -500,68 +671,75 @@ const Card = () => {
   }, [id]);
 
   // Scroll handling
-  const handleScroll = useCallback((deltaY, e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    if (isScrolling.current || isAnimating) return;
-
-    const currentTime = Date.now();
-    if (currentTime - lastScrollTimeRef.current < scrollCooldown) return;
-
-    scrollAccumulator.current = Math.min(
-      scrollAccumulator.current + Math.abs(deltaY),
-      scrollThreshold * 1.5
-    );
-
-    if (scrollAccumulator.current > scrollThreshold) {
-      lastScrollTimeRef.current = currentTime;
-      scrollAccumulator.current = 0;
-
-      const scrollVelocity = Math.abs(deltaY) / 100;
-      if (scrollVelocity < 0.5) return;
-
-      if (deltaY > 0 && currentIndex < allTemplates.length - 1) {
-        isScrolling.current = true;
-        setIsAnimating(true);
-        setSlideDirection("up");
-        prevTemplateRef.current = currentTemplate;
-
-        setTimeout(() => {
-          const nextIndex = currentIndex + 1;
-          setCurrentIndex(nextIndex);
-          setCurrentTemplate(allTemplates[nextIndex]);
-          navigate(`/card/${allTemplates[nextIndex].id.replace('id_', '')}`, { replace: true });
-        }, 10);
-
-        setTimeout(() => {
-          setSlideDirection(null);
-          setIsAnimating(false);
-          isScrolling.current = false;
-        }, 700);
-      } else if (deltaY < 0 && currentIndex > 0) {
-        isScrolling.current = true;
-        setIsAnimating(true);
-        setSlideDirection("down");
-        prevTemplateRef.current = currentTemplate;
-
-        setTimeout(() => {
-          const prevIndex = currentIndex - 1;
-          setCurrentIndex(prevIndex);
-          setCurrentTemplate(allTemplates[prevIndex]);
-          navigate(`/card/${allTemplates[prevIndex].id.replace('id_', '')}`, { replace: true });
-        }, 10);
-
-        setTimeout(() => {
-          setSlideDirection(null);
-          setIsAnimating(false);
-          isScrolling.current = false;
-        }, 700);
+  const handleScroll = useCallback(
+    (deltaY, e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
       }
-    }
-  }, [currentIndex, allTemplates, navigate, currentTemplate, isAnimating]);
+
+      if (isScrolling.current || isAnimating) return;
+
+      const currentTime = Date.now();
+      if (currentTime - lastScrollTimeRef.current < scrollCooldown) return;
+
+      scrollAccumulator.current = Math.min(
+        scrollAccumulator.current + Math.abs(deltaY),
+        scrollThreshold * 1.5
+      );
+
+      if (scrollAccumulator.current > scrollThreshold) {
+        lastScrollTimeRef.current = currentTime;
+        scrollAccumulator.current = 0;
+
+        const scrollVelocity = Math.abs(deltaY) / 100;
+        if (scrollVelocity < 0.5) return;
+
+        if (deltaY > 0 && currentIndex < allTemplates.length - 1) {
+          isScrolling.current = true;
+          setIsAnimating(true);
+          setSlideDirection("up");
+          prevTemplateRef.current = currentTemplate;
+
+          setTimeout(() => {
+            const nextIndex = currentIndex + 1;
+            setCurrentIndex(nextIndex);
+            setCurrentTemplate(allTemplates[nextIndex]);
+            navigate(`/card/${allTemplates[nextIndex].id.replace("id_", "")}`, {
+              replace: true,
+            });
+          }, 10);
+
+          setTimeout(() => {
+            setSlideDirection(null);
+            setIsAnimating(false);
+            isScrolling.current = false;
+          }, 700);
+        } else if (deltaY < 0 && currentIndex > 0) {
+          isScrolling.current = true;
+          setIsAnimating(true);
+          setSlideDirection("down");
+          prevTemplateRef.current = currentTemplate;
+
+          setTimeout(() => {
+            const prevIndex = currentIndex - 1;
+            setCurrentIndex(prevIndex);
+            setCurrentTemplate(allTemplates[prevIndex]);
+            navigate(`/card/${allTemplates[prevIndex].id.replace("id_", "")}`, {
+              replace: true,
+            });
+          }, 10);
+
+          setTimeout(() => {
+            setSlideDirection(null);
+            setIsAnimating(false);
+            isScrolling.current = false;
+          }, 700);
+        }
+      }
+    },
+    [currentIndex, allTemplates, navigate, currentTemplate, isAnimating]
+  );
 
   // Scroll and touch event listeners
   useEffect(() => {
@@ -575,15 +753,15 @@ const Card = () => {
 
     const handleTouchMove = (e) => {
       if (touchStartRef.current === null) return;
-      
+
       const touchDeltaY = e.touches[0].clientY - touchStartRef.current;
       const absDeltaY = Math.abs(touchDeltaY);
-      
+
       scrollAccumulator.current = Math.min(
         scrollAccumulator.current + absDeltaY,
         touchScrollThreshold * 1.5
       );
-      
+
       if (scrollAccumulator.current > touchScrollThreshold) {
         handleScroll(-touchDeltaY * 1.5, e);
         touchStartRef.current = null;
@@ -593,91 +771,100 @@ const Card = () => {
 
     const container = containerRef.current;
     container.addEventListener("wheel", handleWheel, { passive: false });
-    container.addEventListener("touchstart", handleTouchStart, { passive: false });
-    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: false,
+    });
+    container.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
 
     return () => {
       container.removeEventListener("wheel", handleWheel);
       container.removeEventListener("touchstart", handleTouchStart);
       container.removeEventListener("touchmove", handleTouchMove);
     };
-  }, );
+  });
 
   // Template rendering
-  const renderTemplateContent = useCallback((template) => {
-    const isSingleImageTemplate = template?.images?.length === 1;
+  const renderTemplateContent = useCallback(
+    (template) => {
+      const isSingleImageTemplate = template?.images?.length === 1;
 
-    return (
-      <div className="template-content">
-        <img
-          src={template?.images[0]?.template}
-          alt="Base Template"
-          className="base-template"
-        />
-        {template?.images.map((image, index) => {
-          let photoToUse = isSingleImageTemplate ? 
-            photos.couple_photo : 
-            (image.name === "wedding_groom_image" ? photos.groom_photo : photos.bride_photo);
+      return (
+        <div className="template-content">
+          <img
+            src={template?.images[0]?.template}
+            alt="Base Template"
+            className="base-template"
+          />
+          {template?.images.map((image, index) => {
+            let photoToUse = isSingleImageTemplate
+              ? photos.couple_photo
+              : image.name === "wedding_groom_image"
+              ? photos.groom_photo
+              : photos.bride_photo;
 
-          return (
-            <div
-              key={index}
-              style={{
-                width: `${image.coordinates.width_in_px}px`,
-                height: `${image.coordinates.height_in_px}px`,
-                position: "absolute",
-                top: `${image.coordinates.top_in_px}px`,
-                left: `${image.coordinates.left_in_px}px`,
-                zIndex: 0,
-                textAlign: "center",
-              }}
-            >
+            return (
               <div
+                key={index}
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  backgroundImage: `url(${photoToUse || image.sample_image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
+                  width: `${image.coordinates.width_in_px}px`,
+                  height: `${image.coordinates.height_in_px}px`,
+                  position: "absolute",
+                  top: `${image.coordinates.top_in_px}px`,
+                  left: `${image.coordinates.left_in_px}px`,
+                  zIndex: 0,
+                  textAlign: "center",
                 }}
-              />
-            </div>
-          );
-        })}
-        {template?.texts.map((text, index) => {
-          const getFontFamily = (fontId) => {
-            if (!fontId) return "Tinos-Regular, sans-serif";
-            const fontName = fontId.replace(".ttf", "");
-            return `${fontName}, sans-serif`;
-          };
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundImage: `url(${photoToUse || image.sample_image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                  }}
+                />
+              </div>
+            );
+          })}
+          {template?.texts.map((text, index) => {
+            const getFontFamily = (fontId) => {
+              if (!fontId) return "Tinos-Regular, sans-serif";
+              const fontName = fontId.replace(".ttf", "");
+              return `${fontName}, sans-serif`;
+            };
 
-          return (
-            <div
-              key={index}
-              className="text-overlay"
-              style={{
-                position: "absolute",
-                width: `${text.coordinates.width_in_px}px`,
-                height: `${text.coordinates.height_in_px}px`,
-                top: `${text.coordinates.top_in_px}px`,
-                left: `${text.coordinates.left_in_px}px`,
-                fontSize: `${text.text_configs.size}px`,
-                color: text.text_configs.color,
-                textAlign: text.text_configs.text_alignment.toLowerCase(),
-                fontFamily: getFontFamily(text.text_configs.font_id),
-                textRendering: "optimizeLegibility",
-                WebkitFontSmoothing: "antialiased",
-                MozOsxFontSmoothing: "grayscale",
-              }}
-            >
-              {customText[text.name] || text.text_configs.sample_text}
-            </div>
-          );
-        })}
-      </div>
-    );
-  }, [photos, customText]);
+            return (
+              <div
+                key={index}
+                className="text-overlay"
+                style={{
+                  position: "absolute",
+                  width: `${text.coordinates.width_in_px}px`,
+                  height: `${text.coordinates.height_in_px}px`,
+                  top: `${text.coordinates.top_in_px}px`,
+                  left: `${text.coordinates.left_in_px}px`,
+                  fontSize: `${text.text_configs.size}px`,
+                  color: text.text_configs.color,
+                  textAlign: text.text_configs.text_alignment.toLowerCase(),
+                  fontFamily: getFontFamily(text.text_configs.font_id),
+                  textRendering: "optimizeLegibility",
+                  WebkitFontSmoothing: "antialiased",
+                  MozOsxFontSmoothing: "grayscale",
+                }}
+              >
+                {customText[text.name] || text.text_configs.sample_text}
+              </div>
+            );
+          })}
+        </div>
+      );
+    },
+    [photos, customText]
+  );
 
   if (!fontsLoaded) {
     return (
@@ -704,7 +891,7 @@ const Card = () => {
             {renderTemplateContent(prevTemplateRef.current)}
           </div>
         )}
-  
+
         <div
           className={`template-positioning ${
             slideDirection === "up"
@@ -717,7 +904,7 @@ const Card = () => {
           {renderTemplateContent(currentTemplate)}
         </div>
       </div>
-  
+
       {isEditModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -727,7 +914,7 @@ const Card = () => {
                 <X size={24} />
               </button>
             </div>
-  
+
             <div className="modal-body">
               {currentTemplate?.images?.length > 0 && (
                 <div className="input-sections">
@@ -735,7 +922,7 @@ const Card = () => {
                     const imageFields = currentTemplate.images.filter((img) =>
                       img.name.includes("image")
                     );
-  
+
                     if (imageFields.length === 1) {
                       return (
                         <div className="section">
@@ -746,72 +933,33 @@ const Card = () => {
                                 type="file"
                                 accept="image/*"
                                 onChange={(e) =>
-                                  handlePhotoChange(
-                                    "couple_photo",
-                                    e.target.files[0]
-                                  )
+                                  handlePhotoChange("couple_photo", e.target.files[0])
                                 }
                               />
-                              {photos.couple_photo && (
-                                <img
-                                  src={photos.couple_photo}
-                                  alt="Couple preview"
-                                  className="photo-preview"
-                                />
+                              {!photos.couple_photo ? (
+                                <p className="upload-message">Upload Couple Image</p>
+                              ) : (
+                                <div className="photo-preview-container">
+                                  <img
+                                    src={photos.couple_photo}
+                                    alt="Couple preview"
+                                    className="photo-preview"
+                                  />
+                                  <button
+                                    className="remove-photo-btn"
+                                    onClick={() => handlePhotoRemove("couple_photo")}
+                                    aria-label="Remove couple photo"
+                                  >
+                                    <Trash2 size={20} />
+                                  </button>
+                                </div>
                               )}
                             </div>
                           </div>
-  
+                    
                           <div className="input-group">
-                            <label>Couple Name's</label>
-                            <input
-                              type="text"
-                              value={customText.wedding_groom_name}
-                              onChange={(e) =>
-                                handleInputChange("wedding_groom_name", e.target.value)
-                              }
-                              placeholder="Enter groom's name"
-                            />
-                            <input
-                              type="text"
-                              value={customText.wedding_bride_name}
-                              onChange={(e) =>
-                                handleInputChange("wedding_bride_name", e.target.value)
-                              }
-                              placeholder="Enter bride's name"
-                            />
-                          </div>
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <>
-                          <div className="section">
-                            <div className="photo-input">
-                              <label>Groom's Photo</label>
-                              <div className="photo-upload">
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) =>
-                                    handlePhotoChange(
-                                      "groom_photo",
-                                      e.target.files[0]
-                                    )
-                                  }
-                                />
-                                {photos.groom_photo && (
-                                  <img
-                                    src={photos.groom_photo}
-                                    alt="Groom preview"
-                                    className="photo-preview"
-                                  />
-                                )}
-                              </div>
-                            </div>
-  
-                            <div className="input-group">
-                              <label>Groom's Name</label>
+                            <label>Couple's Names</label>
+                            <div className="name-inputs">
                               <input
                                 type="text"
                                 value={customText.wedding_groom_name}
@@ -820,35 +968,6 @@ const Card = () => {
                                 }
                                 placeholder="Enter groom's name"
                               />
-                            </div>
-                          </div>
-  
-                          <div className="section">
-                            <div className="photo-input">
-                              <label>Bride's Photo</label>
-                              <div className="photo-upload">
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) =>
-                                    handlePhotoChange(
-                                      "bride_photo",
-                                      e.target.files[0]
-                                    )
-                                  }
-                                />
-                                {photos.bride_photo && (
-                                  <img
-                                    src={photos.bride_photo}
-                                    alt="Bride preview"
-                                    className="photo-preview"
-                                  />
-                                )}
-                              </div>
-                            </div>
-  
-                            <div className="input-group">
-                              <label>Bride's Name</label>
                               <input
                                 type="text"
                                 value={customText.wedding_bride_name}
@@ -859,11 +978,138 @@ const Card = () => {
                               />
                             </div>
                           </div>
+                        </div>
+                      );
+                    }
+                     else {
+                      return (
+                        <>
+                          <div className="section">
+                            <div className="photo-input">
+                              <label>Groom's Photo</label>
+                              <div className="photo-upload">
+                                <label
+                                  className="upload-label"
+                                  htmlFor="groom-photo-input"
+                                >
+                                  {photos.groom_photo
+                                    ? "Change Image"
+                                    : "Upload Groom's Image"}
+                                </label>
+                                <input
+                                  id="groom-photo-input"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handlePhotoChange(
+                                      "groom_photo",
+                                      e.target.files[0]
+                                    )
+                                  }
+                                  style={{ display: "none" }} // Hides the input for custom styling
+                                />
+                                {photos.groom_photo && (
+                                  <div className="photo-preview-container">
+                                    <img
+                                      src={photos.groom_photo}
+                                      alt="Groom preview"
+                                      className="photo-preview"
+                                    />
+                                    <button
+                                      className="remove-photo-btn"
+                                      onClick={() =>
+                                        handlePhotoRemove("groom_photo")
+                                      }
+                                      aria-label="Remove groom photo"
+                                    >
+                                      <Trash2 size={20} />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="input-group">
+                              <label>Groom's Name</label>
+                              <input
+                                type="text"
+                                value={customText.wedding_groom_name}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "wedding_groom_name",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Enter groom's name"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="section">
+                            <div className="photo-input">
+                              <label>Bride's Photo</label>
+                              <div className="photo-upload">
+                                <label
+                                  className="upload-label"
+                                  htmlFor="bride-photo-input"
+                                >
+                                  {photos.bride_photo
+                                    ? "Change Image"
+                                    : " Upload Bride's Image"}
+                                </label>
+                                <input
+                                  id="bride-photo-input"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) =>
+                                    handlePhotoChange(
+                                      "bride_photo",
+                                      e.target.files[0]
+                                    )
+                                  }
+                                  style={{ display: "none" }} // Hides the input
+                                />
+                                {photos.bride_photo && (
+                                  <div className="photo-preview-container">
+                                    <img
+                                      src={photos.bride_photo}
+                                      alt="Bride preview"
+                                      className="photo-preview"
+                                    />
+                                    <button
+                                      className="remove-photo-btn"
+                                      onClick={() =>
+                                        handlePhotoRemove("bride_photo")
+                                      }
+                                      aria-label="Remove image"
+                                    >
+                                      <Trash2 size={20} />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="input-group">
+                              <label>Bride's Name</label>
+                              <input
+                                type="text"
+                                value={customText.wedding_bride_name}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "wedding_bride_name",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Enter bride's name"
+                              />
+                            </div>
+                          </div>
                         </>
                       );
                     }
                   })()}
-  
+
                   <div className="section wedding-details">
                     <div className="input-group">
                       <label>Wedding Date</label>
@@ -875,7 +1121,7 @@ const Card = () => {
                         }
                       />
                     </div>
-  
+
                     <div className="input-group">
                       <label>Wedding Time</label>
                       <input
@@ -886,7 +1132,7 @@ const Card = () => {
                         }
                       />
                     </div>
-  
+
                     <div className="input-group">
                       <label>Venue</label>
                       <textarea
@@ -901,7 +1147,7 @@ const Card = () => {
                 </div>
               )}
             </div>
-  
+
             <div className="modal-footer">
               <button className="save-button" onClick={handleModalClose}>
                 Save Changes
@@ -910,7 +1156,7 @@ const Card = () => {
           </div>
         </div>
       )}
-  
+
       <div className="button-container">
         <button
           className="floating-button edit-button"
@@ -945,8 +1191,19 @@ const Card = () => {
           <img src={downloadIcon} alt="Download" className="icon" />
         </button>
       </div>
+      {showCropModal && (
+        <CropModal
+          image={cropImage}
+          onCropComplete={handleCroppedImage}
+          onClose={() => {
+            setShowCropModal(false);
+            setCropImage(null);
+            setCurrentPhotoKey(null);
+          }}
+        />
+      )}
     </div>
   );
 };
-  
-  export default Card;
+
+export default Card;

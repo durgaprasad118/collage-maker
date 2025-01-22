@@ -14,8 +14,7 @@
           "width": 31.3,
           "height": 25.83,
           "top": 49.27,
-          "left": 24.54,
-          "type": "box"
+          "left": 24.54
         }
       },
       {
@@ -29,8 +28,7 @@
           "width": 31.3,
           "height": 25.83,
           "top": 48.95,
-          "left": 76.76,
-          "type": "box"
+          "left": 76.76
         }
       }
     ],
@@ -157,8 +155,7 @@
           "width": 43.89,
           "height": 20.83,
           "top": 32.19,
-          "left": 26.75,
-          "type": "box"
+          "left": 26.75
         }
       },
       {
@@ -172,8 +169,7 @@
           "width": 43.89,
           "height": 20.83,
           "top": 32.39,
-          "left": 74.35,
-          "type": "box"
+          "left": 74.35
         }
       }
     ],
@@ -300,8 +296,7 @@
           "width": 74.81,
           "height": 25,
           "top": 50.31,
-          "left": 50.73,
-          "type": "box"
+          "left": 50.73
         }
       }
     ],
@@ -407,8 +402,7 @@
           "width": 29.44,
           "height": 35.94,
           "top": 53.18,
-          "left": 36.94,
-          "type": "box"
+          "left": 36.94
         }
       },
       {
@@ -422,8 +416,7 @@
           "width": 29.44,
           "height": 35.94,
           "top": 53.18,
-          "left": 66.94,
-          "type": "box"
+          "left": 66.94
         }
       }
     ],
@@ -492,7 +485,7 @@
           "left": 50.92
         }
       },
-      
+
       {
         "name": "wedding_venue",
         "text_configs": {
@@ -531,8 +524,7 @@
           "width": 43.89,
           "height": 20.83,
           "top": 32.19,
-          "left": 26.75,
-          "type": "box"
+          "left": 26.75
         }
       }
     ],
@@ -543,8 +535,8 @@
           "font_id": "Times-New-Roman-Regular.ttf",
 
           "size": 30,
-         
-          "char_limit":10,
+
+          "char_limit": 10,
           "text_alignment": "CENTER",
           "color": "#c74251",
           "sample_text": "Raj"
@@ -645,7 +637,7 @@
         }
       }
     ]
-  }, 
+  },
   "id_6": {
     "images": [
       {
@@ -661,8 +653,7 @@
           "width": 43.89,
           "height": 20.83,
           "top": 32.19,
-          "left": 26.75,
-          "type": "box"
+          "left": 26.75
         }
       },
       {
@@ -676,8 +667,7 @@
           "width": 43.89,
           "height": 20.83,
           "top": 32.39,
-          "left": 74.35,
-          "type": "box"
+          "left": 74.35
         }
       }
     ],
@@ -686,7 +676,7 @@
         "name": "wedding_groom_name",
         "text_configs": {
           "font_id": "Montserrat-SemiBold.ttf",
-          
+
           "size": 30,
           "char_limit": 30,
           "text_alignment": "CENTER",
@@ -708,7 +698,7 @@
         "name": "wedding_bride_name",
         "text_configs": {
           "font_id": "Montserrat-SemiBold.ttf",
-        
+
           "size": 30,
           "char_limit": 30,
           "text_alignment": "Start",
@@ -730,7 +720,7 @@
         "name": "wedding_date",
         "text_configs": {
           "font_id": "Montserrat-Regular",
-          
+
           "size": 25,
           "char_limit": 30,
           "text_alignment": "CENTER",
@@ -752,7 +742,7 @@
         "name": "wedding_time",
         "text_configs": {
           "font_id": "Montserrat-Regular",
-         
+
           "size": 25,
           "char_limit": 30,
           "text_alignment": "CENTER",
@@ -808,8 +798,7 @@
           "width": 43.89,
           "height": 20.83,
           "top": 32.19,
-          "left": 26.75,
-          "type": "box"
+          "left": 26.75
         }
       },
       {
@@ -823,8 +812,7 @@
           "width": 43.89,
           "height": 20.83,
           "top": 32.39,
-          "left": 74.35,
-          "type": "box"
+          "left": 74.35
         }
       }
     ],
@@ -833,7 +821,7 @@
         "name": "wedding_groom_name",
         "text_configs": {
           "font_id": "Allura-Regular.ttf",
-          
+
           "size": 45,
           "char_limit": 30,
           "text_alignment": "CENTER",
@@ -855,7 +843,7 @@
         "name": "wedding_bride_name",
         "text_configs": {
           "font_id": "Allura-Regular.ttf",
-         
+
           "size": 45,
           "char_limit": 30,
           "text_alignment": "CENTER",
@@ -877,7 +865,7 @@
         "name": "wedding_date",
         "text_configs": {
           "font_id": "Times-New-Roman-Regular.ttf",
-        
+
           "size": 22,
           "char_limit": 30,
           "text_alignment": "CENTER",
@@ -899,7 +887,7 @@
         "name": "wedding_time",
         "text_configs": {
           "font_id": "Times-New-Roman-Regular.ttf",
-         
+
           "size": 22,
           "char_limit": 30,
           "text_alignment": "CENTER",

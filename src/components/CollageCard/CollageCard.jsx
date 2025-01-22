@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { X, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
-import ZoomableImage from './ZoomableImage';
+import CropModal from "../CropModal/CropModal";
 
 import "./CollageCard.css";
 
@@ -118,6 +118,11 @@ const CollageCard = () => {
   const touchStartRef = useRef(null);
   const prevTemplateRef = useRef(null);
 
+  // Add these with your other state declarations
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImage, setCropImage] = useState(null);
+  const [currentUploadIndex, setCurrentUploadIndex] = useState(null);
+
   // Load saved photos
   const loadSavedPhotos = useCallback(async () => {
     try {
@@ -158,85 +163,127 @@ const CollageCard = () => {
     };
   }, [currentTemplate?.images?.length, photos]);
 
-  // Handle photo uploads
-  const handleMultiplePhotos = useCallback(
-    async (files) => {
-      if (!files || files.length === 0) return;
+  // const handleMultiplePhotos = useCallback(
+  //   async (files) => {
+  //     if (!files || files.length === 0) return;
 
-      // Get remaining slots count
-      const filledPhotosCount = Object.keys(photos).length;
-      const remainingSlots =
-        currentTemplate?.images?.length - filledPhotosCount;
+  //     const filledPhotosCount = Object.keys(photos).length;
+  //     const remainingSlots =
+  //       currentTemplate?.images?.length - filledPhotosCount;
 
-      // Check if user is trying to upload more photos than available slots
-      if (files.length > remainingSlots) {
-        alert(
-          `You can only upload ${remainingSlots} more photo${
-            remainingSlots > 1 ? "s" : ""
-          }`
-        );
-        return;
+  //     if (files.length > remainingSlots) {
+  //       alert(
+  //         `You can only upload ${remainingSlots} more photo${
+  //           remainingSlots > 1 ? "s" : ""
+  //         }`
+  //       );
+  //       return;
+  //     }
+
+  //     // Handle first image with crop modal
+  //     const firstFile = files[0];
+  //     const imageUrl = URL.createObjectURL(firstFile);
+  //     setCurrentUploadIndex(0);
+  //     setCropImage(imageUrl);
+  //     setShowCropModal(true);
+
+  //     // Store remaining files for later processing
+  //     const remainingFiles = Array.from(files).slice(1);
+  //     // You might want to store these in state if you want to process them after the first crop is complete
+  //   },
+  //   [currentTemplate?.images?.length, photos]
+  // );
+
+  const handleCroppedImage = async (croppedImage) => {
+    try {
+      let blob;
+      
+      // Handle different types of input
+      if (croppedImage instanceof Blob) {
+        blob = croppedImage;
+      } else if (typeof croppedImage === 'string' && croppedImage.startsWith('data:')) {
+        // Convert base64 to blob
+        const response = await fetch(croppedImage);
+        blob = await response.blob();
+      } else {
+        throw new Error('Invalid image format received from crop');
       }
-
-      try {
-        const promises = Array.from(files).map(async (file, index) => {
-          let imageData;
-
-          // Check if file needs compression
-          if (file.size > 5 * 1024 * 1024) {
-            const compressedData = await compressImage(file);
-            imageData = compressedData;
-          } else {
-            imageData = await new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onload = (e) => resolve(e.target.result);
-              reader.readAsDataURL(file);
-            });
-          }
-
-          // Find next available slot
-          let slotIndex = index;
-          while (
-            photos[`photo_${slotIndex}`] &&
-            slotIndex < currentTemplate?.images?.length
-          ) {
-            slotIndex++;
-          }
-
-          // Save to storage
-          await ImageStorageService.saveImage(`photo_${slotIndex}`, imageData);
-          return { index: slotIndex, result: imageData };
-        });
-
-        const results = await Promise.all(promises);
-
-        // Update photos state
-        const newPhotos = { ...photos };
-        const newMetadata = { ...photoMetadata };
-        results.forEach(({ index, result }) => {
-          newPhotos[`photo_${index}`] = result;
-          newMetadata[`photo_${index}`] = true;
-        });
-
-        setPhotos(newPhotos);
-        setPhotoMetadata(newMetadata);
-        localStorage.setItem(
-          "collage_photos_metadata",
-          JSON.stringify(newMetadata)
-        );
-
-        // Close modal only if all slots are filled
-        if (Object.keys(newPhotos).length === currentTemplate?.images?.length) {
-          setIsEditModalOpen(false);
-        }
-      } catch (error) {
-        console.error("Error handling photos:", error);
-        alert("Error uploading photos. Please try again.");
+  
+      // Verify blob type
+      if (!blob.type.startsWith('image/')) {
+        throw new Error('Invalid image type');
       }
-    },
-    [currentTemplate?.images?.length, photos, photoMetadata]
-  );
-
+  
+      // Convert blob to base64 for compression
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read blob'));
+        reader.readAsDataURL(blob);
+      });
+  
+      const base64Data = await base64Promise;
+  
+      // Compress image if needed
+      let imageData = base64Data;
+      if (blob.size > 5 * 1024 * 1024) {
+        imageData = await compressImage(new Blob([blob]));
+      }
+  
+      // Save to localStorage
+      const saveResult = await ImageStorageService.saveImage(
+        `photo_${currentUploadIndex}`,
+        imageData
+      );
+  
+      if (!saveResult) {
+        throw new Error('Failed to save image to storage');
+      }
+  
+      // Update states
+      setPhotos(prev => ({
+        ...prev,
+        [`photo_${currentUploadIndex}`]: imageData,
+      }));
+  
+      setFilledSlots(prev => ({
+        ...prev,
+        [`photo_${currentUploadIndex}`]: true,
+      }));
+  
+      // Update metadata
+      const newMetadata = {
+        ...photoMetadata,
+        [`photo_${currentUploadIndex}`]: true,
+      };
+      setPhotoMetadata(newMetadata);
+      localStorage.setItem('collage_photos_metadata', JSON.stringify(newMetadata));
+  
+      // Close modal and reset states
+      setShowCropModal(false);
+      setCropImage(null);
+      setCurrentUploadIndex(null);
+  
+    } catch (error) {
+      console.error('Detailed cropping error:', error);
+      
+      let errorMessage = 'Error saving cropped image. ';
+      if (error.message.includes('storage')) {
+        errorMessage += 'Storage is full. Please free up some space and try again.';
+      } else if (error.message.includes('Invalid image')) {
+        errorMessage += 'Please ensure you are uploading a valid image file.';
+      } else {
+        errorMessage += 'Please try again with a smaller image.';
+      }
+      
+      alert(errorMessage);
+      
+      // Clean up
+      setShowCropModal(false);
+      setCropImage(null);
+      setCurrentUploadIndex(null);
+    }
+  };
   // Download handler
   const handleDownload = useCallback(() => {
     const captureDiv = document.querySelector(".template-content");
@@ -453,36 +500,10 @@ const CollageCard = () => {
     if (!file) return;
 
     try {
-      let imageData = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.readAsDataURL(file);
-      });
-
-      // Save to storage
-      await ImageStorageService.saveImage(`photo_${index}`, imageData);
-
-      // Update states
-      setPhotos((prev) => ({
-        ...prev,
-        [`photo_${index}`]: imageData,
-      }));
-
-      setFilledSlots((prev) => ({
-        ...prev,
-        [`photo_${index}`]: true,
-      }));
-
-      // Update metadata
-      const newMetadata = {
-        ...photoMetadata,
-        [`photo_${index}`]: true,
-      };
-      setPhotoMetadata(newMetadata);
-      localStorage.setItem(
-        "collage_photos_metadata",
-        JSON.stringify(newMetadata)
-      );
+      const imageUrl = URL.createObjectURL(file);
+      setCurrentUploadIndex(index);
+      setCropImage(imageUrl);
+      setShowCropModal(true);
     } catch (error) {
       console.error("Error handling single photo:", error);
       alert("Error uploading photo. Please try again.");
@@ -556,29 +577,9 @@ const CollageCard = () => {
           </div>
 
           <div className="modal-body">
-            <div className="upload-all-section">
-              <p className="upload-info">
-                Upload all {currentTemplate?.images?.length} photos at once
-              </p>
-              <div className="multi-upload-container">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => handleMultiplePhotos(e.target.files)}
-                  className="multi-file-input"
-                />
-                <div className="upload-zone">
-                  <span className="upload-icon">+</span>
-                  <p>
-                    Select {currentTemplate?.images?.length} photos together
-                  </p>
-                </div>
-              </div>
-            </div>
-
+        
             <div className="separator">
-              <span>or upload individually</span>
+              <span>upload-images</span>
             </div>
 
             <div className="photo-grid">
@@ -699,6 +700,17 @@ const CollageCard = () => {
           <img src={downloadIcon} alt="Download" className="icon" />
         </button>
       </div>
+      {showCropModal && (
+        <CropModal
+          image={cropImage}
+          onCropComplete={handleCroppedImage}
+          onClose={() => {
+            setShowCropModal(false);
+            setCropImage(null);
+            setCurrentUploadIndex(null);
+          }}
+        />
+      )}
     </div>
   );
 };
