@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Edit2, X, Download, Trash2 } from "lucide-react";
+import {X,Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import CropModal from "../CropModal/CropModal";
 import "./Card.css";
@@ -860,6 +860,7 @@ const Card = () => {
               </div>
             );
           })}
+        
         </div>
       );
     },

@@ -4,10 +4,12 @@
   "private": true,
   "dependencies": {
     "cra-template": "1.2.0",
+    "framer-motion": "^12.0.1",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.469.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-draggable": "^4.4.3",
     "react-icons": "^5.4.0",
     "react-image-crop": "^11.0.7",
     "react-modal": "^3.16.3",

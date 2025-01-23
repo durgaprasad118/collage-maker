@@ -4,6 +4,7 @@ import {X,Trash2} from "lucide-react";
 import html2canvas from "html2canvas";
 import CropModal from "../CropModal/CropModal";
 import './BirthdayCard.css';
+import ZoomableImage from "./ZoomableImage";
 
 // Font imports
 import TinosRegular from "../../assets/fonts/Tinos-Regular.ttf";
@@ -16,7 +17,6 @@ import TimesNewRoman from "../../assets/fonts/Times-New-Roman-Regular.ttf";
 // Icon imports
 import downloadIcon from "../../assets/icons/Download_Icon.svg";
 import editIcon from "../../assets/icons/Edit_Icon.svg";
-
 
 const compressImage = (file) => {
   return new Promise((resolve) => {
@@ -108,6 +108,7 @@ const BirthdayCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+
   
   // Initialize states
   const [customText, setCustomText] = useState({
@@ -177,9 +178,9 @@ const BirthdayCard = () => {
   const lastScrollTimeRef = useRef(Date.now());
 
   // Constants
-  const scrollThreshold = 120;
-  const touchScrollThreshold = 120;
-  const scrollCooldown = 500;
+  // const scrollThreshold = 120;
+  // const touchScrollThreshold = 120;
+  // const scrollCooldown = 500;
 
 
   const handleCroppedImage = async (croppedImage) => {
@@ -686,29 +687,14 @@ const BirthdayCard = () => {
           className="base-template"
         />
         {template?.images.map((image, index) => (
-          <div
+          <ZoomableImage
             key={index}
-            style={{
-              width: `${image.coordinates.width_in_px}px`,
-              height: `${image.coordinates.height_in_px}px`,
-              position: "absolute",
-              top: `${image.coordinates.top_in_px}px`,
-              left: `${image.coordinates.left_in_px}px`,
-              zIndex: 0,
-            }}
-          >
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundImage: `url(${photos.person_photo || image.sample_image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat"
-              }}
-            />
-          </div>
+            image={image}
+            coordinates={image.coordinates}
+            backgroundImage={photos.person_photo}
+          />
         ))}
+        {/* Text overlays remain unchanged */}
         {template?.texts.map((text, index) => (
           <div
             key={index}
@@ -731,7 +717,6 @@ const BirthdayCard = () => {
       </div>
     );
   }, [photos, customText]);
-
   // Loading and error states
 // Loading and error states
 
