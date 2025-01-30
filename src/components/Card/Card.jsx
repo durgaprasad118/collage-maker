@@ -5,7 +5,6 @@ import html2canvas from "html2canvas";
 import CropModal from "../CropModal/CropModal";
 import "./Card.css";
 
-// Font imports
 import TinosRegular from "../../assets/fonts/Tinos-Regular.ttf";
 import MontserratSemiBold from "../../assets/fonts/Montserrat-SemiBold.ttf";
 import MontserratRegular from "../../assets/fonts/Montserrat-Regular.ttf";
@@ -555,7 +554,7 @@ const Card = () => {
 
     html2canvas(captureDiv, { scale: 8 })
       .then((canvas) => {
-        const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
+        const jpgDataUrl = canvas.toDataURL("image/jpeg", 8);
         const downloadLink = document.createElement("a");
         downloadLink.href = jpgDataUrl;
         downloadLink.download = "wedding-invitation.jpg";
@@ -576,17 +575,17 @@ const Card = () => {
 
     try {
       const canvas = await html2canvas(captureDiv, {
-        scale: 4,
+        scale: 8,
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
       });
 
       const blob = await new Promise((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", 0.8)
+        canvas.toBlob(resolve, "image/jpeg", 8)
       );
       const file = new File([blob], "wedding-invitation.jpg", {
-        type: "image/jpeg",
+        type: "image/png",
       });
 
       const message = `🎊 *Wedding Invitation* 🎊\n\n${
@@ -695,26 +694,35 @@ const Card = () => {
         const scrollVelocity = Math.abs(deltaY) / 100;
         if (scrollVelocity < 0.5) return;
 
-        if (deltaY > 0 && currentIndex < allTemplates.length - 1) {
-          isScrolling.current = true;
-          setIsAnimating(true);
-          setSlideDirection("up");
-          prevTemplateRef.current = currentTemplate;
+        if (deltaY > 0) {
+          // Check if we're at the last template
+          if (currentIndex === allTemplates.length - 1) {
+             navigate('/TemplateLibrary');
+            return;
+          }
+          
+          // Otherwise, proceed with normal scroll behavior
+          if (currentIndex < allTemplates.length - 1) {
+            isScrolling.current = true;
+            setIsAnimating(true);
+            setSlideDirection("up");
+            prevTemplateRef.current = currentTemplate;
 
-          setTimeout(() => {
-            const nextIndex = currentIndex + 1;
-            setCurrentIndex(nextIndex);
-            setCurrentTemplate(allTemplates[nextIndex]);
-            navigate(`/card/${allTemplates[nextIndex].id.replace("id_", "")}`, {
-              replace: true,
-            });
-          }, 10);
+            setTimeout(() => {
+              const nextIndex = currentIndex + 1;
+              setCurrentIndex(nextIndex);
+              setCurrentTemplate(allTemplates[nextIndex]);
+              navigate(`/card/${allTemplates[nextIndex].id.replace("id_", "")}`, {
+                replace: true,
+              });
+            }, 10);
 
-          setTimeout(() => {
-            setSlideDirection(null);
-            setIsAnimating(false);
-            isScrolling.current = false;
-          }, 700);
+            setTimeout(() => {
+              setSlideDirection(null);
+              setIsAnimating(false);
+              isScrolling.current = false;
+            }, 700);
+          }
         } else if (deltaY < 0 && currentIndex > 0) {
           isScrolling.current = true;
           setIsAnimating(true);
@@ -792,6 +800,7 @@ const Card = () => {
 
       return (
         <div className="template-content">
+          
           <img
             src={template?.images[0]?.template}
             alt="Base Template"

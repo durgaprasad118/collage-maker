@@ -132,11 +132,10 @@ body{
   max-height: 90vh; /* Constrain height */
 }
 /* Container styles for the page */
-.min-h-screen {
-  min-height: 100vh;
-}
+
 img.base-template {
   z-index: 50;
+  padding-bottom: 20px;
 }
 
 /* Button Styling */
@@ -149,10 +148,6 @@ button {
 button:hover {
   transform: scale(1.05);
 }
-
-
-
-
 /* Input Section Button Styling */
 .mt-6 {
   margin-top: 24px;

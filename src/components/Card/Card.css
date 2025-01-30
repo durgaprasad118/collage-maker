@@ -84,7 +84,7 @@
   display: flex;
   justify-content: center;
   background-color: #0F1725;
-  padding-top: 5px;
+  padding-top: 30px;
   padding-bottom: 35px;
   align-items: center;
   width: 100%;
@@ -555,55 +555,6 @@
 
 /* Responsive Styles */
 @media (max-width: 480px) {
-  .button-container {
-    gap: 50vw;
-    bottom: 16px;
-  }
-  .photo-preview {
-    height: 140px;
-  }
-
-  .remove-photo-btn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .template-content {
-    transform: scale(0.8);
-  }
-
-  .photo-upload {
-    padding: 12px;
-  }
-  .floating-button,
-  .share-button {
-    width: 44px;
-    height: 44px;
-    padding: 8px;
-  }
-
-  .share-button {
-    width: auto;
-    padding: 8px 20px;
-  }
-
-  .template-content {
-    transform: scale(0.8);
-    background-color: #0F1725;
-    padding-bottom: 65px;
-  }
-
-  .photo-inputs {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-}
-
-.main-container.modal-open .button-container {
-  pointer-events: none; /* Prevent interactions during animation */
-}
-
-@media (max-width: 768px) {
   .modal-overlay {
     padding: 0;
     align-items: flex-end;
@@ -660,7 +611,85 @@
   .button-container {
     position: fixed;
     gap: 80px;
-    bottom: 20px;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+  }
+
+  .share-button {
+    height: 46px;
+    padding: 6px 14px;
+    gap: 6px;
+  }
+
+  .share-button span {
+    font-size: 14px;
+    
+  }
+}
+
+.main-container.modal-open .button-container {
+  pointer-events: none; /* Prevent interactions during animation */
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 90vh;
+    margin: 0;
+    overflow-x: hidden;
+  }
+  .template-content {
+    transform: scale(0.8);
+    margin: 0 auto;
+    padding-bottom: 50px;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .photo-inputs {
+    margin-bottom: 1.5rem;
+  }
+  
+  .section {
+    padding: .75rem;
+  }
+
+
+  .photo-preview {
+    height: 140px;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    font-size: 16px;
+    padding: 0.5rem;
+  }
+
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .save-button {
+    width: 100%;
+  }
+
+  .button-container {
+    position: fixed;
+    gap: 80px;
+    bottom: 5px;
     padding: 0 12px;
   }
 

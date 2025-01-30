@@ -69,10 +69,10 @@ header h1 {
 
 /* Homepage Container */
 .homepage-container {
-  max-width: 1200px;
+  max-width: 90vw; /* Approximately 2.5 cards (180px * 2.5) + gaps + small buffer */
   margin: 0 auto;
   padding: 20px;
-  padding-top: 8px; /* To ensure content starts below the fixed header */
+  padding-top: 8px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -126,8 +126,6 @@ header h1 {
   transform: translateX(2px);
 }
 
-
-
 /* Template Gallery Container */
 .template-gallery-container {
   width: 100%;
@@ -135,15 +133,33 @@ header h1 {
   display: flex;
 }
 
+.template-gallery-container::-webkit-scrollbar {
+  width: 0px;
+  height: 4px;  /* Slightly taller for modern look */
+}
+
+.template-gallery-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);  /* Very subtle track */
+  backdrop-filter: blur(5px);  /* Adds a frosted glass effect */
+}
+
+.template-gallery-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3));  /* Gradient for modern look */
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.template-gallery-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.4));  /* Slightly brighter on hover */
+}
+
 .template-gallery {
   display: flex;
-  gap: 5px;
+  gap: 8px;
   padding: 10px 0;
 }
 
-.template-gallery::-webkit-scrollbar {
-  display: none;
-}
+
 
 /* Template Cards */
 .template-card {
@@ -294,12 +310,16 @@ header h1 {
   }
 
   .template-card {
-    width: 140px;
-    height: 220px;
+    width: 160px;  /* Adjusted for mobile */
+    height: 300px;
   }
 }
 
 @media (max-width: 480px) {
+  .homepage-container {
+    max-width: none; /* Allow full width on mobile */
+    padding: 5px 12px;
+  }
   .section-title {
     flex-direction: row;
     justify-content: space-between;
@@ -316,8 +336,8 @@ header h1 {
   }
 
   .template-card {
-    width: 180px;  /* Adjusted for mobile */
-    height: 320px;
+    width: 160px;  /* Adjusted for mobile */
+    height: 290px;
   }
   
   .shimmer-card {
@@ -326,12 +346,55 @@ header h1 {
   }
   
   .template-gallery {
-    gap: 8px; /* Increased gap for better spacing */
+    gap: 8px;
     padding: 8px 0;
   }
   
+
   .template-gallery-container {
-    margin: 0 -12px; /* Negative margin to allow full-width scrolling */
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
+  
+}
+@media (max-width: 600px) {
+  .homepage-container {
+    max-width: none; /* Allow full width on mobile */
+    padding: 5px 12px;
+  }
+  .section-title {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+  }
+
+  .wedding-title {
+    font-size: 1.4rem;
+    color: white;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .template-card {
+    width: 160px;  /* Adjusted for mobile */
+    height: 290px;
+  }
+  
+  .shimmer-card {
+    width: 160px;
+    height: 300px;
+  }
+  
+  .template-gallery {
+    gap: 8px;
+    padding: 8px 0;
+  }
+  
+
+  .template-gallery-container {
+    margin: 0 -12px;
     padding: 0 12px;
   }
   

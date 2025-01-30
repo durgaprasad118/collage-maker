@@ -23,7 +23,14 @@ const HomePage = () => {
     birthday: 0,
     collage: 0
   });
-  const sliderRef = useRef(null);
+
+  // Separate refs for each gallery
+  const galleryRefs = useRef({
+    wedding: null,
+    birthday: null,
+    collage: null
+  });
+
   const navigate = useNavigate();
 
   const shuffleArray = (array) => {
@@ -36,7 +43,6 @@ const HomePage = () => {
   };
 
   const fetchTemplates = async (type) => {
-  
     try {
       const response = await fetch(`/data/${type}.json`);
       if (!response.ok) {
@@ -93,6 +99,11 @@ const HomePage = () => {
   }, [retryCount.wedding, retryCount.birthday, retryCount.collage]);
 
   const handleTemplateSelect = (template) => {
+    // Store current scroll position before navigation
+    sessionStorage.setItem(`${template.type}ScrollPosition`, 
+      galleryRefs.current[template.type]?.scrollLeft || 0
+    );
+
     switch(template.type) {
       case 'birthday':
         navigate(`/birthday/${template.numericId}`);
@@ -111,6 +122,11 @@ const HomePage = () => {
   };
 
   const handleViewAllClick = (type) => {
+    // Store current scroll position before navigation
+    sessionStorage.setItem(`${type}ScrollPosition`, 
+      galleryRefs.current[type]?.scrollLeft || 0
+    );
+
     switch(type) {
       case 'birthday':
         navigate('/BirthdayLibrary');
@@ -122,6 +138,16 @@ const HomePage = () => {
         navigate('/TemplateLibrary');
     }
   };
+
+  // Effect to restore scroll positions
+  useEffect(() => {
+    ['wedding', 'birthday', 'collage'].forEach(type => {
+      const savedPosition = sessionStorage.getItem(`${type}ScrollPosition`);
+      if (savedPosition && galleryRefs.current[type]) {
+        galleryRefs.current[type].scrollLeft = parseInt(savedPosition, 10);
+      }
+    });
+  }, [weddingTemplates, birthdayTemplates, collageTemplates]);
 
   const ShimmerEffect = () => (
     <div className="template-gallery-container">
@@ -148,7 +174,7 @@ const HomePage = () => {
     return (
       <>
         <section className="section-title">
-          <h2 className="template-title">{type.charAt(0).toUpperCase() + type.slice(1)} Cards</h2>
+          <h2 className="wedding-title">{type.charAt(0).toUpperCase() + type.slice(1)} Cards</h2>
           <button className="view-all-btn" onClick={() => handleViewAllClick(type)}>
             view all<SlArrowRight className="arrow-icon" />
           </button>
@@ -165,7 +191,10 @@ const HomePage = () => {
           </div>
         ) : (
           <div className="template-gallery-container">
-            <div className="template-gallery" ref={sliderRef}>
+            <div 
+              className="template-gallery" 
+              ref={el => galleryRefs.current[type] = el}
+            >
               {templates.map((template) => (
                 <div
                   key={template.id}

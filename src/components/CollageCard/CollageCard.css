@@ -833,7 +833,39 @@ Untitled
   }
  
 }
+@media (max-width: 600px) {
+  .button-container {
+    gap: 60px;
+  }
 
+  .share-button {
+    height: 46px;
+    padding: 6px 14px;
+    gap: 6px;
+  }
+
+  .share-button span {
+    font-size: 14px;
+  }
+
+  .modal-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    font-family:  'Poppins', sans-serif;
+  }
+  
+  .modal-footer {
+    padding: 16px;
+    column-gap: 10px;
+    display:contents;
+    align-items: center;
+    justify-content: space-between;
+  
+
+  }
+}
 @media (max-width: 768px) {
   .button-container {
     gap: 60px;
@@ -867,7 +899,6 @@ Untitled
 
   }
 }
-
 /* Scrollbar Styling */
 .modal-content::-webkit-scrollbar {
   width: 6px;

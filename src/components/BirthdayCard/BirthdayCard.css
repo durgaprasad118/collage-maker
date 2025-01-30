@@ -72,16 +72,7 @@
     overflow-y: hidden;
     touch-action: none;
   }
-  
-  .template-content {
-    position: relative;
-    width: fit-content;
-    height: fit-content;
-    z-index: 10;
-    transition: transform 0.3s ease-in-out;
-    opacity: 1;
-    transform: scale(0.8); /* Adjust this value as needed */
-  }
+
   .template-positioning {
     position: absolute;
     display: flex;
@@ -93,7 +84,7 @@
     width: 100%;
     height: 100%;
     transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .template-content {
@@ -233,6 +224,7 @@
     grid-template-columns: 1fr;  /* Changed to single column for birthday */
     gap: 1.25rem;
     margin-bottom: 2rem;
+
   }
   
   .photo-input {
@@ -521,6 +513,56 @@
     user-select: none;
     -webkit-user-drag: none;
   }
+
+
+  .template-wrapper.zooming {
+    overflow: hidden !important;
+    touch-action: none !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .zoomable-container {
+    isolation: isolate;
+    touch-action: none;
+    position: absolute;
+    overflow: hidden;
+  }
+  .zoomable-image {
+    will-change: transform;
+    touch-action: none;
+    pointer-events: auto;
+   
+  }
+  
+  .zoomable-image.zoomed {
+    cursor: grab;
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    .zoomable-container {
+      touch-action: manipulation;
+    }
+  }
+  .template-wrapper {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    
+    -webkit-overflow-scrolling: touch;
+    touch-action: none !important; 
+  -webkit-touch-action: none !important;
+  }
+  
+  .template-wrapper.zooming {
+    pointer-events: none;
+  }
+  
+  .template-wrapper.zooming .zoomable-container {
+    pointer-events: auto;
+  }
   /* Responsive Styles */
   @media (max-width: 480px) {
 
@@ -565,15 +607,7 @@
     pointer-events: none;
   }
 
-.template-wrapper {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    touch-action: none;
-  }
+
   
   .base-template {
     width: auto;
@@ -606,7 +640,7 @@
   
     .template-content {
       transform: scale(0.8);
-      margin: 0 auto;
+      touch-action: none;
     }
   
     .modal-header {
