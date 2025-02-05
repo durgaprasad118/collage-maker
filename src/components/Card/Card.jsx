@@ -380,7 +380,7 @@ const Card = () => {
     setIsEditModalOpen(false);
   }, [saveData]);
 
-  // Utility functions
+  
   const getOrdinalSuffix = useCallback((day) => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
@@ -549,12 +549,14 @@ const Card = () => {
 
   // Download handler
   const handleDownload = useCallback(() => {
-    const captureDiv = document.querySelector(".template-content");
+    const captureDiv = document.querySelector(".template-content-image");
     if (!captureDiv) return;
 
-    html2canvas(captureDiv, { scale: 8 })
+    html2canvas(captureDiv, { scale: 10 })
       .then((canvas) => {
-        const jpgDataUrl = canvas.toDataURL("image/jpeg", 8);
+        const jpgDataUrl = canvas.toDataURL("image/jpeg", 10
+      
+        );
         const downloadLink = document.createElement("a");
         downloadLink.href = jpgDataUrl;
         downloadLink.download = "wedding-invitation.jpg";
@@ -570,7 +572,7 @@ const Card = () => {
 
   // WhatsApp share handler
   const handleWhatsAppShare = useCallback(async () => {
-    const captureDiv = document.querySelector(".template-content");
+    const captureDiv = document.querySelector(".template-content-image");
     if (!captureDiv) return;
 
     try {
@@ -800,6 +802,8 @@ const Card = () => {
 
       return (
         <div className="template-content">
+           <div className="template-content-image">
+
           
           <img
             src={template?.images[0]?.template}
@@ -867,10 +871,13 @@ const Card = () => {
               >
                 {customText[text.name] || text.text_configs.sample_text}
               </div>
+              
             );
           })}
         
         </div>
+          </div>
+      
       );
     },
     [photos, customText]

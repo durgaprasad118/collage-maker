@@ -132,6 +132,12 @@
   padding: 0 16px;
 }
 
+.template-content-image{
+  position: relative;
+  background-color: #0F1725;
+  padding-top: 5px;
+}
+
 /* Individual Buttons */
 .floating-button {
   padding: 12px;

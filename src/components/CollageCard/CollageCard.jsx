@@ -288,49 +288,105 @@ const CollageCard = () => {
   const handleDownload = useCallback(() => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
-
-    html2canvas(captureDiv, { scale: 9 })
+  
+    const options = {
+      scale: 4,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      imageTimeout: 0,
+      onclone: (clonedDoc) => {
+        const images = clonedDoc.getElementsByTagName('img');
+        for (let img of images) {
+          img.style.imageRendering = 'high-quality';
+          img.style.webkitImageRendering = 'high-quality';
+        }
+      }
+    };
+  
+    html2canvas(captureDiv, options)
       .then((canvas) => {
-        const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
+        // Create high resolution canvas
+        const scaledCanvas = document.createElement('canvas');
+        scaledCanvas.width = canvas.width * 2;
+        scaledCanvas.height = canvas.height * 2;
+        const ctx = scaledCanvas.getContext('2d');
+        
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+  
+        const jpgDataUrl = scaledCanvas.toDataURL("image/jpeg", 1.0);
+        
         const downloadLink = document.createElement("a");
         downloadLink.href = jpgDataUrl;
-        downloadLink.download = `collage-${Date.now()}.jpg`;
+        downloadLink.download = `wedding-card-${Date.now()}.jpg`;
+        
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
       })
       .catch((error) => {
         console.error("Error generating image:", error);
-        alert("Error generating image. Please try again.");
       });
   }, []);
-
-  // Share handler
+  
   const handleWhatsAppShare = useCallback(async () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
-
+  
     try {
-      const canvas = await html2canvas(captureDiv, { scale: 4 });
-      const blob = await new Promise((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", 0.8)
-      );
-      const file = new File([blob], "collage.jpg", { type: "image/jpeg" });
-
+      const canvas = await html2canvas(captureDiv, {
+        scale: 4,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false,
+        onclone: (clonedDoc) => {
+          const images = clonedDoc.getElementsByTagName('img');
+          for (let img of images) {
+            img.style.imageRendering = 'high-quality';
+            img.style.webkitImageRendering = 'high-quality';
+          }
+        }
+      });
+  
+      const scaledCanvas = document.createElement('canvas');
+      scaledCanvas.width = canvas.width * 2;
+      scaledCanvas.height = canvas.height * 2;
+      const ctx = scaledCanvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+  
+      const blob = await new Promise((resolve) => {
+        scaledCanvas.toBlob(
+          (blob) => resolve(blob),
+          'image/jpeg',
+          0.95
+        );
+      });
+  
+      const file = new File([blob], "wedding-card.jpg", {
+        type: "image/jpeg",
+        lastModified: Date.now()
+      });
+  
       if (navigator.share) {
         await navigator.share({
           files: [file],
+          title: 'Wedding Card',
         });
       } else {
-        // Fallback for browsers that don't support native sharing
-        const imageUrl = URL.createObjectURL(blob);
-        window.open(imageUrl, "_blank");
+        const whatsappUrl = `https://wa.me/?text=Check%20out%20my%20wedding%20card!`;
+        window.open(whatsappUrl, '_blank');
       }
     } catch (error) {
-      console.error("Error sharing:", error);
-      alert("Unable to share. Please try again.");
+      console.error("Sharing error:", error);
     }
   }, []);
+
+
 
   // Fetch templates
   useEffect(() => {

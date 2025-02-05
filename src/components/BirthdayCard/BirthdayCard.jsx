@@ -158,7 +158,7 @@ const BirthdayCard = () => {
       setFontsLoaded(true);
     } catch (error) {
       console.error("Failed to preload fonts:", error);
-      setFontsLoaded(true); // Fallback
+      setFontsLoaded(true); 
     }
   };
   useEffect(() => {

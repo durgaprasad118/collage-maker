@@ -167,8 +167,7 @@
     font-weight: 500;
     white-space: nowrap;
   }
-  
-  /* Modal Styles */
+
   .modal-overlay {
     position: fixed;
     top: 0;
