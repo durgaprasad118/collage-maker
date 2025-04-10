@@ -575,7 +575,7 @@
     overflow-x: hidden;
   }
   .template-content {
-    transform: scale(0.8);
+    transform: scale(0.5);
     margin: 0 auto;
   }
 
@@ -652,7 +652,7 @@
     overflow-x: hidden;
   }
   .template-content {
-    transform: scale(0.8);
+    transform: scale(0.5);
     margin: 0 auto;
     padding-bottom: 50px;
   }
