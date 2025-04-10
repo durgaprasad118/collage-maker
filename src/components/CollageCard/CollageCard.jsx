@@ -65,10 +65,18 @@ const compressImage = (file) => {
   });
 };
 
+// Replace the ImageStorageService with in-memory storage
+// Create an in-memory storage for images instead of using localStorage
+const memoryStorage = {
+  images: {},
+  metadata: {}
+};
+
 const ImageStorageService = {
   saveImage: async (key, imageData) => {
     try {
-      localStorage.setItem(`collage_image_${key}`, imageData);
+      // Store image in memory instead of localStorage
+      memoryStorage.images[key] = imageData;
       return true;
     } catch (error) {
       console.error("Error saving image:", error);
@@ -78,7 +86,8 @@ const ImageStorageService = {
 
   getImage: async (key) => {
     try {
-      return localStorage.getItem(`collage_image_${key}`);
+      // Get image from memory
+      return memoryStorage.images[key] || null;
     } catch (error) {
       console.error("Error getting image:", error);
       return null;
@@ -87,7 +96,10 @@ const ImageStorageService = {
 
   removeImage: async (key) => {
     try {
-      localStorage.removeItem(`collage_image_${key}`);
+      // Remove image from memory
+      if (memoryStorage.images[key]) {
+        delete memoryStorage.images[key];
+      }
       return true;
     } catch (error) {
       console.error("Error removing image:", error);
@@ -127,13 +139,12 @@ const CollageCard = () => {
   // Load saved photos
   const loadSavedPhotos = useCallback(async () => {
     try {
-      const savedMetadata = localStorage.getItem("collage_photos_metadata");
-      if (savedMetadata) {
-        const metadata = JSON.parse(savedMetadata);
-        setPhotoMetadata(metadata);
+      // Use memory storage for metadata instead of localStorage
+      if (memoryStorage.metadata) {
+        setPhotoMetadata(memoryStorage.metadata);
 
         const loadedPhotos = {};
-        for (const [key, exists] of Object.entries(metadata)) {
+        for (const [key, exists] of Object.entries(memoryStorage.metadata)) {
           if (exists) {
             const photo = await ImageStorageService.getImage(key);
             if (photo) {
@@ -231,7 +242,7 @@ const CollageCard = () => {
         imageData = await compressImage(new Blob([blob]));
       }
   
-      // Save to localStorage
+      // Save to memory storage
       const saveResult = await ImageStorageService.saveImage(
         `photo_${currentUploadIndex}`,
         imageData
@@ -252,13 +263,13 @@ const CollageCard = () => {
         [`photo_${currentUploadIndex}`]: true,
       }));
   
-      // Update metadata
+      // Update metadata in memory
       const newMetadata = {
         ...photoMetadata,
         [`photo_${currentUploadIndex}`]: true,
       };
       setPhotoMetadata(newMetadata);
-      localStorage.setItem('collage_photos_metadata', JSON.stringify(newMetadata));
+      memoryStorage.metadata = newMetadata; // Store in memory instead of localStorage
   
       // Close modal and reset states
       setShowCropModal(false);
@@ -269,9 +280,7 @@ const CollageCard = () => {
       console.error('Detailed cropping error:', error);
       
       let errorMessage = 'Error saving cropped image. ';
-      if (error.message.includes('storage')) {
-        errorMessage += 'Storage is full. Please free up some space and try again.';
-      } else if (error.message.includes('Invalid image')) {
+      if (error.message.includes('Invalid image')) {
         errorMessage += 'Please ensure you are uploading a valid image file.';
       } else {
         errorMessage += 'Please try again with a smaller image.';
@@ -654,7 +663,7 @@ const CollageCard = () => {
 
   const handleRemovePhoto = async (index) => {
     try {
-      // Remove from storage
+      // Remove from memory storage
       await ImageStorageService.removeImage(`photo_${index}`);
 
       // Update states
@@ -669,16 +678,13 @@ const CollageCard = () => {
         [`photo_${index}`]: false,
       }));
 
-      // Update metadata
+      // Update metadata in memory
       const newMetadata = {
         ...photoMetadata,
         [`photo_${index}`]: false,
       };
       setPhotoMetadata(newMetadata);
-      localStorage.setItem(
-        "collage_photos_metadata",
-        JSON.stringify(newMetadata)
-      );
+      memoryStorage.metadata = newMetadata; // Store in memory instead of localStorage
     } catch (error) {
       console.error("Error removing photo:", error);
       alert("Error removing photo. Please try again.");

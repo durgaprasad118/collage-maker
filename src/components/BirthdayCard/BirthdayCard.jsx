@@ -74,12 +74,20 @@ const compressImage = (file) => {
     reader.readAsDataURL(file);
   });
 };
-// Image Storage Service (same as Card.jsx)
-// Update the ImageStorageService object by adding the removeImage method
+
+// Create an in-memory storage for images instead of using localStorage
+const memoryStorage = {
+  images: {},
+  metadata: {},
+  textData: {}
+};
+
+// Replace the ImageStorageService with in-memory storage
 const ImageStorageService = {
   saveImage: async (key, imageData) => {
     try {
-      localStorage.setItem(`birthday_image_${key}`, imageData);
+      // Store image in memory instead of localStorage
+      memoryStorage.images[key] = imageData;
       return true;
     } catch (error) {
       console.error("Error saving image:", error);
@@ -89,17 +97,20 @@ const ImageStorageService = {
 
   getImage: async (key) => {
     try {
-      return localStorage.getItem(`birthday_image_${key}`);
+      // Get image from memory
+      return memoryStorage.images[key] || null;
     } catch (error) {
       console.error("Error getting image:", error);
       return null;
     }
   },
 
-  // Add this new method
   removeImage: async (key) => {
     try {
-      localStorage.removeItem(`birthday_image_${key}`);
+      // Remove image from memory
+      if (memoryStorage.images[key]) {
+        delete memoryStorage.images[key];
+      }
       return true;
     } catch (error) {
       console.error("Error removing image:", error);
@@ -287,10 +298,12 @@ const BirthdayCard = () => {
         person_photo: imageData,
       }));
 
-      setPhotoMetadata((prev) => ({
-        ...prev,
+      const newMetadata = {
+        ...photoMetadata,
         person_photo: true,
-      }));
+      };
+      setPhotoMetadata(newMetadata);
+      memoryStorage.metadata = newMetadata; // Store in memory
 
       setShowCropModal(false);
       setCropImage(null);
@@ -298,10 +311,7 @@ const BirthdayCard = () => {
       console.error("Detailed cropping error:", error);
 
       let errorMessage = "Error saving cropped image. ";
-      if (error.message.includes("storage")) {
-        errorMessage +=
-          "Storage is full. Please free up some space and try again.";
-      } else if (error.message.includes("Invalid image")) {
+      if (error.message.includes("Invalid image")) {
         errorMessage += "Please ensure you are uploading a valid image file.";
       } else {
         errorMessage += "Please try again with a smaller image.";
@@ -315,7 +325,7 @@ const BirthdayCard = () => {
   };
   const handlePhotoRemove = useCallback(async (photoKey) => {
     try {
-      // Remove image from localStorage
+      // Remove image from memory storage
       await ImageStorageService.removeImage(photoKey);
 
       // Update photos state
@@ -325,38 +335,27 @@ const BirthdayCard = () => {
         return newPhotos;
       });
 
-      // Update metadata
-      setPhotoMetadata((prev) => {
-        const newMetadata = {
-          ...prev,
-          [photoKey]: false,
-        };
-        localStorage.setItem(
-          "birthday_card_metadata",
-          JSON.stringify(newMetadata)
-        );
-        return newMetadata;
-      });
+      // Update metadata in memory
+      const newMetadata = {
+        ...photoMetadata,
+        [photoKey]: false,
+      };
+      setPhotoMetadata(newMetadata);
+      memoryStorage.metadata = newMetadata; // Store in memory
     } catch (error) {
       console.error("Error removing photo:", error);
       alert("Error removing photo. Please try again.");
     }
-  }, []);
+  }, [photoMetadata]);
   // Save data function
   const saveData = useCallback(async () => {
     try {
-      localStorage.setItem(
-        "birthday_card_text",
-        JSON.stringify({
-          customText,
-          inputValues,
-        })
-      );
-
-      localStorage.setItem(
-        "birthday_card_metadata",
-        JSON.stringify(photoMetadata)
-      );
+      // Store in memory instead of localStorage
+      memoryStorage.textData = {
+        customText,
+        inputValues,
+      };
+      memoryStorage.metadata = photoMetadata;
     } catch (error) {
       console.error("Error saving data:", error);
     }
@@ -365,12 +364,11 @@ const BirthdayCard = () => {
   // Load saved data
   const loadSavedData = useCallback(async () => {
     try {
-      const savedMetadata = localStorage.getItem("birthday_card_metadata");
-      if (savedMetadata) {
-        const metadata = JSON.parse(savedMetadata);
-        setPhotoMetadata(metadata);
+      // Use memory storage for metadata
+      if (memoryStorage.metadata && Object.keys(memoryStorage.metadata).length > 0) {
+        setPhotoMetadata(memoryStorage.metadata);
 
-        for (const [key, exists] of Object.entries(metadata)) {
+        for (const [key, exists] of Object.entries(memoryStorage.metadata)) {
           if (exists) {
             const photo = await ImageStorageService.getImage(key);
             if (photo) {
@@ -380,9 +378,9 @@ const BirthdayCard = () => {
         }
       }
 
-      const savedTextData = localStorage.getItem("birthday_card_text");
-      if (savedTextData) {
-        const textData = JSON.parse(savedTextData);
+      // Use memory storage for text data
+      if (memoryStorage.textData && Object.keys(memoryStorage.textData).length > 0) {
+        const textData = memoryStorage.textData;
         if (textData.customText) setCustomText(textData.customText);
         if (textData.inputValues) setInputValues(textData.inputValues);
       }
