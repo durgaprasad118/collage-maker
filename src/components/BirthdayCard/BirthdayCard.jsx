@@ -480,8 +480,21 @@ const BirthdayCard = () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
 
-    // Get all TransformWrapper instances and selection elements
-    const transformWrappers = document.querySelectorAll('.react-transform-component');
+    // Display a loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.style.position = 'fixed';
+    loadingIndicator.style.top = '50%';
+    loadingIndicator.style.left = '50%';
+    loadingIndicator.style.transform = 'translate(-50%, -50%)';
+    loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
+    loadingIndicator.style.color = 'white';
+    loadingIndicator.style.padding = '20px';
+    loadingIndicator.style.borderRadius = '10px';
+    loadingIndicator.style.zIndex = '9999';
+    loadingIndicator.textContent = 'Creating your image...';
+    document.body.appendChild(loadingIndicator);
+
+    // Hide selection indicators for clean capture
     const selectedElements = document.querySelectorAll('.selected');
     const selectionBorders = document.querySelectorAll('.selection-border');
     const saveButtons = document.querySelectorAll('.save-button');
@@ -520,32 +533,151 @@ const BirthdayCard = () => {
       element.classList.remove('selected');
     });
 
-    html2canvas(captureDiv, { scale: 10 })
-      .then((canvas) => {
-        const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
-        const downloadLink = document.createElement("a");
-        downloadLink.href = jpgDataUrl;
-        downloadLink.download = "birthday-invitation.jpg";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        // Restore original states
-        originalStates.forEach(state => {
-          if (state.display !== undefined) state.element.style.display = state.display;
-          if (state.className) state.element.className = state.className;
+    // Wait for a moment to ensure the UI updates
+    setTimeout(() => {
+      const options = {
+        scale: 4, // Higher scale for better quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false,
+        imageTimeout: 0,
+        // Don't modify transforms in the clone - capture exactly as visible
+        onclone: (clonedDoc) => {
+          // Only enhance image quality, don't reset transforms
+          const images = clonedDoc.getElementsByTagName('img');
+          for (let img of images) {
+            img.style.imageRendering = 'high-quality';
+          }
+        }
+      };
+
+      html2canvas(captureDiv, options)
+        .then((canvas) => {
+          // Create high resolution canvas
+          const scaledCanvas = document.createElement('canvas');
+          scaledCanvas.width = canvas.width * 2;
+          scaledCanvas.height = canvas.height * 2;
+          const ctx = scaledCanvas.getContext('2d');
+          
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+
+          const jpgDataUrl = scaledCanvas.toDataURL("image/jpeg", 1.0);
+          
+          // Check if device is iOS (iPhone or iPad)
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          
+          if (isIOS) {
+            // For iOS devices, open the image in a new tab
+            const newTab = window.open();
+            if (newTab) {
+              newTab.document.write(`
+                <html>
+                  <head>
+                    <title>Birthday Invitation</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                      body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+                      img { max-width: 100%; height: auto; }
+                      .instructions { padding: 15px; text-align: center; font-family: Arial, sans-serif; }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="instructions">
+                      <p>Press and hold on the image, then select "Save Image" to download.</p>
+                    </div>
+                    <img src="${jpgDataUrl}" alt="Birthday Invitation">
+                  </body>
+                </html>
+              `);
+              newTab.document.close();
+            }
+          } else {
+            try {
+              // Try native share API first for mobile devices
+              if (navigator.share) {
+                // Convert data URL to blob for sharing
+                fetch(jpgDataUrl)
+                  .then(res => res.blob())
+                  .then(blob => {
+                    const file = new File([blob], "birthday-invitation.jpg", { type: "image/jpeg" });
+                    navigator.share({
+                      files: [file],
+                      title: 'Birthday Invitation',
+                    }).catch(error => {
+                      // Fallback to traditional download if sharing fails
+                      const downloadLink = document.createElement("a");
+                      downloadLink.href = jpgDataUrl;
+                      downloadLink.download = "birthday-invitation.jpg";
+                      document.body.appendChild(downloadLink);
+                      downloadLink.click();
+                      document.body.removeChild(downloadLink);
+                    });
+                  });
+              } else {
+                // Traditional download for desktop browsers
+                const downloadLink = document.createElement("a");
+                downloadLink.href = jpgDataUrl;
+                downloadLink.download = "birthday-invitation.jpg";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+              }
+            } catch (error) {
+              console.error("Error during download:", error);
+              
+              // Final fallback - open in new tab
+              const newTab = window.open();
+              if (newTab) {
+                newTab.document.write(`
+                  <html>
+                    <head>
+                      <title>Birthday Invitation</title>
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <style>
+                        body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+                        img { max-width: 100%; height: auto; }
+                        .instructions { padding: 15px; text-align: center; font-family: Arial, sans-serif; }
+                      </style>
+                    </head>
+                    <body>
+                      <div class="instructions">
+                        <p>Press and hold on the image, then select "Save Image" to download.</p>
+                      </div>
+                      <img src="${jpgDataUrl}" alt="Birthday Invitation">
+                    </body>
+                  </html>
+                `);
+                newTab.document.close();
+              }
+            }
+          }
+          
+          // Restore original states
+          originalStates.forEach(state => {
+            if (state.display !== undefined) state.element.style.display = state.display;
+            if (state.className) state.element.className = state.className;
+          });
+          
+          // Remove loading indicator
+          document.body.removeChild(loadingIndicator);
+        })
+        .catch((error) => {
+          console.error("Error generating image:", error);
+          alert("Error generating image. Please try again.");
+          
+          // Restore original states in case of error
+          originalStates.forEach(state => {
+            if (state.display !== undefined) state.element.style.display = state.display;
+            if (state.className) state.element.className = state.className;
+          });
+          
+          // Remove loading indicator
+          document.body.removeChild(loadingIndicator);
         });
-      })
-      .catch((error) => {
-        console.error("Error generating image:", error);
-        alert("Error generating image. Please try again.");
-        
-        // Restore original states in case of error
-        originalStates.forEach(state => {
-          if (state.display !== undefined) state.element.style.display = state.display;
-          if (state.className) state.element.className = state.className;
-        });
-      });
+    }, 100);
   }, []);
 
   // WhatsApp share handler
@@ -553,9 +685,22 @@ const BirthdayCard = () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
 
+    // Display a loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.style.position = 'fixed';
+    loadingIndicator.style.top = '50%';
+    loadingIndicator.style.left = '50%';
+    loadingIndicator.style.transform = 'translate(-50%, -50%)';
+    loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
+    loadingIndicator.style.color = 'white';
+    loadingIndicator.style.padding = '20px';
+    loadingIndicator.style.borderRadius = '10px';
+    loadingIndicator.style.zIndex = '9999';
+    loadingIndicator.textContent = 'Creating your image for sharing...';
+    document.body.appendChild(loadingIndicator);
+
     try {
-      // Get all TransformWrapper instances and selection elements
-      const transformWrappers = document.querySelectorAll('.react-transform-component');
+      // Hide selection indicators for clean capture
       const selectedElements = document.querySelectorAll('.selected');
       const selectionBorders = document.querySelectorAll('.selection-border');
       const saveButtons = document.querySelectorAll('.save-button');
@@ -594,19 +739,48 @@ const BirthdayCard = () => {
         element.classList.remove('selected');
       });
 
-      const canvas = await html2canvas(captureDiv, { scale: 8 });
+      // Wait for a moment to ensure the UI updates
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const options = {
+        scale: 4, // Higher scale for better quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false,
+        imageTimeout: 0,
+        // Don't modify transforms in the clone - capture exactly as visible
+        onclone: (clonedDoc) => {
+          // Only enhance image quality, don't reset transforms
+          const images = clonedDoc.getElementsByTagName('img');
+          for (let img of images) {
+            img.style.imageRendering = 'high-quality';
+          }
+        }
+      };
+
+      const canvas = await html2canvas(captureDiv, options);
       
-      // Restore original states
-      originalStates.forEach(state => {
-        if (state.display !== undefined) state.element.style.display = state.display;
-        if (state.className) state.element.className = state.className;
+      // Create high resolution canvas
+      const scaledCanvas = document.createElement('canvas');
+      scaledCanvas.width = canvas.width * 2;
+      scaledCanvas.height = canvas.height * 2;
+      const ctx = scaledCanvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+
+      const blob = await new Promise((resolve) => {
+        scaledCanvas.toBlob(
+          (blob) => resolve(blob),
+          'image/jpeg',
+          0.95
+        );
       });
-      
-      const blob = await new Promise((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", 0.9)
-      );
+
       const file = new File([blob], "birthday-invitation.jpg", {
         type: "image/jpeg",
+        lastModified: Date.now()
       });
 
       const message = `🎉 *Birthday Celebration* 🎉\n\nCelebrating ${
@@ -617,22 +791,29 @@ const BirthdayCard = () => {
         customText.birthday_venue || "Venue TBA"
       }\n\nJoin us for this special celebration! 🎂`;
 
-      const shareData = {
-        files: [file],
-        text: message,
-      };
-
-      if (navigator.canShare && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          text: message,
+          title: 'Birthday Invitation'
+        });
       } else {
         window.open(
           `https://wa.me/?text=${encodeURIComponent(message)}`,
           "_blank"
         );
       }
+
+      // Restore original states
+      originalStates.forEach(state => {
+        if (state.display !== undefined) state.element.style.display = state.display;
+        if (state.className) state.element.className = state.className;
+      });
     } catch (error) {
       console.error("Error sharing:", error);
       alert("Unable to share. Please try again.");
+    } finally {
+      document.body.removeChild(loadingIndicator);
     }
   }, [customText]);
 

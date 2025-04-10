@@ -299,147 +299,110 @@ const CollageCard = () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
   
-    // Save current state of zoomed images
-    const zoomedElements = document.querySelectorAll('.zoomed');
-    const zoomedContainers = document.querySelectorAll('.zoomable-container');
-    
-    // Create an array to store the original states for restoration
-    const originalStates = [];
-    
-    // Temporarily reset all zoomed images for capture
-    zoomedElements.forEach(element => {
-      originalStates.push({
-        element,
-        scale: element.style.transform,
-        zIndex: element.style.zIndex
-      });
-      
-      // Reset transform and z-index for clean capture
-      element.style.transform = 'scale(1) translateX(0px) translateY(0px)';
-      element.style.zIndex = 'auto';
-    });
-    
-    // Also reset any zoomable containers
-    zoomedContainers.forEach(container => {
-      if (container.style.zIndex) {
-        originalStates.push({
-          element: container,
-          zIndex: container.style.zIndex
-        });
-        container.style.zIndex = 'auto';
-      }
-    });
+    // Display a loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.style.position = 'fixed';
+    loadingIndicator.style.top = '50%';
+    loadingIndicator.style.left = '50%';
+    loadingIndicator.style.transform = 'translate(-50%, -50%)';
+    loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
+    loadingIndicator.style.color = 'white';
+    loadingIndicator.style.padding = '20px';
+    loadingIndicator.style.borderRadius = '10px';
+    loadingIndicator.style.zIndex = '9999';
+    loadingIndicator.textContent = 'Creating your image...';
+    document.body.appendChild(loadingIndicator);
   
-    const options = {
-      scale: 4,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: null,
-      imageTimeout: 0,
-      onclone: (clonedDoc) => {
-        const images = clonedDoc.getElementsByTagName('img');
-        for (let img of images) {
-          img.style.imageRendering = 'high-quality';
-          img.style.webkitImageRendering = 'high-quality';
+    // Wait for a moment to ensure the UI updates
+    setTimeout(() => {
+      const options = {
+        scale: 4, // Higher scale for better quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false,
+        imageTimeout: 0,
+        // Don't modify transforms in the clone - capture exactly as visible
+        onclone: (clonedDoc) => {
+          // Only enhance image quality, don't reset transforms
+          const images = clonedDoc.getElementsByTagName('img');
+          for (let img of images) {
+            img.style.imageRendering = 'high-quality';
+          }
         }
-      }
-    };
+      };
   
-    html2canvas(captureDiv, options)
-      .then((canvas) => {
-        // Create high resolution canvas
-        const scaledCanvas = document.createElement('canvas');
-        scaledCanvas.width = canvas.width * 2;
-        scaledCanvas.height = canvas.height * 2;
-        const ctx = scaledCanvas.getContext('2d');
-        
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
-  
-        const jpgDataUrl = scaledCanvas.toDataURL("image/jpeg", 1.0);
-        
-        const downloadLink = document.createElement("a");
-        downloadLink.href = jpgDataUrl;
-        downloadLink.download = `wedding-card-${Date.now()}.jpg`;
-        
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-        // Restore original states after capture
-        originalStates.forEach(state => {
-          if (state.scale) state.element.style.transform = state.scale;
-          if (state.zIndex) state.element.style.zIndex = state.zIndex;
+      html2canvas(captureDiv, options)
+        .then((canvas) => {
+          // Create high resolution canvas
+          const scaledCanvas = document.createElement('canvas');
+          scaledCanvas.width = canvas.width * 2;
+          scaledCanvas.height = canvas.height * 2;
+          const ctx = scaledCanvas.getContext('2d');
+          
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+    
+          const jpgDataUrl = scaledCanvas.toDataURL("image/jpeg", 1.0);
+          
+          const downloadLink = document.createElement("a");
+          downloadLink.href = jpgDataUrl;
+          downloadLink.download = `wedding-card-${Date.now()}.jpg`;
+          
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          document.body.removeChild(loadingIndicator);
+        })
+        .catch((error) => {
+          console.error("Error generating image:", error);
+          document.body.removeChild(loadingIndicator);
+          alert("Error creating image. Please try again.");
         });
-      })
-      .catch((error) => {
-        console.error("Error generating image:", error);
-        
-        // Restore original states in case of error
-        originalStates.forEach(state => {
-          if (state.scale) state.element.style.transform = state.scale;
-          if (state.zIndex) state.element.style.zIndex = state.zIndex;
-        });
-      });
+    }, 100);
   }, []);
   
   const handleWhatsAppShare = useCallback(async () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
   
-    try {
-      // Save current state of zoomed images
-      const zoomedElements = document.querySelectorAll('.zoomed');
-      const zoomedContainers = document.querySelectorAll('.zoomable-container');
-      
-      // Create an array to store the original states for restoration
-      const originalStates = [];
-      
-      // Temporarily reset all zoomed images for capture
-      zoomedElements.forEach(element => {
-        originalStates.push({
-          element,
-          scale: element.style.transform,
-          zIndex: element.style.zIndex
-        });
-        
-        // Reset transform and z-index for clean capture
-        element.style.transform = 'scale(1) translateX(0px) translateY(0px)';
-        element.style.zIndex = 'auto';
-      });
-      
-      // Also reset any zoomable containers
-      zoomedContainers.forEach(container => {
-        if (container.style.zIndex) {
-          originalStates.push({
-            element: container,
-            zIndex: container.style.zIndex
-          });
-          container.style.zIndex = 'auto';
-        }
-      });
+    // Display a loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.style.position = 'fixed';
+    loadingIndicator.style.top = '50%';
+    loadingIndicator.style.left = '50%';
+    loadingIndicator.style.transform = 'translate(-50%, -50%)';
+    loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
+    loadingIndicator.style.color = 'white';
+    loadingIndicator.style.padding = '20px';
+    loadingIndicator.style.borderRadius = '10px';
+    loadingIndicator.style.zIndex = '9999';
+    loadingIndicator.textContent = 'Creating your image for sharing...';
+    document.body.appendChild(loadingIndicator);
   
-      const canvas = await html2canvas(captureDiv, {
-        scale: 4,
+    try {
+      // Wait for a moment to ensure the UI updates
+      await new Promise(resolve => setTimeout(resolve, 100));
+  
+      const options = {
+        scale: 4, // Higher scale for better quality
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
         logging: false,
+        imageTimeout: 0,
+        // Don't modify transforms in the clone - capture exactly as visible
         onclone: (clonedDoc) => {
+          // Only enhance image quality, don't reset transforms
           const images = clonedDoc.getElementsByTagName('img');
           for (let img of images) {
             img.style.imageRendering = 'high-quality';
-            img.style.webkitImageRendering = 'high-quality';
           }
         }
-      });
-      
-      // Restore original states after capture
-      originalStates.forEach(state => {
-        if (state.scale) state.element.style.transform = state.scale;
-        if (state.zIndex) state.element.style.zIndex = state.zIndex;
-      });
+      };
+  
+      const canvas = await html2canvas(captureDiv, options);
   
       const scaledCanvas = document.createElement('canvas');
       scaledCanvas.width = canvas.width * 2;
@@ -473,6 +436,9 @@ const CollageCard = () => {
       }
     } catch (error) {
       console.error("Sharing error:", error);
+      alert("Error creating image for sharing. Please try again.");
+    } finally {
+      document.body.removeChild(loadingIndicator);
     }
   }, []);
 
