@@ -539,7 +539,7 @@ const BirthdayCard = () => {
         scale: 4, // Higher scale for better quality
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null,
+        backgroundColor: '#FFFFFF', // Set explicit white background
         logging: false,
         imageTimeout: 0,
         // Don't modify transforms in the clone - capture exactly as visible
@@ -559,6 +559,10 @@ const BirthdayCard = () => {
           scaledCanvas.width = canvas.width * 2;
           scaledCanvas.height = canvas.height * 2;
           const ctx = scaledCanvas.getContext('2d');
+          
+          // Add white background to eliminate black transparency artifacts
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height);
           
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
@@ -746,7 +750,7 @@ const BirthdayCard = () => {
         scale: 4, // Higher scale for better quality
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null,
+        backgroundColor: '#FFFFFF', // Set explicit white background
         logging: false,
         imageTimeout: 0,
         // Don't modify transforms in the clone - capture exactly as visible
@@ -766,6 +770,11 @@ const BirthdayCard = () => {
       scaledCanvas.width = canvas.width * 2;
       scaledCanvas.height = canvas.height * 2;
       const ctx = scaledCanvas.getContext('2d');
+      
+      // Add white background to eliminate black transparency artifacts
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+      
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
