@@ -1,133 +1,51 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
-import { SlArrowRight } from "react-icons/sl";
 import Header from '../Header/Header';
 
 const HomePage = () => {
-  const [weddingTemplates, setWeddingTemplates] = useState([]);
-  const [birthdayTemplates, setBirthdayTemplates] = useState([]);
-  const [collageTemplates, setCollageTemplates] = useState([]);
-  const [loading, setLoading] = useState({
-    wedding: true,
-    birthday: true,
-    collage: true
-  });
-  const [error, setError] = useState({
-    wedding: null,
-    birthday: null,
-    collage: null
-  });
-  const [retryCount, setRetryCount] = useState({
-    wedding: 0,
-    birthday: 0,
-    collage: 0
-  });
-
-  // Separate refs for each gallery
-  const galleryRefs = useRef({
-    wedding: null,
-    birthday: null,
-    collage: null
-  });
-
   const navigate = useNavigate();
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const shuffleArray = (array) => {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
+  // Dummy image URLs as fallbacks
+  const dummyImages = {
+    wedding: 'https://via.placeholder.com/400x600/1a2438/ffffff?text=Wedding+Cards',
+    birthday: 'https://via.placeholder.com/400x600/1a2438/ffffff?text=Birthday+Cards',
+    collage: 'https://via.placeholder.com/400x600/1a2438/ffffff?text=Photo+Collages'
   };
 
-  const fetchTemplates = async (type) => {
-    try {
-      const response = await fetch(`/data/${type}.json`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch ${type} templates`);
-      }
-  
-      const data = await response.json();
-      let templates = Object.entries(data).map(([id, details]) => ({
-        id: id,
-        numericId: id.replace('id_', ''),
-        type: type,
-        ...details,
-      }));
-  
-      templates = shuffleArray(templates);
-      
-      switch(type) {
-        case 'wedding':
-          setWeddingTemplates(templates);
-          break;
-        case 'birthday':
-          setBirthdayTemplates(templates);
-          break;
-        case 'collage':
-          setCollageTemplates(templates);
-          break;
-      }
-      
-      setError(prev => ({ ...prev, [type]: null }));
-    } catch (err) {
-      console.error(`Fetch error for ${type}:`, err);
-      setError(prev => ({ 
-        ...prev, 
-        [type]: `Failed to load ${type} templates. Please try again.` 
-      }));
-      
-      if (retryCount[type] < 3) {
-        setTimeout(() => {
-          setRetryCount(prev => ({
-            ...prev,
-            [type]: prev[type] + 1
-          }));
-        }, 2000);
-      }
-    } finally {
-      setLoading(prev => ({ ...prev, [type]: false }));
+  const categories = [
+    {
+      id: 'wedding',
+      title: 'Wedding Cards',
+      description: 'Beautiful cards for your special day',
+      image: '/Wedding-Templates/id_1/thumbnail.jpg',
+      fallbackImage: dummyImages.wedding,
+      path: '/TemplateLibrary'
+    },
+    {
+      id: 'birthday',
+      title: 'Birthday Cards',
+      description: 'Celebrate with custom birthday cards',
+      image: '/Birthday-Templates/id_1/thumbnail.jpg',
+      fallbackImage: dummyImages.birthday,
+      path: '/BirthdayLibrary'
+    },
+    {
+      id: 'collage',
+      title: 'Photo Collages',
+      description: 'Create amazing photo collections',
+      image: '/Collage-Templates/id_1/thumbnail.jpg',
+      fallbackImage: dummyImages.collage,
+      path: '/CollageLibrary'
     }
-  };
+  ];
 
-  useEffect(() => {
-    fetchTemplates('wedding');
-    fetchTemplates('birthday');
-    fetchTemplates('collage');
-  }, [retryCount.wedding, retryCount.birthday, retryCount.collage]);
-
-  const handleTemplateSelect = (template) => {
-    // Store current scroll position before navigation
-    sessionStorage.setItem(`${template.type}ScrollPosition`, 
-      galleryRefs.current[template.type]?.scrollLeft || 0
-    );
-
-    switch(template.type) {
-      case 'birthday':
-        navigate(`/birthday/${template.numericId}`);
+  const handleCategoryClick = (category) => {
+    switch(category.id) {
+      case 'wedding':
+        navigate('/TemplateLibrary');
         break;
-      case 'collage':
-        navigate(`/collage/${template.numericId}`);
-        break;
-      default:
-        navigate(`/card/${template.numericId}`);
-    }
-  };
-
-  const handleRetry = (type) => {
-    setRetryCount(prev => ({ ...prev, [type]: 0 }));
-    setError(prev => ({ ...prev, [type]: null }));
-  };
-
-  const handleViewAllClick = (type) => {
-    // Store current scroll position before navigation
-    sessionStorage.setItem(`${type}ScrollPosition`, 
-      galleryRefs.current[type]?.scrollLeft || 0
-    );
-
-    switch(type) {
       case 'birthday':
         navigate('/BirthdayLibrary');
         break;
@@ -135,94 +53,87 @@ const HomePage = () => {
         navigate('/CollageLibrary');
         break;
       default:
-        navigate('/TemplateLibrary');
+        navigate('/');
     }
   };
 
-  // Effect to restore scroll positions
   useEffect(() => {
-    ['wedding', 'birthday', 'collage'].forEach(type => {
-      const savedPosition = sessionStorage.getItem(`${type}ScrollPosition`);
-      if (savedPosition && galleryRefs.current[type]) {
-        galleryRefs.current[type].scrollLeft = parseInt(savedPosition, 10);
-      }
-    });
-  }, [weddingTemplates, birthdayTemplates, collageTemplates]);
-
-  const ShimmerEffect = () => (
-    <div className="template-gallery-container">
-      <div className="template-gallery">
-        {[1, 2, 3].map((_, index) => (
-          <div key={index} className="template-card shimmer-card">
-            <div className="shimmer-wrapper">
-              <div className="shimmer-animation"></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderTemplateSection = (type, templates) => {
-    const getTemplateImagePath = (template) => {
-      if (type === 'collage') {
-        return template?.images?.[0]?.thumbnail?.replace('/Wedding-Templates/', '/Collage-Templates/') || '/placeholder-image.jpg';
-      }
-      return template?.images?.[0]?.thumbnail || '/placeholder-image.jpg';
-    };
-
-    return (
-      <>
-        <section className="section-title">
-          <h2 className="wedding-title">{type.charAt(0).toUpperCase() + type.slice(1)} Cards</h2>
-          <button className="view-all-btn" onClick={() => handleViewAllClick(type)}>
-            view all<SlArrowRight className="arrow-icon" />
-          </button>
-        </section>
-  
-        {loading[type] ? (
-          <ShimmerEffect />
-        ) : error[type] ? (
-          <div className="error-container">
-            <p className="error-text">{error[type]}</p>
-            <button onClick={() => handleRetry(type)} className="retry-button">
-              Try Again
-            </button>
-          </div>
-        ) : (
-          <div className="template-gallery-container">
-            <div 
-              className="template-gallery" 
-              ref={el => galleryRefs.current[type] = el}
-            >
-              {templates.map((template) => (
-                <div
-                  key={template.id}
-                  className="template-card"
-                  onClick={() => handleTemplateSelect(template)}
-                >
-                  <img
-                    src={getTemplateImagePath(template)}
-                    alt={`${type.charAt(0).toUpperCase() + type.slice(1)} Template ${template.numericId}`}
-                    className="template-image"
-                    onError={(e) => {
-                      e.target.src = '/placeholder-image.jpg';
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </>
-    );
-  };
+    // Add animation delay for elements to appear
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 300);
+  }, []);
 
   return (
-    <div className="homepage-container">
-      {renderTemplateSection('wedding', weddingTemplates)}
-      {renderTemplateSection('birthday', birthdayTemplates)}
-      {renderTemplateSection('collage', collageTemplates)}
+    <div className="min-h-screen bg-gradient-custom text-white">
+      <Header />
+      
+      <div className="hero-section">
+        <div className="hero-content container mx-auto px-4">
+          <h1 className="hero-title animate__animated animate__fadeInUp">
+            Card <span className="text-highlight">Customizer</span>
+          </h1>
+          <p className="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
+            Craft Memories, Design Emotions
+          </p>
+          <div className="hero-cta animate__animated animate__fadeInUp animate__delay-2s">
+            <p className="cta-text">Choose a category below to get started</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className={`categories-grid ${isLoaded ? 'loaded' : ''}`}>
+          {categories.map((category, index) => (
+            <div 
+              key={category.id}
+              className={`category-card category-${index}`}
+              onClick={() => handleCategoryClick(category)}
+            >
+              <div className="card-image-container">
+                <img 
+                  src={category.image} 
+                  alt={category.title}
+                  className="card-image"
+                  onError={(e) => {
+                    e.target.src = category.fallbackImage;
+                  }}
+                />
+                <div className="card-overlay">
+                  <h2 className="card-title">{category.title}</h2>
+                </div>
+              </div>
+              <div className="card-content">
+                <p className="card-description">{category.description}</p>
+                <button className="browse-button">
+                  Browse {category.title}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="features-section">
+          <h2 className="section-heading">Why Choose Our Card Maker?</h2>
+          <div className="features-grid">
+            <div className="feature-item">
+              <div className="feature-icon">✨</div>
+              <h3 className="feature-title">Stunning Templates</h3>
+              <p className="feature-description">Choose from our collection of professionally designed templates</p>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">🎨</div>
+              <h3 className="feature-title">Easy Customization</h3>
+              <p className="feature-description">Personalize every detail to match your style</p>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">📱</div>
+              <h3 className="feature-title">Mobile Friendly</h3>
+              <p className="feature-description">Create beautiful cards on any device</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

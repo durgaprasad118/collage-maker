@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Grid, ArrowLeft } from "lucide-react";
 import html2canvas from "html2canvas";
 import CropModal from "../CropModal/CropModal";
 import "./BirthdayCard.css";
-import ZoomableImage from "./ZoomableImage";
+import ZoomableImage from "./ZoomableImage"; // Enhanced with react-zoom-pan-pinch
 
 // Font imports
 import TinosRegular from "../../assets/fonts/Tinos-Regular.ttf";
@@ -113,6 +113,7 @@ const BirthdayCard = () => {
   const [cropImage, setCropImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showTemplateGallery, setShowTemplateGallery] = useState(false);
 
   // Initialize states
   const [customText, setCustomText] = useState({
@@ -181,10 +182,62 @@ const BirthdayCard = () => {
   const scrollAccumulator = useRef(0);
   const lastScrollTimeRef = useRef(Date.now());
 
+  // Disable default touch behaviors that might interfere with our custom handling
+  useEffect(() => {
+    const templateWrapper = containerRef.current;
+    const templateContent = templateWrapper?.querySelector('.template-content');
+    
+    // Prevent unwanted touch behaviors
+    const preventDefaultTouchBehavior = (e) => {
+      // Only prevent default for pinch gestures
+      if (e.touches && e.touches.length === 2) {
+        e.preventDefault();
+      }
+    };
+    
+    // Prevent unwanted touch behaviors on iOS devices
+    const preventIOSTouchBehavior = (e) => {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+    
+    if (templateWrapper) {
+      // Add these with passive: false to ensure preventDefault works
+      templateWrapper.addEventListener('touchstart', preventDefaultTouchBehavior, { passive: false });
+      templateWrapper.addEventListener('touchmove', preventDefaultTouchBehavior, { passive: false });
+      
+      // For iOS
+      document.addEventListener('gesturestart', preventIOSTouchBehavior, { passive: false });
+      document.addEventListener('gesturechange', preventIOSTouchBehavior, { passive: false });
+      document.addEventListener('gestureend', preventIOSTouchBehavior, { passive: false });
+    }
+    
+    return () => {
+      if (templateWrapper) {
+        templateWrapper.removeEventListener('touchstart', preventDefaultTouchBehavior);
+        templateWrapper.removeEventListener('touchmove', preventDefaultTouchBehavior);
+      }
+      
+      document.removeEventListener('gesturestart', preventIOSTouchBehavior);
+      document.removeEventListener('gesturechange', preventIOSTouchBehavior);
+      document.removeEventListener('gestureend', preventIOSTouchBehavior);
+    };
+  }, []);
+
   // Constants
   // const scrollThreshold = 120;
   // const touchScrollThreshold = 120;
   // const scrollCooldown = 500;
+  
+  // Debug: Log photos state whenever it changes
+  useEffect(() => {
+    console.log("Photos state updated:", {
+      hasPersonPhoto: !!photos.person_photo,
+      photoType: photos.person_photo ? typeof photos.person_photo : 'none',
+      photoLength: photos.person_photo ? photos.person_photo.slice(0, 30) + '...' : 'none'
+    });
+  }, [photos]);
 
   const handleCroppedImage = async (croppedImage) => {
     try {
@@ -429,6 +482,46 @@ const BirthdayCard = () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
 
+    // Get all TransformWrapper instances and selection elements
+    const transformWrappers = document.querySelectorAll('.react-transform-component');
+    const selectedElements = document.querySelectorAll('.selected');
+    const selectionBorders = document.querySelectorAll('.selection-border');
+    const saveButtons = document.querySelectorAll('.save-button');
+    
+    // Store original states
+    const originalStates = [];
+    
+    // Hide all selection indicators
+    selectionBorders.forEach(border => {
+      if (border.style.display !== 'none') {
+        originalStates.push({
+          element: border,
+          display: border.style.display
+        });
+        border.style.display = 'none';
+      }
+    });
+    
+    // Hide save buttons
+    saveButtons.forEach(button => {
+      if (button.style.display !== 'none') {
+        originalStates.push({
+          element: button,
+          display: button.style.display
+        });
+        button.style.display = 'none';
+      }
+    });
+    
+    // Reset selection classes
+    selectedElements.forEach(element => {
+      originalStates.push({
+        element: element,
+        className: element.className
+      });
+      element.classList.remove('selected');
+    });
+
     html2canvas(captureDiv, { scale: 10 })
       .then((canvas) => {
         const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
@@ -438,10 +531,22 @@ const BirthdayCard = () => {
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
+        
+        // Restore original states
+        originalStates.forEach(state => {
+          if (state.display !== undefined) state.element.style.display = state.display;
+          if (state.className) state.element.className = state.className;
+        });
       })
       .catch((error) => {
         console.error("Error generating image:", error);
         alert("Error generating image. Please try again.");
+        
+        // Restore original states in case of error
+        originalStates.forEach(state => {
+          if (state.display !== undefined) state.element.style.display = state.display;
+          if (state.className) state.element.className = state.className;
+        });
       });
   }, []);
 
@@ -451,9 +556,56 @@ const BirthdayCard = () => {
     if (!captureDiv) return;
 
     try {
+      // Get all TransformWrapper instances and selection elements
+      const transformWrappers = document.querySelectorAll('.react-transform-component');
+      const selectedElements = document.querySelectorAll('.selected');
+      const selectionBorders = document.querySelectorAll('.selection-border');
+      const saveButtons = document.querySelectorAll('.save-button');
+      
+      // Store original states
+      const originalStates = [];
+      
+      // Hide all selection indicators
+      selectionBorders.forEach(border => {
+        if (border.style.display !== 'none') {
+          originalStates.push({
+            element: border,
+            display: border.style.display
+          });
+          border.style.display = 'none';
+        }
+      });
+      
+      // Hide save buttons
+      saveButtons.forEach(button => {
+        if (button.style.display !== 'none') {
+          originalStates.push({
+            element: button,
+            display: button.style.display
+          });
+          button.style.display = 'none';
+        }
+      });
+      
+      // Reset selection classes
+      selectedElements.forEach(element => {
+        originalStates.push({
+          element: element,
+          className: element.className
+        });
+        element.classList.remove('selected');
+      });
+
       const canvas = await html2canvas(captureDiv, { scale: 8 });
+      
+      // Restore original states
+      originalStates.forEach(state => {
+        if (state.display !== undefined) state.element.style.display = state.display;
+        if (state.className) state.element.className = state.className;
+      });
+      
       const blob = await new Promise((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", 5)
+        canvas.toBlob(resolve, "image/jpeg", 0.9)
       );
       const file = new File([blob], "birthday-invitation.jpg", {
         type: "image/jpeg",
@@ -525,90 +677,6 @@ const BirthdayCard = () => {
 
     fetchTemplateData();
   }, [id]);
-
-  useEffect(() => {
-    const handleScroll = (deltaY, e) => {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-
-      if (isScrolling.current || isAnimating) return;
-
-      if (deltaY > 0 && currentIndex < allTemplates.length - 1) {
-        isScrolling.current = true;
-        setIsAnimating(true);
-        setSlideDirection("up");
-        prevTemplateRef.current = currentTemplate;
-
-        setTimeout(() => {
-          const nextIndex = currentIndex + 1;
-          setCurrentIndex(nextIndex);
-          setCurrentTemplate(allTemplates[nextIndex]);
-          navigate(`/birthday/${nextIndex + 1}`, { replace: true });
-        }, 30);
-
-        setTimeout(() => {
-          setSlideDirection(null);
-          setIsAnimating(false);
-          isScrolling.current = false;
-        }, 1000);
-      } else if (deltaY < 0 && currentIndex > 0) {
-        isScrolling.current = true;
-        setIsAnimating(true);
-        setSlideDirection("down");
-        prevTemplateRef.current = currentTemplate;
-
-        setTimeout(() => {
-          const prevIndex = currentIndex - 1;
-          setCurrentIndex(prevIndex);
-          setCurrentTemplate(allTemplates[prevIndex]);
-          navigate(`/birthday/${prevIndex + 1}`, { replace: true });
-        }, 100);
-
-        setTimeout(() => {
-          setSlideDirection(null);
-          setIsAnimating(false);
-          isScrolling.current = false;
-        }, 1000);
-      }
-    };
-
-    // Scroll and touch event listeners
-    const handleWheel = (e) => {
-      handleScroll(e.deltaY, e);
-    };
-
-    const handleTouchStart = (e) => {
-      touchStartRef.current = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e) => {
-      if (touchStartRef.current === null) return;
-      const touchDeltaY = e.touches[0].clientY - touchStartRef.current;
-      handleScroll(-touchDeltaY, e);
-      touchStartRef.current = null;
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("wheel", handleWheel, { passive: false });
-      container.addEventListener("touchstart", handleTouchStart, {
-        passive: false,
-      });
-      container.addEventListener("touchmove", handleTouchMove, {
-        passive: false,
-      });
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("wheel", handleWheel);
-        container.removeEventListener("touchstart", handleTouchStart);
-        container.removeEventListener("touchmove", handleTouchMove);
-      }
-    };
-  }, [currentIndex, allTemplates, navigate, currentTemplate, isAnimating]);
 
   // Render modal content
   const renderModal = () => {
@@ -735,22 +803,41 @@ const BirthdayCard = () => {
   // Template rendering logic
   const renderTemplateContent = useCallback(
     (template) => {
+      // Debug: Log template and photos info
+      console.log("Rendering template content:", {
+        templateId: template?.id,
+        hasTemplateImages: template?.images?.length > 0,
+        personPhoto: photos.person_photo ? "Present" : "Missing"
+      });
+      
       return (
         <div className="template-content">
-          
           <img
             src={template?.images[0]?.template}
             alt="Base Template"
             className="base-template"
           />
-          {template?.images.map((image, index) => (
-            <ZoomableImage
-              key={index}
-              image={image}
-              coordinates={image.coordinates}
-              backgroundImage={photos.person_photo}
-            />
-          ))}
+          {template?.images.map((image, index) => {
+            console.log(`Rendering ZoomableImage ${index}:`, {
+              imageData: image,
+              coordinates: image.coordinates,
+              hasPersonPhoto: !!photos.person_photo
+            });
+            
+            return (
+              <ZoomableImage
+                key={index}
+                image={image}
+                coordinates={image.coordinates}
+                backgroundImage={photos.person_photo}
+                allTemplates={allTemplates}
+                currentIndex={currentIndex}
+                setCurrentIndex={setCurrentIndex}
+                currentTemplate={currentTemplate}
+                setCurrentTemplate={setCurrentTemplate}
+              />
+            );
+          })}
           {/* Text overlays remain unchanged */}
           {template?.texts.map((text, index) => (
             <div
@@ -777,7 +864,7 @@ const BirthdayCard = () => {
         </div>
       );
     },
-    [photos, customText]
+    [photos, customText, allTemplates, currentIndex, setCurrentIndex, setCurrentTemplate]
   );
   // Loading and error states
   // Loading and error states
@@ -786,29 +873,58 @@ const BirthdayCard = () => {
     return <div className="error-screen">{error}</div>;
   }
 
+  // Handle template selection
+  const handleTemplateSelect = (index) => {
+    setCurrentIndex(index);
+    setCurrentTemplate(allTemplates[index]);
+    navigate(`/birthday/${index + 1}`, { replace: true });
+    setShowTemplateGallery(false);
+  };
+
+  // Template gallery component
+  const renderTemplateGallery = () => {
+    if (!showTemplateGallery) return null;
+
+    return (
+      <div className="template-gallery-overlay">
+        <div className="template-gallery-header">
+          <button
+            className="back-button"
+            onClick={() => setShowTemplateGallery(false)}
+          >
+            <ArrowLeft size={24} />
+            <span>Back to Card</span>
+          </button>
+          <h2>Select Template</h2>
+        </div>
+        <div className="template-gallery-grid">
+          {allTemplates.map((template, index) => (
+            <div
+              key={index}
+              className={`template-thumbnail ${
+                index === currentIndex ? "active" : ""
+              }`}
+              onClick={() => handleTemplateSelect(index)}
+            >
+              <img
+                src={template?.images[0]?.template}
+                alt={`Template ${index + 1}`}
+              />
+              <div className="template-number">{index + 1}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // Main render
   return (
     <div className={`main-container ${isEditModalOpen ? "modal-open" : ""}`}>
+      {renderTemplateGallery()}
+      
       <div ref={containerRef} className="template-wrapper">
-        {isAnimating && prevTemplateRef.current && (
-          <div
-            className={`template-positioning ${
-              slideDirection === "up" ? "slide-up-exit" : "slide-down-exit"
-            }`}
-          >
-            {renderTemplateContent(prevTemplateRef.current)}
-          </div>
-        )}
-
-        <div
-          className={`template-positioning ${
-            slideDirection === "up"
-              ? "slide-up-enter"
-              : slideDirection === "down"
-              ? "slide-down-enter"
-              : ""
-          }`}
-        >
+        <div className="template-positioning">
           {renderTemplateContent(currentTemplate)}
         </div>
       </div>
@@ -818,6 +934,13 @@ const BirthdayCard = () => {
 
       {/* Action buttons */}
       <div className="button-container">
+        <button
+          className="floating-button gallery-button"
+          onClick={() => setShowTemplateGallery(true)}
+        >
+          <Grid size={20} />
+          <span>Templates</span>
+        </button>
         <button
           className="floating-button edit-button"
           onClick={() => setIsEditModalOpen(true)}

@@ -17,7 +17,9 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  touch-action: none;
+  touch-action: pan-x pan-y;
+  position: relative;
+  transform: translateZ(0);
 }
 
 .template-positioning {
@@ -41,12 +43,22 @@
   z-index: 10;
   transition: transform 0.3s ease-in-out;
   opacity: 1;
+  touch-action: none;
+  user-select: none;
+}
+
+.template-content img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .base-template {
   width: auto;
   height: auto;
   object-fit: contain !important;
+  touch-action: manipulation;
+  pointer-events: none;
 }
 
 /* Loading Styles */
@@ -295,7 +307,6 @@
   transition: all 0.2s ease;
   backdrop-filter: blur(4px);
 }
-Untitled
 
 .crop-container {
   width: 100%;
@@ -304,7 +315,6 @@ Untitled
   align-items: center;
   max-height: 70vh;
 }
-
 
 .crop-modal-overlay {
   position: fixed;
@@ -363,7 +373,6 @@ Untitled
   background: rgba(26, 34, 52, 0.95);
 }
 
-
 .cancel-button {
   min-width: 120px;
   padding: 12px 24px;
@@ -381,13 +390,11 @@ Untitled
   justify-content: center;
 }
 
-
 .cancel-button:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
 
 .modal-footer {
   padding: 16px;
@@ -414,7 +421,6 @@ Untitled
   align-items: center;
   justify-content: center;
 }
-
 
 .save-button:hover {
   transform: translateY(-2px);
@@ -444,6 +450,7 @@ Untitled
   background: rgba(156, 204, 101, 0.2);
   transform: scale(1.05);
 }
+
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -537,6 +544,7 @@ Untitled
   opacity: 0;
   cursor: pointer;
 }
+
 /* Upload Section Styles */
 .modal-body {
   padding: 24px;
@@ -560,6 +568,7 @@ Untitled
   align-items: flex-start;
   gap: 16px;
 }
+
 .upload-status {
   background: red;
   padding: 8px 16px;
@@ -675,7 +684,6 @@ Untitled
 }
 
 .save-button:hover {
- 
   transform: translateY(-5px);
 }
 
@@ -831,8 +839,8 @@ Untitled
   .modal-header h2 {
     font-size: 1.1rem;
   }
- 
 }
+
 @media (max-width: 600px) {
   .button-container {
     gap: 60px;
@@ -868,6 +876,7 @@ Untitled
 
   }
 }
+
 @media (max-width: 768px) {
   .button-container {
     gap: 60px;
@@ -903,6 +912,7 @@ Untitled
 
   }
 }
+
 /* Scrollbar Styling */
 .modal-content::-webkit-scrollbar {
   width: 6px;
@@ -919,4 +929,189 @@ Untitled
 
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: rgba(156, 204, 101, 0.5);
+}
+
+/* Zoom Image Functionality - Enhanced */
+.zoomable-container {
+  isolation: isolate;
+  touch-action: none !important;
+  position: absolute;
+  overflow: hidden;
+}
+
+.zoomable-container.zooming {
+  z-index: 100;
+}
+
+.zoomable-image {
+  will-change: transform;
+  touch-action: none !important;
+  pointer-events: auto;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  transition: transform 0.05s ease-out;
+}
+
+.zoomable-image.zoomed {
+  cursor: grab;
+  z-index: 101;
+}
+
+.zoomable-image.zoomed:active {
+  cursor: grabbing !important;
+}
+
+.zoomable-container.dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+.zoomable-container.dragging::after {
+  opacity: 0 !important;
+}
+
+/* Mouse wheel zoom instructions */
+.zoomable-container::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.zoomable-container:hover::after {
+  content: "Drag to move";
+  opacity: 0.8;
+  line-height: 1.5;
+  padding: 10px;
+}
+
+.template-wrapper.zooming {
+  overflow: hidden !important;
+  touch-action: none !important;
+  -webkit-touch-action: none !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.template-wrapper.zooming .zoomable-container {
+  pointer-events: auto;
+}
+
+/* iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .zoomable-container {
+    touch-action: none;
+  }
+  
+  .template-wrapper {
+    touch-action: manipulation;
+  }
+  
+  .template-content {
+    touch-action: manipulation;
+  }
+  
+  .base-template {
+    touch-action: manipulation;
+    pointer-events: none;
+  }
+}
+
+/* Image controls styling */
+.image-controls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.save-image-btn, .reset-image-btn {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+}
+
+.save-image-btn:hover, .reset-image-btn:hover {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+.save-image-btn.saved {
+  background-color: rgba(52, 168, 83, 0.7);
+}
+
+.image-save-toast {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(52, 168, 83, 0.9);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
+}
+
+.image-save-toast-hidden {
+  opacity: 0;
+}
+
+/* Save transform button styles */
+.save-transform-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  opacity: 0.8;
+}
+
+.save-transform-button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.save-transform-button.saved {
+  background-color: #4CAF50;
+  color: white;
 }

@@ -8,6 +8,8 @@ const HomePage = React.lazy(() => import('./components/HomePage/HomePage'));
 const Card = React.lazy(() => import('./components/Card/Card'));
 const BirthdayCard = React.lazy(() => import('./components/BirthdayCard/BirthdayCard'));
 const TemplateLibrary = React.lazy(() => import('./components/TemplateLibrary/TemplateLibrary'));
+const BirthdayLibrary = React.lazy(() => import('./components/BirthdayLibrary/BirthdayLibrary'));
+const CollageLibrary = React.lazy(() => import('./components/CollageLibrary/CollageLibrary'));
 
 const LoadingFallback = () => (
   <div className="loading-screen">
@@ -27,6 +29,8 @@ const App = () => {
             <Route path="/card/:id" element={<Card />} />
             <Route path="/birthday/:id" element={<BirthdayCard />} />
             <Route path="/TemplateLibrary" element={<TemplateLibrary />} />
+            <Route path="/BirthdayLibrary" element={<BirthdayLibrary />} />
+            <Route path="/CollageLibrary" element={<CollageLibrary />} />
             <Route path="/collage/:id" element={<CollageCard />} />
             <Route
               path="*"

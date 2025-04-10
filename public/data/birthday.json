@@ -212,151 +212,71 @@
         }
       }
     ]
-  }
-  ,
+  },
   "id_3": {
     "images": [
       {
-        "thumbnail": "/Wedding-Templates/templetes-thumbnail/7.jpeg",
-        "template": "/Wedding-Templates/templetes/7.png",
-        "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/groom.jpg",
+        "thumbnail": "/Birthday-Templates/templetes-thumbnail/3.png",
+        "template": "../Birthday-Templates/templetes/3.png",
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/Sample.jpg",
         "coordinates": {
-          "width_in_px": 170,
-          "height_in_px": 340,
-          "top_in_px": 186,
-          "left_in_px": 92,
-          "width": 43.89,
-          "height": 20.83,
-          "top": 32.19,
-          "left": 26.75
-        }
-      },
-      {
-        "name": "wedding_bride_image",
-        "sample_image": "/Wedding-Templates/default-images/bride.jpg",
-        "coordinates": {
-          "width_in_px": 173,
-          "height_in_px": 338,
-          "top_in_px": 186,
-          "left_in_px": 290,
-          "width": 43.89,
-          "height": 20.83,
-          "top": 32.39,
-          "left": 74.35
+          "width_in_px": 485,
+          "height_in_px": 585,
+          "top_in_px": 505,
+          "left_in_px": 280,
+          "width": 50,
+          "height": 25,
+          "top": 20,
+          "left": 10,
+          "type": "box"
         }
       }
     ],
-    "texts": [
+    "texts": []
+  },
+  "id_4": {
+    "images": [
       {
-        "name": "wedding_groom_name",
-        "text_configs": {
-          "font_id": "Allura-Regular.ttf",
-
-          "size": 45,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#d0203c",
-          "sample_text": "Sureshwasham"
-        },
+        "thumbnail": "/Birthday-Templates/templetes-thumbnail/4.png",
+        "template": "../Birthday-Templates/templetes/4.png",
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/Sample2.jpg",
         "coordinates": {
-          "width_in_px": 307,
-          "height_in_px": 74,
-          "top_in_px": 540,
-          "left_in_px": 163,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 47.08,
-          "left": 24.25
-        }
-      },
-      {
-        "name": "wedding_bride_name",
-        "text_configs": {
-          "font_id": "Allura-Regular.ttf",
-
-          "size": 45,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#d0203c",
-          "sample_text": "Savanthi"
-        },
-        "coordinates": {
-          "width_in_px": 288,
-          "height_in_px": 60,
-          "top_in_px": 660,
-          "left_in_px": 148,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 46.77,
-          "left": 75.56
-        }
-      },
-      {
-        "name": "wedding_date",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-
-          "size": 22,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#5e450b",
-          "sample_text": "20-01-2025"
-        },
-        "coordinates": {
-          "width_in_px": 269,
-          "height_in_px": 32,
-          "top_in_px": 780,
-          "left_in_px": 141,
-          "width": 32.96,
-          "height": 5.21,
-          "top": 72.92,
-          "left": 50
-        }
-      },
-      {
-        "name": "wedding_time",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-
-          "size": 22,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#5e450b",
-          "sample_text": "23:00"
-        },
-        "coordinates": {
-          "width_in_px": 248,
-          "height_in_px": 26,
-          "top_in_px": 811,
-          "left_in_px": 150,
+          "width_in_px": 651,
+          "height_in_px": 785,
+          "top_in_px": 374,
+          "left_in_px": 181,
           "width": 60,
-          "height": 5.21,
-          "top": 81.98,
-          "left": 50.74
-        }
-      },
-      {
-        "name": "wedding_venue",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 25,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#5e450b",
-          "sample_text": "kavuri hills madhapur"
-        },
-        "coordinates": {
-          "width_in_px": 279,
-          "height_in_px": 70,
-          "top_in_px": 860,
-          "left_in_px": 132,
-          "width": 60,
-          "height": 5.21,
-          "top": 92.61,
-          "left": 51.3
+          "height": 54,
+          "top": 20,
+          "left": 10,
+          "type": "box"
         }
       }
-    ]
+    ],
+    "texts": []
+  },
+  "id_5": {
+    "images": [
+      {
+        "thumbnail": "/Birthday-Templates/templetes-thumbnail/5.png",
+        "template": "../Birthday-Templates/templetes/5.png",
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/Sample.jpg",
+        "coordinates": {
+          "width_in_px": 612,
+          "height_in_px": 715,
+          "top_in_px": 408,
+          "left_in_px": 201,
+          "width": 50,
+          "height": 25,
+          "top": 20,
+          "left": 10,
+          "type": "box"
+        }
+      }
+    ],
+    "texts": []
   }
 }

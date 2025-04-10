@@ -702,8 +702,7 @@ const Card = () => {
              navigate('/TemplateLibrary');
             return;
           }
-          
-          // Otherwise, proceed with normal scroll behavior
+         // Otherwise, proceed with normal scroll behavior
           if (currentIndex < allTemplates.length - 1) {
             isScrolling.current = true;
             setIsAnimating(true);

@@ -130,6 +130,73 @@
         }
       }
     ]
+  },
+  "id_3": {
+    "images": [
+      {
+        "thumbnail": "/Collage-Templates/templetes-thumbnail/3.jpeg",
+        "template": "../Collage-Templates/templetes/4.png",
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample.jpg",
+        "coordinates": {
+          "width_in_px": 464,
+          "height_in_px": 419,
+          "top_in_px": 365,
+          "left_in_px": 46,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 49.27,
+          "left": 15,
+          "z_index": 1,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample2.jpg",
+        "coordinates": {
+          "width_in_px": 472,
+          "height_in_px": 419,
+          "top_in_px": 362,
+          "left_in_px": 480,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 10,
+          "left": 15,
+          "z_index": 2,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample3.jpg",
+        "coordinates": {
+          "width_in_px": 472,
+          "height_in_px": 419,
+          "top_in_px": 797,
+          "left_in_px": 62,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 15,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample4.jpg",
+        "coordinates": {
+          "width_in_px": 472,
+          "height_in_px": 419,
+          "top_in_px": 816,
+          "left_in_px": 514,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 50,
+          "type": "box"
+        }
+      }
+    ]
   }
-
 }

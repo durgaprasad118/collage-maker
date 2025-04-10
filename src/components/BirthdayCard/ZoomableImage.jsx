@@ -1,6 +1,29 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import './ZoomableImage.css';
+
+// Storage service for image transformations
+const TransformStorageService = {
+  saveTransform: (key, transform) => {
+    try {
+      localStorage.setItem(`birthday_transform_${key}`, JSON.stringify(transform));
+      return true;
+    } catch (error) {
+      console.error("Error saving transform:", error);
+      return false;
+    }
+  },
+
+  getTransform: (key) => {
+    try {
+      const data = localStorage.getItem(`birthday_transform_${key}`);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error("Error getting transform:", error);
+      return null;
+    }
+  }
+};
 
 const defaultCoordinates = {
   width_in_px: 0,
@@ -19,250 +42,180 @@ const ZoomableImage = ({
   currentTemplate = null,
   setCurrentTemplate = () => {}
 }) => {
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isZooming, setIsZooming] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [slideDirection, setSlideDirection] = useState(null);
+  // Generate a unique key for this image based on image coordinates and template index
+  const imageKey = `${currentIndex}_${coordinates?.top_in_px}_${coordinates?.left_in_px}`;
+  
+  // Get saved transform data on initial load
+  const savedTransform = TransformStorageService.getTransform(imageKey);
+  
+  const [isSelected, setIsSelected] = useState(false);
+  const [showSaveButton, setShowSaveButton] = useState(false);
+  const [isSaved, setIsSaved] = useState(!!savedTransform);
 
-  const navigate = useNavigate();
-  const containerRef = useRef(null);
-  const touchStartRef = useRef(null);
-  const initialTouchRef = useRef(null);
-  const isScrolling = useRef(false);
+  // Debug logs for image data
+  useEffect(() => {
+    console.log("ZoomableImage props:", {
+      backgroundImage: backgroundImage ? "Present" : "Missing",
+      sampleImage: image.sample_image ? "Present" : "Missing",
+      imageShape: image.shape || "Default",
+      coordinates
+    });
+  }, [backgroundImage, image, coordinates]);
 
-  const useScrollLock = () => {
-    const lockScroll = useCallback(() => {
-      const scrollPosition = window.scrollY;
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollPosition}px`;
-      document.body.style.width = '100%';
-    }, []);
+  // Initialize with saved transform values if available
+  const initialScale = savedTransform?.scale || 1;
+  const initialPositionX = savedTransform?.position?.x || 0;
+  const initialPositionY = savedTransform?.position?.y || 0;
 
-    const unlockScroll = useCallback(() => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, parseInt(document.body.style.top || '0', 10) * -9);
-    }, []);
-
-    return { lockScroll, unlockScroll };
+  // Save transformation state
+  const saveTransform = (state) => {
+    if (!state) return;
+    
+    const { scale, positionX, positionY } = state;
+    
+    if (scale !== 1 || positionX !== 0 || positionY !== 0) {
+      TransformStorageService.saveTransform(imageKey, {
+        scale,
+        position: { x: positionX, y: positionY }
+      });
+      setIsSaved(true);
+      
+      // Show success message
+      const toast = document.createElement('div');
+      toast.className = 'image-save-toast';
+      toast.textContent = 'Image position saved!';
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('image-save-toast-hidden');
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 2000);
+    }
   };
 
-  const { lockScroll, unlockScroll } = useScrollLock();
-
-  useEffect(() => {
-    if (isZooming) {
-      lockScroll();
-    } else {
-      unlockScroll();
-    }
-  }, [isZooming, lockScroll, unlockScroll]);
-
-  const handleScroll = useCallback((deltaY, e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    if (isScrolling.current || isAnimating || isZooming) return;
-
-    const templatesLength = allTemplates?.length || 0;
-
-    if (deltaY > 0 && currentIndex < templatesLength - 1) {
-      isScrolling.current = true;
-      setIsAnimating(true);
-      setSlideDirection("up");
-
-      setTimeout(() => {
-        const nextIndex = currentIndex + 1;
-        setCurrentIndex(nextIndex);
-        setCurrentTemplate(allTemplates[nextIndex]);
-        navigate(`/birthday/${nextIndex + 1}`, { replace: true });
-      }, 300);
-
-      setTimeout(() => {
-        setSlideDirection(null);
-        setIsAnimating(false);
-        isScrolling.current = false;
-      }, 1000);
-    } else if (deltaY < 0 && currentIndex > 0) {
-      isScrolling.current = true;
-      setIsAnimating(true);
-      setSlideDirection("down");
-
-      setTimeout(() => {
-        const prevIndex = currentIndex - 1;
-        setCurrentIndex(prevIndex);
-        setCurrentTemplate(allTemplates[prevIndex]);
-        navigate(`/birthday/${prevIndex + 1}`, { replace: true });
-      }, 100);
-
-      setTimeout(() => {
-        setSlideDirection(null);
-        setIsAnimating(false);
-        isScrolling.current = false;
-      }, 1000);
-    }
-  }, [
-    currentIndex, 
-    allTemplates, 
-    currentTemplate, 
-    isAnimating, 
-    isZooming,
-    navigate, 
-    setCurrentIndex, 
-    setCurrentTemplate
-  ]);
-
-  const handleTouchStart = useCallback((e) => {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsZooming(true);
-      
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      initialTouchRef.current = {
-        distance: Math.hypot(
-          touch1.clientX - touch2.clientX,
-          touch1.clientY - touch2.clientY
-        ),
-        scale: scale
-      };
-      
-      const templateWrapper = containerRef.current?.closest('.template-wrapper');
-      if (templateWrapper) {
-        templateWrapper.classList.add('zooming');
-      }
-    } else if (e.touches.length === 1 && !isZooming) {
-      touchStartRef.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-        time: Date.now()
-      };
-    }
-  }, [scale, isZooming]);
-
-  const handleTouchMove = useCallback((e) => {
-    // Two-finger zoom
-    if (e.touches.length === 2 && initialTouchRef.current) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const currentDistance = Math.hypot(
-        touch1.clientX - touch2.clientX,
-        touch1.clientY - touch2.clientY
-      );
-      
-      const scaleDiff = currentDistance / initialTouchRef.current.distance;
-      const newScale = Math.min(Math.max(
-        initialTouchRef.current.scale * scaleDiff,
-        1
-      ), 3);
-      
-      setScale(newScale);
-    } 
-    // Single finger handling
-    else if (e.touches.length === 1 && !isZooming) {
-      // Prevent default to stop scrolling
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (!touchStartRef.current) return;
-      
-      const touch = e.touches[0];
-      const deltaX = touch.clientX - touchStartRef.current.x;
-      const deltaY = touch.clientY - touchStartRef.current.y;
-      
-      // If the vertical movement is more significant, handle page scroll
-      if (Math.abs(deltaY) > Math.abs(deltaX)) {
-        handleScroll(-deltaY, e);
-      }
-      
-      // Reset touch start to prevent continuous triggering
-      touchStartRef.current = {
-        x: touch.clientX,
-        y: touch.clientY,
-        time: Date.now()
-      };
-    }
-  }, [handleScroll, isZooming]);
-
-  const handleTouchEnd = useCallback((e) => {
-    if (isZooming) {
-      setIsZooming(false);
-      initialTouchRef.current = null;
-      
-      const templateWrapper = containerRef.current?.closest('.template-wrapper');
-      if (templateWrapper) {
-        templateWrapper.classList.remove('zooming');
-      }
-      
-      setTimeout(() => {
-        unlockScroll();
-      }, 100);
-    }
+  // Toggle selection state for panning only, without visual selection indicators
+  const toggleSelect = (e) => {
+    e.stopPropagation();
+    // Enable panning functionality only, without visual styling changes
+    setIsSelected(!isSelected);
     
-    // Reset touch references
-    touchStartRef.current = null;
-  }, [isZooming, unlockScroll]);
+    if (!isSelected) {
+      const handleOutsideClick = (event) => {
+        const container = e.currentTarget;
+        if (container && !container.contains(event.target)) {
+          setIsSelected(false);
+          document.removeEventListener('click', handleOutsideClick);
+        }
+      };
+      
+      setTimeout(() => {
+        document.addEventListener('click', handleOutsideClick);
+      }, 0);
+    }
+  };
 
-  const backgroundImageUrl = backgroundImage || image.sample_image || '';
+  // Show/hide save button based on transform state
+  const handleTransformChange = ({ state, instance }) => {
+    if (!state) return;
+    
+    const hasTransformation = state.scale !== 1 || state.positionX !== 0 || state.positionY !== 0;
+    
+    setShowSaveButton(hasTransformation);
+    if (hasTransformation) {
+      setIsSaved(false);
+    }
+  };
 
   return (
-    <div
-      ref={containerRef}
-      className={`zoomable-container ${slideDirection ? `slide-${slideDirection}` : ''}`}
+    <div 
+      className="zoomable-container"
       style={{
-        width: `${coordinates?.width_in_px || 0}px`,
-        height: `${coordinates?.height_in_px || 0}px`,
-        top: `${coordinates?.top_in_px || 0}px`,
-        left: `${coordinates?.left_in_px || 0}px`,
+        position: 'absolute',
+        width: `${coordinates?.width_in_px}px`,
+        height: `${coordinates?.height_in_px}px`,
+        top: `${coordinates?.top_in_px}px`,
+        left: `${coordinates?.left_in_px}px`,
+        overflow: 'hidden',
+        borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
       }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      aria-label="Zoomable Image"
+      onClick={toggleSelect}
     >
-      <motion.div
-        className={`zoomable-image ${scale > 1 ? 'zoomed' : ''}`}
-        style={{
-          width: "100%",
-          height: "100%",
-          backgroundImage: backgroundImageUrl ? `url(${backgroundImageUrl})` : 'none',
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          willChange: "transform"
+      {/* Remove selection border */}
+      
+      <TransformWrapper
+        initialScale={initialScale}
+        initialPositionX={initialPositionX}
+        initialPositionY={initialPositionY}
+        minScale={1}
+        maxScale={3}
+        limitToBounds={true}
+        doubleClick={{
+          disabled: false,
+          mode: "reset"
         }}
-        animate={{ 
-          scale, 
-          x: position.x, 
-          y: position.y 
+        panning={{
+          disabled: !isSelected,
+          velocityDisabled: true
         }}
-        transition={{
-          type: "spring", 
-          stiffness: 300,
-          damping: 30,
-          mass: 0.5
-        }}
-        drag={scale > 1}
-        dragConstraints={{
-          left: -(coordinates?.width_in_px || 0) * (scale - 1) / 2,
-          right: (coordinates?.width_in_px || 0) * (scale - 1) / 2,
-          top: -(coordinates?.height_in_px || 0) * (scale - 1) / 2,
-          bottom: (coordinates?.height_in_px || 0) * (scale - 1) / 2
-        }}
-        dragElastic={0.1}
-        onDragStart={() => setIsZooming(true)}
-        onDragEnd={() => setIsZooming(false)}
-        dragMomentum={false}
-        role="img"
-      />
+        onTransformed={handleTransformChange}
+      >
+        {({ state, zoomIn, zoomOut, resetTransform }) => (
+          <>
+            <TransformComponent
+              wrapperStyle={{
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden'
+              }}
+              contentStyle={{
+                width: '100%',
+                height: '100%'
+              }}
+            >
+              {/* Direct image rendering with fallbacks */}
+              {backgroundImage ? (
+                <img 
+                  src={backgroundImage}
+                  alt="User uploaded"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                  }}
+                />
+              ) : image.sample_image ? (
+                <img 
+                  src={image.sample_image}
+                  alt="Sample"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                  }}
+                />
+              ) : (
+                <div 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                  }}
+                >
+                  <span style={{ color: '#777', fontSize: '12px' }}>No image</span>
+                </div>
+              )}
+            </TransformComponent>
+            
+            {/* Hide save button and zoom controls entirely */}
+            {/* We've removed the controls that were previously shown when selected */}
+          </>
+        )}
+      </TransformWrapper>
     </div>
   );
 };

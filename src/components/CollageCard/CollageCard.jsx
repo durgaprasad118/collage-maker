@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { X, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import CropModal from "../CropModal/CropModal";
+import ZoomableImage from "./ZoomableImage";
 
 import "./CollageCard.css";
 
@@ -289,6 +290,37 @@ const CollageCard = () => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
   
+    // Save current state of zoomed images
+    const zoomedElements = document.querySelectorAll('.zoomed');
+    const zoomedContainers = document.querySelectorAll('.zoomable-container');
+    
+    // Create an array to store the original states for restoration
+    const originalStates = [];
+    
+    // Temporarily reset all zoomed images for capture
+    zoomedElements.forEach(element => {
+      originalStates.push({
+        element,
+        scale: element.style.transform,
+        zIndex: element.style.zIndex
+      });
+      
+      // Reset transform and z-index for clean capture
+      element.style.transform = 'scale(1) translateX(0px) translateY(0px)';
+      element.style.zIndex = 'auto';
+    });
+    
+    // Also reset any zoomable containers
+    zoomedContainers.forEach(container => {
+      if (container.style.zIndex) {
+        originalStates.push({
+          element: container,
+          zIndex: container.style.zIndex
+        });
+        container.style.zIndex = 'auto';
+      }
+    });
+  
     const options = {
       scale: 4,
       useCORS: true,
@@ -325,9 +357,21 @@ const CollageCard = () => {
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
+        
+        // Restore original states after capture
+        originalStates.forEach(state => {
+          if (state.scale) state.element.style.transform = state.scale;
+          if (state.zIndex) state.element.style.zIndex = state.zIndex;
+        });
       })
       .catch((error) => {
         console.error("Error generating image:", error);
+        
+        // Restore original states in case of error
+        originalStates.forEach(state => {
+          if (state.scale) state.element.style.transform = state.scale;
+          if (state.zIndex) state.element.style.zIndex = state.zIndex;
+        });
       });
   }, []);
   
@@ -336,6 +380,37 @@ const CollageCard = () => {
     if (!captureDiv) return;
   
     try {
+      // Save current state of zoomed images
+      const zoomedElements = document.querySelectorAll('.zoomed');
+      const zoomedContainers = document.querySelectorAll('.zoomable-container');
+      
+      // Create an array to store the original states for restoration
+      const originalStates = [];
+      
+      // Temporarily reset all zoomed images for capture
+      zoomedElements.forEach(element => {
+        originalStates.push({
+          element,
+          scale: element.style.transform,
+          zIndex: element.style.zIndex
+        });
+        
+        // Reset transform and z-index for clean capture
+        element.style.transform = 'scale(1) translateX(0px) translateY(0px)';
+        element.style.zIndex = 'auto';
+      });
+      
+      // Also reset any zoomable containers
+      zoomedContainers.forEach(container => {
+        if (container.style.zIndex) {
+          originalStates.push({
+            element: container,
+            zIndex: container.style.zIndex
+          });
+          container.style.zIndex = 'auto';
+        }
+      });
+  
       const canvas = await html2canvas(captureDiv, {
         scale: 4,
         useCORS: true,
@@ -349,6 +424,12 @@ const CollageCard = () => {
             img.style.webkitImageRendering = 'high-quality';
           }
         }
+      });
+      
+      // Restore original states after capture
+      originalStates.forEach(state => {
+        if (state.scale) state.element.style.transform = state.scale;
+        if (state.zIndex) state.element.style.zIndex = state.zIndex;
       });
   
       const scaledCanvas = document.createElement('canvas');
@@ -435,30 +516,13 @@ const CollageCard = () => {
             className="base-template"
           />
           {template.images.map((image, index) => (
-            <div
+            <ZoomableImage 
               key={index}
-              style={{
-                width: `${image.coordinates.width_in_px}px`,
-                height: `${image.coordinates.height_in_px}px`,
-                position: "absolute",
-                top: `${image.coordinates.top_in_px}px`,
-                left: `${image.coordinates.left_in_px}px`,
-                zIndex: 0,
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  backgroundImage: `url(${
-                    photos[`photo_${index}`] || image.sample_image
-                  })`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
-            </div>
+              index={index}
+              coordinates={image.coordinates}
+              backgroundImage={photos[`photo_${index}`] || image.sample_image}
+              templateId={template.id}
+            />
           ))}
         </div>
       );
@@ -473,6 +537,10 @@ const CollageCard = () => {
         e.preventDefault();
         e.stopPropagation();
       }
+
+      // Don't scroll between templates if any image is zoomed in
+      const hasZoomedImages = document.querySelectorAll('.zoomed').length > 0;
+      if (hasZoomedImages) return;
 
       if (isScrolling.current || isAnimating) return;
 
@@ -518,14 +586,32 @@ const CollageCard = () => {
     };
 
     const handleWheel = (e) => {
+      // Check if the event originated from a zoomable container
+      const isFromZoomableContainer = e.target.closest('.zoomable-container');
+      
+      // If from zoomable container, let the container handle it
+      if (isFromZoomableContainer) return;
+      
       handleScroll(e.deltaY, e);
     };
 
     const handleTouchStart = (e) => {
+      // Don't handle template scrolling if touching a zoomable container
+      const isFromZoomableContainer = e.target.closest('.zoomable-container');
+      if (isFromZoomableContainer) return;
+      
       touchStartRef.current = e.touches[0].clientY;
     };
 
     const handleTouchMove = (e) => {
+      // Don't handle template scrolling if any image is zoomed
+      const hasZoomedImages = document.querySelectorAll('.zoomed').length > 0;
+      if (hasZoomedImages) return;
+      
+      // Don't handle template scrolling if touching a zoomable container
+      const isFromZoomableContainer = e.target.closest('.zoomable-container');
+      if (isFromZoomableContainer) return;
+      
       if (touchStartRef.current === null) return;
       const touchDeltaY = e.touches[0].clientY - touchStartRef.current;
       handleScroll(-touchDeltaY, e);
