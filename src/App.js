@@ -23,7 +23,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Suspense fallback={<LoadingFallback />}>
-        <div className="bg-[#0F1725] min-h-screen">
+        <div className="app-container">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/card/:id" element={<Card />} />
@@ -38,7 +38,7 @@ const App = () => {
                 <div className="min-h-screen flex items-center justify-center text-white">
                   <div className="text-center">
                     <h1 className="text-2xl mb-4">404 - Page Not Found</h1>
-                    <a href="/" className="text-[#9CCC65] hover:underline">
+                    <a href="/" className="text-[#60efbc] hover:underline">
                       Go Back to Home
                     </a>
                   </div>

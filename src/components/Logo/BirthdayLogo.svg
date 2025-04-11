@@ -1,0 +1,38 @@
+<svg width="220" height="70" viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background shape with gradient -->
+  <rect x="10" y="10" width="200" height="50" rx="10" fill="url(#bgGradient)" />
+  
+  <!-- Birthday elements -->
+  <path d="M45 25 C45 18 55 18 55 25 L55 45 L45 45 Z" fill="#FF6B6B" /> <!-- Candle -->
+  <path d="M45 18 C45 14 55 14 55 18 Z" fill="#FFD166" /> <!-- Flame -->
+  <rect x="35" y="45" width="30" height="5" rx="2" fill="#4ECDC4" /> <!-- Candle base -->
+  
+  <ellipse cx="30" cy="40" rx="10" ry="6" fill="#FF9E7A" transform="rotate(-10 30 40)" /> <!-- Balloon 1 -->
+  <path d="M30 46 L32 55" stroke="#FF9E7A" stroke-width="1" /> <!-- Balloon 1 string -->
+  
+  <ellipse cx="70" cy="35" rx="10" ry="6" fill="#7DCFB6" transform="rotate(10 70 35)" /> <!-- Balloon 2 -->
+  <path d="M70 41 L68 55" stroke="#7DCFB6" stroke-width="1" /> <!-- Balloon 2 string -->
+  
+  <!-- Text elements -->
+  <text x="100" y="35" font-family="Poppins, sans-serif" font-size="18" font-weight="bold" fill="white">Birthday</text>
+  <text x="100" y="55" font-family="Poppins, sans-serif" font-size="18" font-weight="bold" fill="#FFD166">Cards</text>
+  
+  <!-- Decorative elements -->
+  <circle cx="85" cy="20" r="2" fill="#FF6B6B" opacity="0.8" />
+  <circle cx="90" cy="25" r="1.5" fill="#7DCFB6" opacity="0.8" />
+  <circle cx="95" cy="20" r="1" fill="#FFD166" opacity="0.8" />
+  
+  <!-- Confetti elements -->
+  <rect x="25" y="20" width="2" height="4" fill="#FF6B6B" transform="rotate(45 25 20)" />
+  <rect x="75" y="15" width="2" height="4" fill="#4ECDC4" transform="rotate(-30 75 15)" />
+  <rect x="40" y="15" width="2" height="4" fill="#FFD166" transform="rotate(60 40 15)" />
+  <rect x="60" cy="20" width="2" height="4" fill="#FF9E7A" transform="rotate(-15 60 20)" />
+  
+  <!-- Define gradients -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F1725" />
+      <stop offset="100%" stop-color="#1a2438" />
+    </linearGradient>
+  </defs>
+</svg> 

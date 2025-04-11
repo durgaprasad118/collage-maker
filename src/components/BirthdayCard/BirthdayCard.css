@@ -769,8 +769,9 @@
       font-size: 14px;
     }
   
-    /* Disable bouncing and unwanted zooming */
-    html, body {
+    /* Scope these styles to only apply when the BirthdayCard component is active */
+    .birthday-card-active html, 
+    .birthday-card-active body {
       overflow: hidden;
       position: fixed;
       height: 100%;

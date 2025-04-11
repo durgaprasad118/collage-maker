@@ -4,6 +4,7 @@ body {
   font-family: 'Poppins', sans-serif;;
   background:#0F1725;
   min-height: 100vh;
+  overscroll-behavior: none; /* Prevent bounce/overscroll on mobile */
 }
 
 /* Template Library Container */
@@ -37,6 +38,8 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  aspect-ratio: 3/4; /* Standard aspect ratio for consistency */
+  touch-action: manipulation; /* Better touch handling */
 }
 
 .template-grid div:hover {
@@ -71,6 +74,11 @@ body {
   opacity: 1; /* Show overlay on hover */
 }
 
+/* Active state for touch devices */
+.template-grid div:active::after {
+  opacity: 1; /* Show overlay on touch/active state */
+}
+
 /* Loading and Error States */
 .loading-templates {
   text-align: center;
@@ -86,16 +94,38 @@ body {
   margin-top: 50px;
 }
 
+/* Loading Spinner */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #9CCC65;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Media Queries */
 @media (max-width: 768px) {
+  .template-library {
+    padding: 15px 10px;
+  }
+  
   .template-library h1 {
     font-size: 1.8rem;
     font-family: 'Poppins', sans-serif;
+    margin-bottom: 20px;
   }
 
   .template-grid {
     grid-template-columns: repeat(2, 1fr); /* Two images per row */
     gap: 15px;
+    padding: 5px;
   }
 
   .template-grid div {
@@ -108,15 +138,22 @@ body {
 }
 
 @media (max-width: 480px) {
+  .template-library {
+    padding: 10px 8px;
+  }
+  
   .template-library h1 {
     font-size: 1.6rem;
     color:white;
     font-family: 'Poppins', sans-serif;
+    padding-top: 60px; /* Account for fixed headers */
+    margin-bottom: 15px;
   }
 
   .template-grid {
     grid-template-columns: repeat(2, 1fr); /* Ensure two images per row */
     gap: 10px;
+    padding: 3px;
   }
 
   .template-grid div {
@@ -125,5 +162,13 @@ body {
 
   .template-grid img {
     border-radius: 8px;
+  }
+}
+
+/* Touch Feedback */
+@media (hover: none) {
+  .template-grid div:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
   }
 }

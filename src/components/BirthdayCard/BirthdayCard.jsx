@@ -628,6 +628,16 @@ const BirthdayCard = () => {
     fetchTemplateData();
   }, [id]);
 
+  // Add birthday-card-active class to body when component mounts
+  useEffect(() => {
+    document.body.classList.add('birthday-card-active');
+    
+    // Clean up function to remove the class when component unmounts
+    return () => {
+      document.body.classList.remove('birthday-card-active');
+    };
+  }, []);
+
   // Render modal content using the shared utility
   const renderModal = () => {
     if (!isEditModalOpen) return null;

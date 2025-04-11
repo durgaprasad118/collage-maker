@@ -42,9 +42,21 @@
 .App {
   text-align: center;
 }
-body{
-  background-color: #0F1725;
+
+body {
+  background-color: #121212;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
 }
+
+/* New app container with gradient background */
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #121212 0%, #1d2b4c 100%);
+  color: #ffffff;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -61,7 +73,7 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0F1725;
+  background: linear-gradient(135deg, #121212 0%, #1d2b4c 100%);
 }
 
 .loading-content {
@@ -71,7 +83,7 @@ body{
 .loading-spinner {
   width: 4rem;
   height: 4rem;
-  border: 4px solid #00DA4B;
+  border: 4px solid #60efbc;
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -142,7 +154,7 @@ img.base-template {
 button {
   cursor: pointer;
   transition: all 0.3s ease;
-  color:#9CCC65;
+  color: #60efbc;
 }
 
 button:hover {
@@ -199,4 +211,13 @@ button:hover {
   .card-text {
     font-size: 1.5rem;
   }
+}
+
+
+.template-grid-item{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  width: 300px;
 }

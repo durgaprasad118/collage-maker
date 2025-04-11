@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
-import Header from '../Header/Header';
+import Logo from '../Logo/Logo';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -21,7 +21,8 @@ const HomePage = () => {
       description: 'Beautiful cards for your special day',
       image: '/Wedding-Templates/id_1/thumbnail.jpg',
       fallbackImage: dummyImages.wedding,
-      path: '/TemplateLibrary'
+      path: '/TemplateLibrary',
+      icon: '💍'
     },
     {
       id: 'birthday',
@@ -29,7 +30,8 @@ const HomePage = () => {
       description: 'Celebrate with custom birthday cards',
       image: '/Birthday-Templates/id_1/thumbnail.jpg',
       fallbackImage: dummyImages.birthday,
-      path: '/BirthdayLibrary'
+      path: '/BirthdayLibrary',
+      icon: '🎂'
     },
     {
       id: 'collage',
@@ -37,7 +39,8 @@ const HomePage = () => {
       description: 'Create amazing photo collections',
       image: '/Collage-Templates/id_1/thumbnail.jpg',
       fallbackImage: dummyImages.collage,
-      path: '/CollageLibrary'
+      path: '/CollageLibrary',
+      icon: '📸'
     }
   ];
 
@@ -65,19 +68,19 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-custom text-white">
-      <Header />
+    <div className="min-h-screen">
+      <Logo type="svg" />
       
       <div className="hero-section">
         <div className="hero-content container mx-auto px-4">
           <h1 className="hero-title animate__animated animate__fadeInUp">
-            Card <span className="text-highlight">Customizer</span>
+            Design Beautiful <span className="text-highlight">Cards</span>
           </h1>
           <p className="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-            Craft Memories, Design Emotions
+            Express your emotions through our elegant designs
           </p>
           <div className="hero-cta animate__animated animate__fadeInUp animate__delay-2s">
-            <p className="cta-text">Choose a category below to get started</p>
+            <p className="cta-text">Choose a category to begin creating</p>
           </div>
         </div>
       </div>
@@ -91,16 +94,19 @@ const HomePage = () => {
               onClick={() => handleCategoryClick(category)}
             >
               <div className="card-image-container">
-                <img 
+                {/* <img 
                   src={category.image} 
                   alt={category.title}
                   className="card-image"
                   onError={(e) => {
                     e.target.src = category.fallbackImage;
                   }}
-                />
+                /> */}
                 <div className="card-overlay">
-                  <h2 className="card-title">{category.title}</h2>
+                  <h2 className="card-title">
+                    <span className="card-icon">{category.icon}</span>
+                    {category.title}
+                  </h2>
                 </div>
               </div>
               <div className="card-content">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../TemplateLibrary/TemplateLibrary.css';
-import Header from '../Header/Header';
+import Logo from '../Logo/Logo';
 
 const BirthdayLibrary = () => {
   const [templates, setTemplates] = useState([]);
@@ -10,6 +10,12 @@ const BirthdayLibrary = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Set viewport meta tag for mobile responsiveness
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (viewportMeta) {
+      viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    }
+
     const fetchTemplates = async () => {
       try {
         const response = await fetch('/data/birthday.json');
@@ -33,6 +39,13 @@ const BirthdayLibrary = () => {
       }
     };
     fetchTemplates();
+
+    // Clean up function
+    return () => {
+      if (viewportMeta) {
+        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+      }
+    };
   }, []);
 
   if (loading) return (
@@ -57,24 +70,31 @@ const BirthdayLibrary = () => {
 
   return (
     <div className="bg-[#0F1725] min-h-screen">
-      <Header />
+      <Logo type="birthday" />
       <div className="template-library">
         <h1 className="text-3xl font-bold text-white mb-8 text-center pt-8">Birthday Card Templates</h1>
+        
         <div className="template-grid">
           {templates.map((template) => (
             <div 
               key={template.id} 
-              className="template-item hover:transform hover:scale-105 transition-transform duration-300"
               onClick={() => navigate(`/birthday/${template.numericId}`)}
+              className="template-grid-item"
             >
               <img
                 src={template.thumbnail}
                 alt={`Birthday Template ${template.numericId}`}
                 className="w-full h-full object-cover rounded-lg"
                 onError={(e) => (e.target.src = 'https://via.placeholder.com/400x600/1a2438/ffffff?text=Birthday+Card')}
+                loading="lazy"
               />
             </div>
           ))}
+        </div>
+        
+        {/* Mobile helper text */}
+        <div className="text-center text-gray-400 text-sm mt-6 md:hidden">
+          Tap on any template to customize
         </div>
       </div>
     </div>
