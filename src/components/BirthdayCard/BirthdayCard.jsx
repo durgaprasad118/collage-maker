@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { X, Trash2, Grid, ArrowLeft } from "lucide-react";
 import html2canvas from "html2canvas";
-import CropModal from "../CropModal/CropModal";
 import "./BirthdayCard.css";
-import ZoomableImage from "./ZoomableImage"; // Enhanced with react-zoom-pan-pinch
+import ZoomableImage from "../shared/ZoomableImage"; // Using shared component
+import { useImageUpload, renderImageUploadModal } from "../../utils/ImageUploadManager";
 
 // Font imports
 import TinosRegular from "../../assets/fonts/Tinos-Regular.ttf";
@@ -120,8 +120,7 @@ const ImageStorageService = {
 };
 
 const BirthdayCard = () => {
-  const [showCropModal, setShowCropModal] = useState(false);
-  const [cropImage, setCropImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
   const [showTemplateGallery, setShowTemplateGallery] = useState(false);
@@ -139,14 +138,36 @@ const BirthdayCard = () => {
     birthday_time: "",
   });
 
-  const [photos, setPhotos] = useState({
-    person_photo: null,
-  });
+  const [allTemplates, setAllTemplates] = useState([]);
+  const [currentTemplate, setCurrentTemplate] = useState(null);
+  const [error, setError] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [slideDirection, setSlideDirection] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  const [photoMetadata, setPhotoMetadata] = useState({
-    person_photo: false,
-  });
-  const [isLoading, setIsLoading] = useState(true); // Add this line
+  // Same refs as Card.jsx
+  const containerRef = useRef(null);
+  const isScrolling = useRef(false);
+  const touchStartRef = useRef(null);
+  const prevTemplateRef = useRef(null);
+  const scrollAccumulator = useRef(0);
+  const lastScrollTimeRef = useRef(Date.now());
+
+  // Use the shared image upload hook
+  const {
+    photos,
+    uploadError,
+    handleDrag,
+    handleDrop,
+    handlePhotoChange,
+    handlePhotoRemove,
+    handleMultipleImageDrop,
+    handleMultipleImageSelect,
+  } = useImageUpload(currentTemplate);
+
+  // Font preloading
   const preloadFonts = async () => {
     const fonts = [
       { name: "Tinos-Regular", url: TinosRegular },
@@ -173,225 +194,10 @@ const BirthdayCard = () => {
       setFontsLoaded(true); 
     }
   };
+  
   useEffect(() => {
     preloadFonts();
   }, []);
-  const [allTemplates, setAllTemplates] = useState([]);
-  const [currentTemplate, setCurrentTemplate] = useState(null);
-  const [error, setError] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [slideDirection, setSlideDirection] = useState(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  // Same refs as Card.jsx
-  const containerRef = useRef(null);
-  const isScrolling = useRef(false);
-  const touchStartRef = useRef(null);
-  const prevTemplateRef = useRef(null);
-  const scrollAccumulator = useRef(0);
-  const lastScrollTimeRef = useRef(Date.now());
-
-  // Disable default touch behaviors that might interfere with our custom handling
-  useEffect(() => {
-    const templateWrapper = containerRef.current;
-    const templateContent = templateWrapper?.querySelector('.template-content');
-    
-    // Prevent unwanted touch behaviors
-    const preventDefaultTouchBehavior = (e) => {
-      // Only prevent default for pinch gestures
-      if (e.touches && e.touches.length === 2) {
-        e.preventDefault();
-      }
-    };
-    
-    // Prevent unwanted touch behaviors on iOS devices
-    const preventIOSTouchBehavior = (e) => {
-      if (e.touches && e.touches.length > 1) {
-        e.preventDefault();
-      }
-    };
-    
-    if (templateWrapper) {
-      // Add these with passive: false to ensure preventDefault works
-      templateWrapper.addEventListener('touchstart', preventDefaultTouchBehavior, { passive: false });
-      templateWrapper.addEventListener('touchmove', preventDefaultTouchBehavior, { passive: false });
-      
-      // For iOS
-      document.addEventListener('gesturestart', preventIOSTouchBehavior, { passive: false });
-      document.addEventListener('gesturechange', preventIOSTouchBehavior, { passive: false });
-      document.addEventListener('gestureend', preventIOSTouchBehavior, { passive: false });
-    }
-    
-    return () => {
-      if (templateWrapper) {
-        templateWrapper.removeEventListener('touchstart', preventDefaultTouchBehavior);
-        templateWrapper.removeEventListener('touchmove', preventDefaultTouchBehavior);
-      }
-      
-      document.removeEventListener('gesturestart', preventIOSTouchBehavior);
-      document.removeEventListener('gesturechange', preventIOSTouchBehavior);
-      document.removeEventListener('gestureend', preventIOSTouchBehavior);
-    };
-  }, []);
-
-  // Constants
-  // const scrollThreshold = 120;
-  // const touchScrollThreshold = 120;
-  // const scrollCooldown = 500;
-  
-  // Debug: Log photos state whenever it changes
-  useEffect(() => {
-    console.log("Photos state updated:", {
-      hasPersonPhoto: !!photos.person_photo,
-      photoType: photos.person_photo ? typeof photos.person_photo : 'none',
-      photoLength: photos.person_photo ? photos.person_photo.slice(0, 30) + '...' : 'none'
-    });
-  }, [photos]);
-
-  const handleCroppedImage = async (croppedImage) => {
-    try {
-      let blob;
-
-      if (croppedImage instanceof Blob) {
-        blob = croppedImage;
-      } else if (
-        typeof croppedImage === "string" &&
-        croppedImage.startsWith("data:")
-      ) {
-        const response = await fetch(croppedImage);
-        blob = await response.blob();
-      } else {
-        throw new Error("Invalid image format received from crop");
-      }
-
-      if (!blob.type.startsWith("image/")) {
-        throw new Error("Invalid image type");
-      }
-
-      const reader = new FileReader();
-      const base64Promise = new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error("Failed to read blob"));
-        reader.readAsDataURL(blob);
-      });
-
-      const base64Data = await base64Promise;
-
-      let imageData = base64Data;
-      if (blob.size > 5 * 1024 * 1024) {
-        imageData = await compressImage(new Blob([blob]));
-      }
-
-      const saveResult = await ImageStorageService.saveImage(
-        "person_photo",
-        imageData
-      );
-
-      if (!saveResult) {
-        throw new Error("Failed to save image to storage");
-      }
-
-      setPhotos((prev) => ({
-        ...prev,
-        person_photo: imageData,
-      }));
-
-      const newMetadata = {
-        ...photoMetadata,
-        person_photo: true,
-      };
-      setPhotoMetadata(newMetadata);
-      memoryStorage.metadata = newMetadata; // Store in memory
-
-      setShowCropModal(false);
-      setCropImage(null);
-    } catch (error) {
-      console.error("Detailed cropping error:", error);
-
-      let errorMessage = "Error saving cropped image. ";
-      if (error.message.includes("Invalid image")) {
-        errorMessage += "Please ensure you are uploading a valid image file.";
-      } else {
-        errorMessage += "Please try again with a smaller image.";
-      }
-
-      alert(errorMessage);
-
-      setShowCropModal(false);
-      setCropImage(null);
-    }
-  };
-  const handlePhotoRemove = useCallback(async (photoKey) => {
-    try {
-      // Remove image from memory storage
-      await ImageStorageService.removeImage(photoKey);
-
-      // Update photos state
-      setPhotos((prev) => {
-        const newPhotos = { ...prev };
-        delete newPhotos[photoKey];
-        return newPhotos;
-      });
-
-      // Update metadata in memory
-      const newMetadata = {
-        ...photoMetadata,
-        [photoKey]: false,
-      };
-      setPhotoMetadata(newMetadata);
-      memoryStorage.metadata = newMetadata; // Store in memory
-    } catch (error) {
-      console.error("Error removing photo:", error);
-      alert("Error removing photo. Please try again.");
-    }
-  }, [photoMetadata]);
-  // Save data function
-  const saveData = useCallback(async () => {
-    try {
-      // Store in memory instead of localStorage
-      memoryStorage.textData = {
-        customText,
-        inputValues,
-      };
-      memoryStorage.metadata = photoMetadata;
-    } catch (error) {
-      console.error("Error saving data:", error);
-    }
-  }, [customText, inputValues, photoMetadata]);
-
-  // Load saved data
-  const loadSavedData = useCallback(async () => {
-    try {
-      // Use memory storage for metadata
-      if (memoryStorage.metadata && Object.keys(memoryStorage.metadata).length > 0) {
-        setPhotoMetadata(memoryStorage.metadata);
-
-        for (const [key, exists] of Object.entries(memoryStorage.metadata)) {
-          if (exists) {
-            const photo = await ImageStorageService.getImage(key);
-            if (photo) {
-              setPhotos((prev) => ({ ...prev, [key]: photo }));
-            }
-          }
-        }
-      }
-
-      // Use memory storage for text data
-      if (memoryStorage.textData && Object.keys(memoryStorage.textData).length > 0) {
-        const textData = memoryStorage.textData;
-        if (textData.customText) setCustomText(textData.customText);
-        if (textData.inputValues) setInputValues(textData.inputValues);
-      }
-    } catch (error) {
-      console.error("Error loading saved data:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadSavedData();
-  }, [loadSavedData]);
 
   // Handle input changes
   const handleInputChange = useCallback(
@@ -443,37 +249,9 @@ const BirthdayCard = () => {
           [name]: value,
         }));
       }
-
-      saveData();
     },
-    [saveData]
+    []
   );
-
-  // Photo handling
-  const handlePhotoChange = useCallback(async (name, file) => {
-    if (!file) return;
-  
-    try {
-      // Compress image if it exceeds 5MB
-      let processedFile = file;
-      if (file.size > 5 * 1024 * 1024) {
-        const compressedDataUrl = await compressImage(file); // Use the compressImage function
-        const compressedBlob = await fetch(compressedDataUrl).then((res) => res.blob());
-  
-        // Create a new file object from the compressed blob
-        processedFile = new File([compressedBlob], file.name, { type: "image/jpeg" });
-      }
-  
-      // Create a URL for cropping
-      const imageUrl = URL.createObjectURL(processedFile);
-      setCropImage(imageUrl);
-      setShowCropModal(true);
-    } catch (error) {
-      console.error("Error handling photo:", error);
-      alert("Error processing photo. Please try again.");
-    }
-  }, []);
-  
 
   // Download handler
   const handleDownload = useCallback(() => {
@@ -488,7 +266,7 @@ const BirthdayCard = () => {
     loadingIndicator.style.transform = 'translate(-50%, -50%)';
     loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
     loadingIndicator.style.color = 'white';
-    loadingIndicator.style.padding = '20px';
+    loadingIndicator.style.padding = '15px 20px';
     loadingIndicator.style.borderRadius = '10px';
     loadingIndicator.style.zIndex = '9999';
     loadingIndicator.textContent = 'Creating your image...';
@@ -501,6 +279,15 @@ const BirthdayCard = () => {
     
     // Store original states
     const originalStates = [];
+    
+    // Get exact dimensions
+    const width = captureDiv.offsetWidth;
+    const height = captureDiv.offsetHeight;
+    const scale = window.devicePixelRatio || 1; // Get device pixel ratio for higher resolution
+    
+    // Store original transform styles
+    const originalTransform = captureDiv.style.transform;
+    const originalZoom = captureDiv.style.zoom;
     
     // Hide all selection indicators
     selectionBorders.forEach(border => {
@@ -532,156 +319,131 @@ const BirthdayCard = () => {
       });
       element.classList.remove('selected');
     });
+    
+    // Temporarily remove transforms that might affect rendering
+    captureDiv.style.transform = 'none';
+    captureDiv.style.zoom = '100%';
 
-    // Wait for a moment to ensure the UI updates
-    setTimeout(() => {
-      const options = {
-        scale: 4, // Higher scale for better quality
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#FFFFFF', // Set explicit white background
-        logging: false,
-        imageTimeout: 0,
-        // Don't modify transforms in the clone - capture exactly as visible
-        onclone: (clonedDoc) => {
-          // Only enhance image quality, don't reset transforms
-          const images = clonedDoc.getElementsByTagName('img');
-          for (let img of images) {
-            img.style.imageRendering = 'high-quality';
-          }
-        }
-      };
-
-      html2canvas(captureDiv, options)
-        .then((canvas) => {
-          // Create high resolution canvas
-          const scaledCanvas = document.createElement('canvas');
-          scaledCanvas.width = canvas.width * 2;
-          scaledCanvas.height = canvas.height * 2;
-          const ctx = scaledCanvas.getContext('2d');
+    // Create a direct, immediate capture with exact dimensions
+    const options = {
+      scale: scale, // Use device pixel ratio for higher resolution
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+      imageTimeout: 0,
+      removeContainer: false,
+      width: width,
+      height: height,
+      onclone: (clonedDoc) => {
+        const clonedElement = clonedDoc.querySelector(".template-content");
+        
+        if (clonedElement) {
+          // Apply exact dimensions to clone
+          clonedElement.style.margin = '0';
+          clonedElement.style.padding = '0';
+          clonedElement.style.width = `${width}px`;
+          clonedElement.style.height = `${height}px`;
           
-          // Add white background to eliminate black transparency artifacts
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+          // Remove any transforms from clone elements
+          clonedElement.style.transform = 'none';
+          clonedElement.style.zoom = '100%';
           
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
-          ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
-
-          const jpgDataUrl = scaledCanvas.toDataURL("image/jpeg", 1.0);
-          
-          // Check if device is iOS (iPhone or iPad)
-          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-          
-          if (isIOS) {
-            // For iOS devices, open the image in a new tab
-            const newTab = window.open();
-            if (newTab) {
-              newTab.document.write(`
-                <html>
-                  <head>
-                    <title>Birthday Invitation</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <style>
-                      body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-                      img { max-width: 100%; height: auto; }
-                      .instructions { padding: 15px; text-align: center; font-family: Arial, sans-serif; }
-                    </style>
-                  </head>
-                  <body>
-                    <div class="instructions">
-                      <p>Press and hold on the image, then select "Save Image" to download.</p>
-                    </div>
-                    <img src="${jpgDataUrl}" alt="Birthday Invitation">
-                  </body>
-                </html>
-              `);
-              newTab.document.close();
-            }
-          } else {
-            try {
-              // Try native share API first for mobile devices
-              if (navigator.share) {
-                // Convert data URL to blob for sharing
-                fetch(jpgDataUrl)
-                  .then(res => res.blob())
-                  .then(blob => {
-                    const file = new File([blob], "birthday-invitation.jpg", { type: "image/jpeg" });
-                    navigator.share({
-                      files: [file],
-                      title: 'Birthday Invitation',
-                    }).catch(error => {
-                      // Fallback to traditional download if sharing fails
-                      const downloadLink = document.createElement("a");
-                      downloadLink.href = jpgDataUrl;
-                      downloadLink.download = "birthday-invitation.jpg";
-                      document.body.appendChild(downloadLink);
-                      downloadLink.click();
-                      document.body.removeChild(downloadLink);
-                    });
-                  });
-              } else {
-                // Traditional download for desktop browsers
-                const downloadLink = document.createElement("a");
-                downloadLink.href = jpgDataUrl;
-                downloadLink.download = "birthday-invitation.jpg";
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-              }
-            } catch (error) {
-              console.error("Error during download:", error);
+          // Preserve all image containers exactly as they are
+          const imageContainers = clonedElement.querySelectorAll("[class*='image-container']");
+          imageContainers.forEach(container => {
+            const dataId = container.getAttribute('data-id') || '';
+            const originalContainer = document.querySelector(`[data-id="${dataId}"]`);
+            if (originalContainer) {
+              // Preserve exact styles but remove transforms
+              const originalStyle = window.getComputedStyle(originalContainer);
               
-              // Final fallback - open in new tab
-              const newTab = window.open();
-              if (newTab) {
-                newTab.document.write(`
-                  <html>
-                    <head>
-                      <title>Birthday Invitation</title>
-                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                      <style>
-                        body { margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-                        img { max-width: 100%; height: auto; }
-                        .instructions { padding: 15px; text-align: center; font-family: Arial, sans-serif; }
-                      </style>
-                    </head>
-                    <body>
-                      <div class="instructions">
-                        <p>Press and hold on the image, then select "Save Image" to download.</p>
-                      </div>
-                      <img src="${jpgDataUrl}" alt="Birthday Invitation">
-                    </body>
-                  </html>
-                `);
-                newTab.document.close();
-              }
+              // Apply key styles directly
+              container.style.width = originalStyle.width;
+              container.style.height = originalStyle.height;
+              container.style.position = originalStyle.position;
+              container.style.top = originalStyle.top;
+              container.style.left = originalStyle.left;
+              // Do not copy transforms to avoid distortion
+              container.style.transformOrigin = 'center center';
             }
-          }
-          
-          // Restore original states
-          originalStates.forEach(state => {
-            if (state.display !== undefined) state.element.style.display = state.display;
-            if (state.className) state.element.className = state.className;
           });
           
-          // Remove loading indicator
-          document.body.removeChild(loadingIndicator);
-        })
-        .catch((error) => {
-          console.error("Error generating image:", error);
-          alert("Error generating image. Please try again.");
-          
-          // Restore original states in case of error
-          originalStates.forEach(state => {
-            if (state.display !== undefined) state.element.style.display = state.display;
-            if (state.className) state.element.className = state.className;
+          // Preserve all images exactly as they are
+          const images = clonedElement.querySelectorAll("img");
+          images.forEach(img => {
+            const imgId = img.getAttribute('id') || '';
+            const originalImg = document.querySelector(`img[id="${imgId}"]`);
+            
+            if (originalImg) {
+              const originalStyle = window.getComputedStyle(originalImg);
+              
+              // Copy all critical style properties exactly
+              img.style.width = originalStyle.width;
+              img.style.height = originalStyle.height;
+              img.style.objectFit = originalStyle.objectFit;
+              img.style.objectPosition = originalStyle.objectPosition;
+              img.style.maxWidth = "none";
+              img.style.maxHeight = "none";
+              img.crossOrigin = "anonymous";
+            }
           });
           
-          // Remove loading indicator
-          document.body.removeChild(loadingIndicator);
+          // Preserve text elements
+          const textElements = clonedElement.querySelectorAll(".text-overlay");
+          textElements.forEach(text => {
+            text.style.whiteSpace = 'pre-wrap';
+            text.style.overflow = 'hidden';
+          });
+        }
+      }
+    };
+
+    html2canvas(captureDiv, options)
+      .then((canvas) => {
+        // Use the canvas directly with maximum quality
+        const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
+        
+        // Direct download without notifications
+        const downloadLink = document.createElement("a");
+        downloadLink.href = jpgDataUrl;
+        downloadLink.download = "birthday-invitation.jpg";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        // Restore original states
+        originalStates.forEach(state => {
+          if (state.display !== undefined) state.element.style.display = state.display;
+          if (state.className) state.element.className = state.className;
         });
-    }, 100);
+        
+        // Restore original transform styles
+        captureDiv.style.transform = originalTransform;
+        captureDiv.style.zoom = originalZoom;
+        
+        // Remove loading indicator
+        document.body.removeChild(loadingIndicator);
+      })
+      .catch((error) => {
+        console.error("Error generating image:", error);
+        
+        // Restore original states in case of error
+        originalStates.forEach(state => {
+          if (state.display !== undefined) state.element.style.display = state.display;
+          if (state.className) state.element.className = state.className;
+        });
+        
+        // Restore original transform styles
+        captureDiv.style.transform = originalTransform;
+        captureDiv.style.zoom = originalZoom;
+        
+        // Remove loading indicator
+        document.body.removeChild(loadingIndicator);
+        
+        // Show error notification
+        alert("Failed to generate image. Please try again.");
+      });
   }, []);
 
   // WhatsApp share handler
@@ -866,121 +628,91 @@ const BirthdayCard = () => {
     fetchTemplateData();
   }, [id]);
 
-  // Render modal content
+  // Render modal content using the shared utility
   const renderModal = () => {
     if (!isEditModalOpen) return null;
 
+    // Get upload modal elements from shared utility
+    const uploadModal = renderImageUploadModal({
+      isOpen: isEditModalOpen,
+      onClose: () => setIsEditModalOpen(false),
+      currentTemplate,
+      photos,
+      uploadError,
+      handleDrag,
+      handleDrop,
+      handlePhotoRemove,
+      handlePhotoChange,
+      handleMultipleImageDrop,
+      handleMultipleImageSelect,
+    });
+
+    if (!uploadModal) return null;
+
     return (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h2>Edit Birthday Card Details</h2>
+      <div className="modal-overlay" style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+      }}>
+        <div className="modal-content" style={{
+          ...uploadModal.modalStyles.content,
+          width: '100%',
+          maxWidth: '550px',
+          maxHeight: '90vh',
+          overflow: 'hidden'
+        }}>
+          <div className="modal-header" style={uploadModal.modalStyles.header}>
+            <h2 style={{margin: 0, fontWeight: '600', fontSize: '20px'}}>{uploadModal.headerTitle}</h2>
             <button
               className="close-button"
               onClick={() => setIsEditModalOpen(false)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '24px',
+                padding: '4px'
+              }}
             >
               <X size={24} />
             </button>
           </div>
 
-          <div className="modal-body">
-            {/* Photo upload section */}
-            {currentTemplate?.images?.length > 0 && (
-              <div className="photo-inputs">
-                <div className="photo-input">
-                  <label>Birthday Person's Photo</label>
-                  <div className="photo-upload">
-                    <label
-                      className="upload-label"
-                      htmlFor="person-photo-input"
-                    >
-                      {photos.person_photo ? "Change Image" : "Upload Image"}
-                    </label>
-                    <input
-                      id="person-photo-input"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handlePhotoChange("person_photo", e.target.files[0])
-                      }
-                      style={{ display: "none" }} // Hides the input for custom styling
-                    />
-                    {photos.person_photo && (
-                      <div className="photo-preview-container">
-                        <img
-                          src={photos.person_photo}
-                          alt="Preview"
-                          className="photo-preview"
-                        />
-                        <button
-                          className="remove-photo-btn"
-                          onClick={() => handlePhotoRemove("person_photo")}
-                          aria-label="Remove person photo"
-                        >
-                          <Trash2 size={20} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Text input section */}
-            <div className="text-inputs">
-              <div className="input-group">
-                <label>Name</label>
-                <input
-                  type="text"
-                  value={customText.birthday_name || ""}
-                  onChange={(e) =>
-                    handleInputChange("birthday_name", e.target.value)
-                  }
-                  placeholder="Enter name"
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Birthday Date</label>
-                <input
-                  type="date"
-                  value={inputValues.birthday_date || ""}
-                  onChange={(e) =>
-                    handleInputChange("birthday_date", e.target.value)
-                  }
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Celebration Time</label>
-                <input
-                  type="time"
-                  value={inputValues.birthday_time || ""}
-                  onChange={(e) =>
-                    handleInputChange("birthday_time", e.target.value)
-                  }
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Venue</label>
-                <textarea
-                  value={customText.birthday_venue || ""}
-                  onChange={(e) =>
-                    handleInputChange("birthday_venue", e.target.value)
-                  }
-                  placeholder="Enter venue details"
-                />
-              </div>
-            </div>
+          <div className="modal-body" style={{
+            ...uploadModal.modalStyles.body,
+            overflow: 'auto',
+            maxHeight: 'calc(90vh - 140px)'
+          }}>
+            {uploadModal.renderUploadArea()}
+            {uploadModal.renderPreviewGrid()}
           </div>
 
-          <div className="modal-footer">
+          <div className="modal-footer" style={uploadModal.modalStyles.footer}>
             <button
-              className="save-button"
+              className="primary-button"
               onClick={() => setIsEditModalOpen(false)}
+              style={{
+                background: '#5D5FEF',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 48px',
+                fontSize: '16px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
             >
-              Save Changes
+              Done
             </button>
           </div>
         </div>
@@ -991,13 +723,6 @@ const BirthdayCard = () => {
   // Template rendering logic
   const renderTemplateContent = useCallback(
     (template) => {
-      // Debug: Log template and photos info
-      console.log("Rendering template content:", {
-        templateId: template?.id,
-        hasTemplateImages: template?.images?.length > 0,
-        personPhoto: photos.person_photo ? "Present" : "Missing"
-      });
-      
       return (
         <div className="template-content">
           <img
@@ -1006,27 +731,23 @@ const BirthdayCard = () => {
             className="base-template"
           />
           {template?.images.map((image, index) => {
-            console.log(`Rendering ZoomableImage ${index}:`, {
-              imageData: image,
-              coordinates: image.coordinates,
-              hasPersonPhoto: !!photos.person_photo
-            });
-            
+            const photoKey = `photo_${index}`;
             return (
               <ZoomableImage
                 key={index}
                 image={image}
                 coordinates={image.coordinates}
-                backgroundImage={photos.person_photo}
+                backgroundImage={photos[photoKey]}
                 allTemplates={allTemplates}
                 currentIndex={currentIndex}
                 setCurrentIndex={setCurrentIndex}
                 currentTemplate={currentTemplate}
                 setCurrentTemplate={setCurrentTemplate}
+                cardType="birthday"
+                index={index}
               />
             );
           })}
-          {/* Text overlays remain unchanged */}
           {template?.texts.map((text, index) => (
             <div
               key={index}
@@ -1054,8 +775,6 @@ const BirthdayCard = () => {
     },
     [photos, customText, allTemplates, currentIndex, setCurrentIndex, setCurrentTemplate]
   );
-  // Loading and error states
-  // Loading and error states
 
   if (error) {
     return <div className="error-screen">{error}</div>;
@@ -1123,55 +842,39 @@ const BirthdayCard = () => {
       {/* Action buttons */}
       <div className="button-container">
         <button
-          className="floating-button gallery-button"
+          className="action-button gallery-button"
           onClick={() => setShowTemplateGallery(true)}
         >
           <Grid size={20} />
           <span>Templates</span>
         </button>
         <button
-          className="floating-button edit-button"
+          className="action-button edit-button"
           onClick={() => setIsEditModalOpen(true)}
         >
           <img src={editIcon} alt="Edit" className="icon" />
+          <span>Upload</span>
         </button>
         <button
-          className="floating-button share-button"
+          className="action-button share-button"
           onClick={handleWhatsAppShare}
         >
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
             alt="WhatsApp"
             className="icon"
-            style={{ width: "24px", height: "24px" }}
+            style={{ width: "20px", height: "20px" }}
           />
-          <span
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              fontSize: "16px",
-              fontWeight: "bold",
-            }}
-          >
-            Share
-          </span>
+          <span>Share</span>
         </button>
         <button
-          className="floating-button download-button"
+          className="action-button download-button"
           onClick={handleDownload}
         >
           <img src={downloadIcon} alt="Download" className="icon" />
+          <span>Download</span>
         </button>
       </div>
-      {showCropModal && (
-        <CropModal
-          image={cropImage}
-          onCropComplete={handleCroppedImage}
-          onClose={() => {
-            setShowCropModal(false);
-            setCropImage(null);
-          }}
-        />
-      )}
     </div>
   );
 };

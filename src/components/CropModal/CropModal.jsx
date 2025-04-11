@@ -207,76 +207,95 @@ const CropModal = ({ image, onCropComplete, onClose }) => {
   return (
     <div className="crop-modal-overlay">
       <div className="crop-modal-content">
-        <div className="modal-header">
-          <h3>Crop Image</h3>
-          <button className="close-button" onClick={onClose}>
+        <div className="modal-header bg-white">
+          <h3 className="text-lg font-medium text-gray-800">Adjust Photo</h3>
+          <button className="close-button text-gray-500 hover:text-gray-700" onClick={onClose}>
             <X size={24} />
           </button>
         </div>
         
-        <div className="crop-controls">
-          <button className="crop-control-button" onClick={handleRotateLeft} title="Rotate Left">
-            <RefreshCw size={20} className="rotate-counterclockwise" />
+        <div className="crop-controls bg-white border-b border-gray-200 p-3 flex justify-center gap-2">
+          <button 
+            className="crop-control-button bg-gray-100 hover:bg-gray-200 rounded-md p-2 transition-colors" 
+            onClick={handleRotateLeft} 
+            title="Rotate Left">
+            <RefreshCw size={20} className="rotate-counterclockwise text-gray-700" />
           </button>
-          <button className="crop-control-button" onClick={handleRotateRight} title="Rotate Right">
-            <RotateCw size={20} />
+          <button 
+            className="crop-control-button bg-gray-100 hover:bg-gray-200 rounded-md p-2 transition-colors" 
+            onClick={handleRotateRight} 
+            title="Rotate Right">
+            <RotateCw size={20} className="text-gray-700" />
           </button>
-          <button className="crop-control-button" onClick={handleZoomIn} title="Zoom In">
-            <ZoomIn size={20} />
+          <button 
+            className="crop-control-button bg-gray-100 hover:bg-gray-200 rounded-md p-2 transition-colors" 
+            onClick={handleZoomIn} 
+            title="Zoom In">
+            <ZoomIn size={20} className="text-gray-700" />
           </button>
-          <button className="crop-control-button" onClick={handleZoomOut} title="Zoom Out">
-            <ZoomOut size={20} />
+          <button 
+            className="crop-control-button bg-gray-100 hover:bg-gray-200 rounded-md p-2 transition-colors" 
+            onClick={handleZoomOut} 
+            title="Zoom Out">
+            <ZoomOut size={20} className="text-gray-700" />
           </button>
-          <button className="crop-control-button" onClick={toggleAspectRatio} title="Square/Free Ratio">
-            <Maximize size={20} />
+          <button 
+            className="crop-control-button bg-gray-100 hover:bg-gray-200 rounded-md p-2 transition-colors" 
+            onClick={toggleAspectRatio} 
+            title="Square/Free Ratio">
+            <Maximize size={20} className="text-gray-700" />
           </button>
-          <button className="crop-control-button" onClick={handleReset} title="Reset">
-            <RefreshCw size={20} />
+          <button 
+            className="crop-control-button bg-gray-100 hover:bg-gray-200 rounded-md p-2 transition-colors" 
+            onClick={handleReset} 
+            title="Reset">
+            <RefreshCw size={20} className="text-gray-700" />
           </button>
         </div>
         
-        <div className="crop-modal-body">
+        <div className="crop-modal-body bg-gray-100 p-4 flex justify-center">
           <ReactCrop
             crop={crop}
             onChange={(c) => setCrop(c)}
             onComplete={(c) => setCompletedCrop(c)}
             aspect={aspect}
-            className="crop-container"
+            className="crop-container max-h-[65vh]"
             style={{
               maxHeight: '65vh',
               width: 'auto',
               height: '450px',
               maxWidth: '100%',
               transform: `scale(${scale}) rotate(${rotation}deg)`,
-              transition: 'transform 0.3s ease'
+              transformOrigin: 'center'
             }}
-            minWidth={10}
-            minHeight={10}
-            keepSelection={true}
-            ruleOfThirds={true}
           >
             <img
-              src={image}
-              onLoad={(e) => onImageLoad(e.target)}
               alt="Crop"
-              style={{
-                maxHeight: '65vh',
-                width: 'auto',
-                height: '450px',
+              src={image}
+              onLoad={(e) => onImageLoad(e.currentTarget)}
+              style={{ 
+                maxHeight: '100%', 
                 maxWidth: '100%',
-                transform: `scale(${scale}) rotate(${rotation}deg)`,
-                transition: 'transform 0.3s ease'
+                objectFit: 'contain',
+                transform: 'none'
               }}
             />
           </ReactCrop>
         </div>
         
-        <div className="modal-footer">
-          <button className="save-button" onClick={handleSave}>
-            <Check size={16} /> Apply
-          </button>
-          <button className="cancel-button" onClick={onClose}>
+        <div className="modal-footer bg-white p-4 flex justify-end gap-3">
+          <button 
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 font-medium"
+            onClick={onClose}
+          >
             Cancel
+          </button>
+          <button 
+            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 font-medium flex items-center gap-2"
+            onClick={handleSave}
+          >
+            <Check size={18} />
+            Apply
           </button>
         </div>
       </div>
