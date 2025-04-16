@@ -283,7 +283,6 @@ const BirthdayCard = () => {
     // Get exact dimensions
     const width = captureDiv.offsetWidth;
     const height = captureDiv.offsetHeight;
-    const scale = window.devicePixelRatio || 1; // Get device pixel ratio for higher resolution
     
     // Store original transform styles
     const originalTransform = captureDiv.style.transform;
@@ -326,10 +325,10 @@ const BirthdayCard = () => {
 
     // Create a direct, immediate capture with exact dimensions
     const options = {
-      scale: scale, // Use device pixel ratio for higher resolution
+      scale: 1,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: null,
+      backgroundColor: '#FFFFFF',
       logging: false,
       imageTimeout: 0,
       removeContainer: false,
@@ -337,63 +336,16 @@ const BirthdayCard = () => {
       height: height,
       onclone: (clonedDoc) => {
         const clonedElement = clonedDoc.querySelector(".template-content");
-        
         if (clonedElement) {
-          // Apply exact dimensions to clone
-          clonedElement.style.margin = '0';
-          clonedElement.style.padding = '0';
-          clonedElement.style.width = `${width}px`;
-          clonedElement.style.height = `${height}px`;
+          // Set background color explicitly
+          clonedElement.style.backgroundColor = '#FFFFFF';
           
-          // Remove any transforms from clone elements
-          clonedElement.style.transform = 'none';
-          clonedElement.style.zoom = '100%';
-          
-          // Preserve all image containers exactly as they are
-          const imageContainers = clonedElement.querySelectorAll("[class*='image-container']");
-          imageContainers.forEach(container => {
-            const dataId = container.getAttribute('data-id') || '';
-            const originalContainer = document.querySelector(`[data-id="${dataId}"]`);
-            if (originalContainer) {
-              // Preserve exact styles but remove transforms
-              const originalStyle = window.getComputedStyle(originalContainer);
-              
-              // Apply key styles directly
-              container.style.width = originalStyle.width;
-              container.style.height = originalStyle.height;
-              container.style.position = originalStyle.position;
-              container.style.top = originalStyle.top;
-              container.style.left = originalStyle.left;
-              // Do not copy transforms to avoid distortion
-              container.style.transformOrigin = 'center center';
-            }
-          });
-          
-          // Preserve all images exactly as they are
+          // Ensure proper color rendering
           const images = clonedElement.querySelectorAll("img");
           images.forEach(img => {
-            const imgId = img.getAttribute('id') || '';
-            const originalImg = document.querySelector(`img[id="${imgId}"]`);
-            
-            if (originalImg) {
-              const originalStyle = window.getComputedStyle(originalImg);
-              
-              // Copy all critical style properties exactly
-              img.style.width = originalStyle.width;
-              img.style.height = originalStyle.height;
-              img.style.objectFit = originalStyle.objectFit;
-              img.style.objectPosition = originalStyle.objectPosition;
-              img.style.maxWidth = "none";
-              img.style.maxHeight = "none";
-              img.crossOrigin = "anonymous";
-            }
-          });
-          
-          // Preserve text elements
-          const textElements = clonedElement.querySelectorAll(".text-overlay");
-          textElements.forEach(text => {
-            text.style.whiteSpace = 'pre-wrap';
-            text.style.overflow = 'hidden';
+            img.style.filter = 'none';
+            img.style.webkitFilter = 'none';
+            img.style.mixBlendMode = 'normal';
           });
         }
       }
@@ -401,13 +353,28 @@ const BirthdayCard = () => {
 
     html2canvas(captureDiv, options)
       .then((canvas) => {
-        // Use the canvas directly with maximum quality
-        const jpgDataUrl = canvas.toDataURL("image/jpeg", 1.0);
+        // Create a new canvas with white background
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = canvas.width;
+        finalCanvas.height = canvas.height;
+        const ctx = finalCanvas.getContext('2d', { alpha: false });
+        
+        // Fill with white background
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        
+        // Draw the original canvas on top with proper color handling
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(canvas, 0, 0);
+        
+        // Use PNG format for better color preservation
+        const dataUrl = finalCanvas.toDataURL("image/png");
         
         // Direct download without notifications
         const downloadLink = document.createElement("a");
-        downloadLink.href = jpgDataUrl;
-        downloadLink.download = "birthday-invitation.jpg";
+        downloadLink.href = dataUrl;
+        downloadLink.download = "birthday-invitation.png";
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
