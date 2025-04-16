@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../TemplateLibrary/TemplateLibrary.css';
-import Logo from '../Logo/Logo';
 
 const BirthdayLibrary = () => {
   const [templates, setTemplates] = useState([]);
@@ -70,7 +69,6 @@ const BirthdayLibrary = () => {
 
   return (
     <div className="bg-[#0F1725] min-h-screen">
-      <Logo type="birthday" />
       <div className="template-library">
         <h1 className="text-3xl font-bold text-white mb-8 text-center pt-8">Birthday Card Templates</h1>
         

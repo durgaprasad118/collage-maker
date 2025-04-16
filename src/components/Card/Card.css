@@ -100,6 +100,7 @@
   z-index: 10;
   transition: transform 0.3s ease-in-out;
   opacity: 1;
+  background: transparent;
 }
 
 
@@ -108,6 +109,7 @@
   width: auto;
   height: auto;
   object-fit: contain !important;
+  background: transparent;
 }
 
 .text-overlay {
@@ -134,7 +136,7 @@
 
 .template-content-image{
   position: relative;
-  background-color: #0F1725;
+  background-color: transparent;
   padding-top: 5px;
 }
 

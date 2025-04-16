@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TemplateLibrary.css';
-import Logo from '../Logo/Logo';
 
 const TemplateLibrary = () => {
   const [templates, setTemplates] = useState([]);
@@ -69,7 +68,6 @@ const TemplateLibrary = () => {
 
   return (
     <div className="bg-[#0F1725] min-h-screen">
-      <Logo type="svg" />
       <div className="template-library">
         <h1>Wedding Templates</h1>
         <div className="template-grid">

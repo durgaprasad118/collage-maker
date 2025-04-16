@@ -69,7 +69,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen">
-      <Logo type="svg" />
+      <Logo />
       
       <div className="hero-section">
         <div className="hero-content container mx-auto px-4">
