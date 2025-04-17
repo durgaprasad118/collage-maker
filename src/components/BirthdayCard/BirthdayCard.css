@@ -71,11 +71,10 @@
     overflow-x: hidden;
     overflow-y: hidden;
     touch-action: none;
+    width: 100%;
   }
 
   .template-positioning {
-    position: relative;
-    transform: translateZ(0);
     will-change: transform;
     touch-action: manipulation;
     user-select: none;
@@ -86,12 +85,13 @@
     user-select: none;
     touch-action: manipulation;
     transform-origin: center;
+    max-width: 100%;
+    margin: 0 auto;
   }
   
   .base-template {
     width: auto;
     height: auto;
-    object-fit: contain !important;
     position: relative;
     z-index: 1;
     pointer-events: none;
@@ -581,14 +581,16 @@
 
   .template-wrapper {
     width: 100%;
-    height: 100vh;
+    height: 90vh;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    touch-action: pan-x pan-y;
+    touch-action: manipulation;
     position: relative;
-    transform: translateZ(0);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
   }
   
   .template-wrapper.zooming {
@@ -666,12 +668,11 @@
     }
   
     .template-content {
-      transform: scale(0.5);
       touch-action: manipulation;
     }
 
     .template-wrapper {
-        width: 90%;
+        width: 100%;
         height: 90vh;
         display: flex;
         justify-content: center;

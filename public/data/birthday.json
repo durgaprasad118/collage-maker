@@ -27,7 +27,7 @@
         "thumbnail": "/Birthday-Templates/templetes-thumbnail/4.png",
         "template": "../Birthday-Templates/templetes/4.png",
         "name": "birthday_person",
-        "sample_image": "/Birthday-Templates/default-images/Sample2.jpg",
+        "sample_image": "/Birthday-Templates/default-images/Sample.jpg",
         "coordinates": {
           "width_in_px": 651,
           "height_in_px": 785,
