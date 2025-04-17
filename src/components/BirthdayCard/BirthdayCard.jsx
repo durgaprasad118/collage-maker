@@ -107,176 +107,72 @@ const BirthdayCard = () => {
   }, []);
 
   // Download handler
-  const handleDownload = useCallback(() => {
-    const captureDiv = document.querySelector(".template-content");
-    if (!captureDiv) return;
+const handleDownload = useCallback(() => {
+  const captureDiv = document.querySelector(".template-content");
+  if (!captureDiv) return;
 
-    // Add a loading indicator
-    const loadingIndicator = document.createElement('div');
-    loadingIndicator.style.position = 'fixed';
-    loadingIndicator.style.top = '50%';
-    loadingIndicator.style.left = '50%';
-    loadingIndicator.style.transform = 'translate(-50%, -50%)';
-    loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
-    loadingIndicator.style.color = 'white';
-    loadingIndicator.style.padding = '15px 20px';
-    loadingIndicator.style.borderRadius = '10px';
-    loadingIndicator.style.zIndex = '9999';
-    loadingIndicator.textContent = 'Creating your image...';
-    document.body.appendChild(loadingIndicator);
+  // Add loading indicator
+  const loadingIndicator = document.createElement('div');
+  loadingIndicator.style.position = 'fixed';
+  loadingIndicator.style.top = '50%';
+  loadingIndicator.style.left = '50%';
+  loadingIndicator.style.transform = 'translate(-50%, -50%)';
+  loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
+  loadingIndicator.style.color = 'white';
+  loadingIndicator.style.padding = '15px 20px';
+  loadingIndicator.style.borderRadius = '10px';
+  loadingIndicator.style.zIndex = '9999';
+  loadingIndicator.textContent = 'Creating your image...';
+  document.body.appendChild(loadingIndicator);
 
-    // Hide all UI controls and selection indicators
-    const saveButtons = document.querySelectorAll('.save-button');
-    const selectionBorders = document.querySelectorAll('.selection-border');
-    const selectedElements = document.querySelectorAll('.selected');
-    const zoomControls = document.querySelectorAll('.image-controls, .react-transform-component__content--bottom-right');
-    
-    // Store original states to restore later
-    const originalStates = [];
-    
-    // Hide any UI controls that shouldn't be in the image
-    [...saveButtons, ...selectionBorders, ...zoomControls].forEach(element => {
-      if (element && element.style.display !== 'none') {
-        originalStates.push({
-          element,
-          display: element.style.display
-        });
-        element.style.display = 'none';
-      }
-    });
-    
-    // Remove selection styling
-    selectedElements.forEach(element => {
-      originalStates.push({
-        element,
-        className: element.className
-      });
-      element.classList.remove('selected');
-    });
-    
-    // Capture current transform states of all zoomed content
-    const transformComponents = document.querySelectorAll('.react-transform-component');
-    const zoomableContainers = document.querySelectorAll('.zoomable-container');
-    const transformStates = [];
-    
-    // First process transform components (react-zoom-pan-pinch)
-    transformComponents.forEach(element => {
-      const style = window.getComputedStyle(element);
-      const img = element.querySelector('img');
-      
-      if (img) {
-        const imgStyle = window.getComputedStyle(img);
-        transformStates.push({
-          element,
-          transform: style.transform,
-          transformOrigin: style.transformOrigin,
-          img,
-          imgTransform: imgStyle.transform,
-          imgTransformOrigin: imgStyle.transformOrigin,
-          imgWidth: imgStyle.width,
-          imgHeight: imgStyle.height,
-          imgObjectFit: imgStyle.objectFit,
-          imgObjectPosition: imgStyle.objectPosition
-        });
-      }
-    });
-    
-    // Also process zoomable containers
-    zoomableContainers.forEach(container => {
-      originalStates.push({
-        element: container,
-        className: container.className
-      });
-      // Add a special class to identify this container during capture
-      container.classList.add('capturing');
-    });
+  // Hide UI controls
+  const uiControls = document.querySelectorAll(
+    '.save-button, .selection-border, .image-controls, .react-transform-component__content--bottom-right'
+  );
+  const selectedElements = document.querySelectorAll('.selected');
 
-    // Create a direct capture with exact styles without any HTML changes
-    const options = {
-      scale: 2,
+  const originalStates = [];
+
+  // Hide elements temporarily
+  uiControls.forEach(element => {
+    if (element && element.style.display !== 'none') {
+      originalStates.push({ element, display: element.style.display });
+      element.style.display = 'none';
+    }
+  });
+
+  selectedElements.forEach(element => {
+    originalStates.push({ element, className: element.className });
+    element.classList.remove('selected');
+  });
+
+  // ⏳ Wait for layout to settle
+  setTimeout(() => {
+    html2canvas(captureDiv, {
+      scale: 2, // 2x resolution to avoid blurry output
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#FFFFFF',
       logging: false,
       imageTimeout: 0,
-      ignoreElements: (element) => {
-        // Ignore any remaining UI elements that shouldn't be in the image
-        return element.classList.contains('save-button') || 
-               element.classList.contains('selection-border') ||
-               element.classList.contains('image-controls') ||
-               element.classList.contains('react-transform-component__content--bottom-right');
-      },
-      onclone: (clonedDoc) => {
-        // Add a temporary stylesheet to the cloned document to ensure transforms are preserved
-        const style = clonedDoc.createElement('style');
-        style.innerHTML = `
-          .react-transform-component {
-            transform-style: preserve-3d !important;
-          }
-          .capturing img {
-            object-fit: cover !important;
-            transform-origin: center !important;
-          }
-        `;
-        clonedDoc.head.appendChild(style);
-        
-        // For react-zoom-pan-pinch, we need to preserve exact transforms
-        const clonedTransformComponents = clonedDoc.querySelectorAll('.react-transform-component');
-        
-        clonedTransformComponents.forEach((element, index) => {
-          if (index < transformStates.length) {
-            const state = transformStates[index];
-            // Apply exact transform to ensure it matches the current view
-            element.style.transform = state.transform;
-            element.style.transformOrigin = state.transformOrigin;
-            
-            const img = element.querySelector('img');
-            if (img && state.img) {
-              // Apply exact image styles
-              img.style.transform = state.imgTransform;
-              img.style.transformOrigin = state.imgTransformOrigin;
-              img.style.width = state.imgWidth;
-              img.style.height = state.imgHeight;
-              img.style.objectFit = state.imgObjectFit;
-              img.style.objectPosition = state.imgObjectPosition;
-              img.style.maxWidth = 'none';
-              img.style.maxHeight = 'none';
-            }
-          }
-        });
-      }
-    };
+      backgroundColor: null, // preserve transparency
+      scrollY: -window.scrollY // fix scroll offset issues
+    })
+      .then(canvas => {
+        const pngDataUrl = canvas.toDataURL("image/png");
 
-    html2canvas(captureDiv, options)
-      .then((canvas) => {
-        // Convert to JPEG with high quality
-        const jpgDataUrl = canvas.toDataURL("image/jpeg", 0.95);
-        
-        // Create download link
         const downloadLink = document.createElement("a");
-        downloadLink.href = jpgDataUrl;
-        downloadLink.download = "birthday-invitation.jpg";
+        downloadLink.href = pngDataUrl;
+        downloadLink.download = "birthday-invitation.png";
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-        
-        // Restore original UI states
-        originalStates.forEach(state => {
-          if (state.display !== undefined) {
-            state.element.style.display = state.display;
-          }
-          if (state.className) {
-            state.element.className = state.className;
-          }
-        });
-        
-        // Remove loading indicator
-        document.body.removeChild(loadingIndicator);
       })
-      .catch((error) => {
-        console.error("Error generating image:", error);
-        
-        // Restore original UI states
+      .catch(err => {
+        console.error("html2canvas error:", err);
+        alert("Could not generate the image. Please try again.");
+      })
+      .finally(() => {
+        // Restore hidden elements
         originalStates.forEach(state => {
           if (state.display !== undefined) {
             state.element.style.display = state.display;
@@ -285,11 +181,10 @@ const BirthdayCard = () => {
             state.element.className = state.className;
           }
         });
-        
         document.body.removeChild(loadingIndicator);
-        alert("Error generating image. Please try again.");
       });
-  }, []);
+  }, 100); // small delay ensures DOM updates before screenshot
+}, []);
 
   // WhatsApp share handler
   const handleWhatsAppShare = useCallback(async () => {
@@ -310,14 +205,14 @@ const BirthdayCard = () => {
     loadingIndicator.textContent = 'Creating your image for sharing...';
     document.body.appendChild(loadingIndicator);
 
+    // Store original states
+    const originalStates = [];
+
     try {
       // Hide selection indicators for clean capture
       const selectedElements = document.querySelectorAll('.selected');
       const selectionBorders = document.querySelectorAll('.selection-border');
       const saveButtons = document.querySelectorAll('.save-button');
-      
-      // Store original states
-      const originalStates = [];
       
       // Hide all selection indicators
       selectionBorders.forEach(border => {
@@ -353,52 +248,52 @@ const BirthdayCard = () => {
       // Wait for a moment to ensure the UI updates
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const options = {
-        scale: 4, // Higher scale for better quality
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#FFFFFF', // Set explicit white background
-        logging: false,
-        imageTimeout: 0,
-        // Don't modify transforms in the clone - capture exactly as visible
-        onclone: (clonedDoc) => {
-          // Only enhance image quality, don't reset transforms
-          const images = clonedDoc.getElementsByTagName('img');
-          for (let img of images) {
-            img.style.imageRendering = 'high-quality';
-          }
-        }
-      };
+      // Create an exact snapshot using canvas
+      let pngDataUrl;
+      let file;
 
-      const canvas = await html2canvas(captureDiv, options);
-      
-      // Create high resolution canvas
-      const scaledCanvas = document.createElement('canvas');
-      scaledCanvas.width = canvas.width * 2;
-      scaledCanvas.height = canvas.height * 2;
-      const ctx = scaledCanvas.getContext('2d');
-      
-      // Add white background to eliminate black transparency artifacts
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height);
-      
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+      try {
+        // Get the exact dimensions of the template
+        const rect = captureDiv.getBoundingClientRect();
+        
+        // Create a canvas with the exact dimensions
+        const canvas = document.createElement('canvas');
+        canvas.id = 'canvas';
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        
+        // Get the canvas context
+        const ctx = canvas.getContext('2d');
+        
+        // Use drawImage to draw the template directly onto the canvas
+        ctx.drawImage(captureDiv, 0, 0);
+        
+        // Convert to PNG with transparency preserved
+        pngDataUrl = canvas.toDataURL('image/png');
+      } catch (canvasError) {
+        console.error("Direct canvas approach failed:", canvasError);
+        
+        // Fallback to html2canvas with exact 1:1 scale
+        const canvas = await html2canvas(captureDiv, {
+          scale: 1,
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          imageTimeout: 0
+        });
+        
+        pngDataUrl = canvas.toDataURL('image/png');
+      }
 
-      const blob = await new Promise((resolve) => {
-        scaledCanvas.toBlob(
-          (blob) => resolve(blob),
-          'image/jpeg',
-          0.95
-        );
-      });
-
-      const file = new File([blob], "birthday-invitation.jpg", {
-        type: "image/jpeg",
+      // Convert data URL to blob
+      const blob = await fetch(pngDataUrl).then(res => res.blob());
+      
+      // Create file from blob
+      file = new File([blob], "birthday-invitation.png", {
+        type: "image/png",
         lastModified: Date.now()
       });
-
+      
       const message = `🎉 *Birthday Celebration* 🎉\n\nCelebrating ${
         customText.birthday_name || "[Name]"
       }'s Birthday!\n\n📅 ${customText.birthday_date || "Date TBA"}\n⏰ ${
@@ -419,16 +314,16 @@ const BirthdayCard = () => {
           "_blank"
         );
       }
-
+    } catch (error) {
+      console.error("Error sharing:", error);
+      alert("Unable to share. Please try again.");
+    } finally {
       // Restore original states
       originalStates.forEach(state => {
         if (state.display !== undefined) state.element.style.display = state.display;
         if (state.className) state.element.className = state.className;
       });
-    } catch (error) {
-      console.error("Error sharing:", error);
-      alert("Unable to share. Please try again.");
-    } finally {
+      
       document.body.removeChild(loadingIndicator);
     }
   }, [customText]);
