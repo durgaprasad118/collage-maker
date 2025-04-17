@@ -107,84 +107,98 @@ const BirthdayCard = () => {
   }, []);
 
   // Download handler
-const handleDownload = useCallback(() => {
-  const captureDiv = document.querySelector(".template-content");
-  if (!captureDiv) return;
 
-  // Add loading indicator
-  const loadingIndicator = document.createElement('div');
-  loadingIndicator.style.position = 'fixed';
-  loadingIndicator.style.top = '50%';
-  loadingIndicator.style.left = '50%';
-  loadingIndicator.style.transform = 'translate(-50%, -50%)';
-  loadingIndicator.style.background = 'rgba(0, 0, 0, 0.7)';
-  loadingIndicator.style.color = 'white';
-  loadingIndicator.style.padding = '15px 20px';
-  loadingIndicator.style.borderRadius = '10px';
-  loadingIndicator.style.zIndex = '9999';
-  loadingIndicator.textContent = 'Creating your image...';
-  document.body.appendChild(loadingIndicator);
-
-  // Hide UI controls
-  const uiControls = document.querySelectorAll(
-    '.save-button, .selection-border, .image-controls, .react-transform-component__content--bottom-right'
-  );
-  const selectedElements = document.querySelectorAll('.selected');
-
-  const originalStates = [];
-
-  // Hide elements temporarily
-  uiControls.forEach(element => {
-    if (element && element.style.display !== 'none') {
-      originalStates.push({ element, display: element.style.display });
-      element.style.display = 'none';
-    }
-  });
-
-  selectedElements.forEach(element => {
-    originalStates.push({ element, className: element.className });
-    element.classList.remove('selected');
-  });
-
-  // ⏳ Wait for layout to settle
-  setTimeout(() => {
-    html2canvas(captureDiv, {
-      scale: 2, // 2x resolution to avoid blurry output
-      useCORS: true,
-      allowTaint: true,
-      logging: false,
-      imageTimeout: 0,
-      backgroundColor: null, // preserve transparency
-      scrollY: -window.scrollY // fix scroll offset issues
-    })
-      .then(canvas => {
-        const pngDataUrl = canvas.toDataURL("image/png");
-
-        const downloadLink = document.createElement("a");
-        downloadLink.href = pngDataUrl;
-        downloadLink.download = "birthday-invitation.png";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+  const handleDownload = useCallback(() => {
+    const captureDiv = document.querySelector(".template-content");
+    if (!captureDiv) return;
+  
+    // Create loading indicator
+    const loadingIndicator = document.createElement('div');
+    Object.assign(loadingIndicator.style, {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      background: 'rgba(0, 0, 0, 0.7)',
+      color: 'white',
+      padding: '15px 20px',
+      borderRadius: '10px',
+      zIndex: '9999'
+    });
+    loadingIndicator.textContent = 'Creating your image...';
+    document.body.appendChild(loadingIndicator);
+  
+    // Hide UI controls
+    const uiControls = document.querySelectorAll(
+      '.save-button, .selection-border, .image-controls, .react-transform-component__content--bottom-right'
+    );
+    const selectedElements = document.querySelectorAll('.selected');
+    const originalStates = [];
+  
+    uiControls.forEach(element => {
+      if (element && element.style.display !== 'none') {
+        originalStates.push({ element, display: element.style.display });
+        element.style.display = 'none';
+      }
+    });
+  
+    selectedElements.forEach(element => {
+      originalStates.push({ element, className: element.className });
+      element.classList.remove('selected');
+    });
+  
+    // Small delay before rendering to canvas
+    setTimeout(() => {
+      html2canvas(captureDiv, {
+        scale: 2, // High resolution output
+        useCORS: true, // To allow cross-origin images
+        allowTaint: false,
+        logging: false,
+        imageTimeout: 0,
+        backgroundColor: "#ffffff", // Force white background to fix mobile grayscale issue
+        scrollY: -window.scrollY
       })
-      .catch(err => {
-        console.error("html2canvas error:", err);
-        alert("Could not generate the image. Please try again.");
-      })
-      .finally(() => {
-        // Restore hidden elements
-        originalStates.forEach(state => {
-          if (state.display !== undefined) {
-            state.element.style.display = state.display;
+        .then(canvas => {
+          // Explicit fix for mobile grayscale issue: force full alpha channel
+          const ctx = canvas.getContext('2d');
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+  
+          // Optionally normalize alpha (fully opaque)
+          for (let i = 3; i < data.length; i += 4) {
+            data[i] = 255; // Set alpha to 255
           }
-          if (state.className) {
-            state.element.className = state.className;
-          }
+          ctx.putImageData(imageData, 0, 0);
+  
+          // Export PNG
+          const pngDataUrl = canvas.toDataURL("image/png");
+          const downloadLink = document.createElement("a");
+          downloadLink.href = pngDataUrl;
+          downloadLink.download = "birthday-invitation.png";
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        })
+        .catch(err => {
+          console.error("html2canvas error:", err);
+          alert("Could not generate the image. Please try again.");
+        })
+        .finally(() => {
+          // Restore UI state
+          originalStates.forEach(state => {
+            if (state.display !== undefined) {
+              state.element.style.display = state.display;
+            }
+            if (state.className) {
+              state.element.className = state.className;
+            }
+          });
+  
+          document.body.removeChild(loadingIndicator);
         });
-        document.body.removeChild(loadingIndicator);
-      });
-  }, 100); // small delay ensures DOM updates before screenshot
-}, []);
+    }, 100);
+  }, []);
+  
 
   // WhatsApp share handler
   const handleWhatsAppShare = useCallback(async () => {
