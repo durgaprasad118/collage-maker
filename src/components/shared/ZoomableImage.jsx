@@ -66,6 +66,14 @@ const ZoomableImage = ({
     });
   }, [backgroundImage, image, coordinates]);
 
+  // Initialize with saved transform values if available
+  const initialScale = savedTransform?.scale || 1.3;
+  const initialPositionX = savedTransform?.position?.x || 0;
+  const initialPositionY = savedTransform?.position?.y || 0;
+
+  // Reference to the transform wrapper instance
+  const transformRef = React.useRef(null);
+
   // Add CSS for high-quality image rendering during export
   useEffect(() => {
     // Create style element for high-res images during export
@@ -81,8 +89,20 @@ const ZoomableImage = ({
       
       .zoomable-container img {
         object-fit: cover !important;
-        min-width: 105% !important;
-        min-height: 105% !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+        transform-origin: center center !important;
+        max-width: unset !important;
+        max-height: unset !important;
+      }
+      
+      /* Prevent image leaking outside container */
+      .zoomable-container {
+        isolation: isolate;
+      }
+      
+      .zoomable-container .react-transform-wrapper {
+        overflow: hidden !important;
       }
     `;
     document.head.appendChild(style);
@@ -92,10 +112,18 @@ const ZoomableImage = ({
     };
   }, []);
 
-  // Initialize with saved transform values if available
-  const initialScale = savedTransform?.scale || 1.3;
-  const initialPositionX = savedTransform?.position?.x || 0;
-  const initialPositionY = savedTransform?.position?.y || 0;
+  // Ensure image stays within bounds after scale changes
+  useEffect(() => {
+    if (transformRef.current && isSelected) {
+      const { state, instance } = transformRef.current;
+      if (state && instance) {
+        // Small delay to ensure the transform state is updated
+        setTimeout(() => {
+          constrainPosition(state, instance);
+        }, 50);
+      }
+    }
+  }, [isSelected]);
 
   // Save transformation state
   const saveTransform = (state) => {
@@ -155,6 +183,71 @@ const ZoomableImage = ({
     }
   };
 
+  // Calculate the bounds for panning based on the scale
+  const calculateBounds = (state) => {
+    if (!state) return { minPositionX: 0, maxPositionX: 0, minPositionY: 0, maxPositionY: 0 };
+    
+    const { scale } = state;
+    // Calculate how much extra space the scaled image takes
+    const extraWidth = (scale - 1) * coordinates.width_in_px;
+    const extraHeight = (scale - 1) * coordinates.height_in_px;
+    
+    // Tighter constraints to prevent image edges from showing
+    // This accounts for the min-width: 100% on the image
+    return {
+      minPositionX: Math.min(-extraWidth / 2, 0),
+      maxPositionX: Math.max(extraWidth / 2, 0),
+      minPositionY: Math.min(-extraHeight / 2, 0),
+      maxPositionY: Math.max(extraHeight / 2, 0)
+    };
+  };
+
+  // Constrain the position within the calculated bounds
+  const constrainPosition = (state, instance) => {
+    if (!state || !instance) return;
+    
+    const bounds = calculateBounds(state);
+    const { positionX, positionY, scale } = state;
+    
+    let newX = positionX;
+    let newY = positionY;
+    
+    // Constrain X position
+    if (positionX < bounds.minPositionX) {
+      newX = bounds.minPositionX;
+    } else if (positionX > bounds.maxPositionX) {
+      newX = bounds.maxPositionX;
+    }
+    
+    // Constrain Y position
+    if (positionY < bounds.minPositionY) {
+      newY = bounds.minPositionY;
+    } else if (positionY > bounds.maxPositionY) {
+      newY = bounds.maxPositionY;
+    }
+    
+    // Apply the constrained position
+    if (newX !== positionX || newY !== positionY) {
+      instance.setTransform(newX, newY, scale, 100); // Add smoothness with 100ms transition
+    }
+  };
+
+  // Custom reset handler to ensure image is properly centered
+  const handleReset = (resetTransform) => {
+    resetTransform();
+    // Save the reset state
+    if (transformRef.current) {
+      const { state } = transformRef.current;
+      if (state) {
+        saveTransform({
+          scale: 1,
+          positionX: 0,
+          positionY: 0
+        });
+      }
+    }
+  };
+
   return (
     <div 
       className="zoomable-container"
@@ -172,17 +265,25 @@ const ZoomableImage = ({
       aria-label="Zoomable Image"
     >
       <TransformWrapper
+        ref={transformRef}
         initialScale={initialScale}
         initialPositionX={initialPositionX}
         initialPositionY={initialPositionY}
         minScale={1}
         maxScale={3}
-        limitToBounds={false}
+        limitToBounds={true}
+        boundsTolerance={0.1} // Adds slight tolerance to bounds
         centerOnInit={true}
         centerZoomedOut={true}
         doubleClick={{
           disabled: false,
-          mode: "reset"
+          mode: "reset",
+          onDoubleClick: () => {
+            if (transformRef.current) {
+              const { resetTransform } = transformRef.current;
+              handleReset(resetTransform);
+            }
+          }
         }}
         panning={{
           disabled: !isSelected,
@@ -190,6 +291,7 @@ const ZoomableImage = ({
           lockAxisY: false,
           lockAxisX: false,
           padPinch: false,
+          bounds: "parent"
         }}
         velocityAnimation={{
           disabled: true
@@ -209,6 +311,17 @@ const ZoomableImage = ({
           velocityAlignmentTime: 0
         }}
         onTransformed={handleTransformChange}
+        onTransforming={({ state, instance }) => constrainPosition(state, instance)}
+        onZoomChange={({ state, instance }) => constrainPosition(state, instance)}
+        onInit={({ instance }) => {
+          // Initial constraint after mounting
+          if (savedTransform) {
+            // Need a small delay to let the component fully initialize
+            setTimeout(() => {
+              constrainPosition(instance.state, instance);
+            }, 100);
+          }
+        }}
       >
         {({ state, zoomIn, zoomOut, resetTransform }) => (
           <TransformComponent
@@ -237,9 +350,60 @@ const ZoomableImage = ({
                 alignItems: "center",
                 justifyContent: "center",
                 overflow: "hidden",
-                borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+                position: "relative"
               }}
             >
+              {isSelected && (
+                <div 
+                  className="image-controls"
+                  style={{
+                    position: 'absolute',
+                    bottom: '10px',
+                    right: '10px',
+                    display: 'flex',
+                    gap: '6px',
+                    zIndex: 5
+                  }}
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReset(resetTransform);
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      padding: '4px 8px',
+                      fontSize: '10px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Reset
+                  </button>
+                  {showSaveButton && !isSaved && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        saveTransform(state);
+                      }}
+                      style={{
+                        backgroundColor: 'rgba(0, 123, 255, 0.8)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '4px 8px',
+                        fontSize: '10px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+              )}
               {backgroundImage ? (
                 <img
                   src={backgroundImage}

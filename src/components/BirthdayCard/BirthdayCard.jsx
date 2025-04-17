@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { X, Trash2, Grid, ArrowLeft } from "lucide-react";
+import { X, Grid, ArrowLeft } from "lucide-react";
 import html2canvas from "html2canvas";
 import "./BirthdayCard.css";
 import ZoomableImage from "../shared/ZoomableImage"; // Using shared component
@@ -18,105 +18,12 @@ import TimesNewRoman from "../../assets/fonts/Times-New-Roman-Regular.ttf";
 import downloadIcon from "../../assets/icons/Download_Icon.svg";
 import editIcon from "../../assets/icons/Edit_Icon.svg";
 
-const compressImage = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        // Advanced scaling with preservation of details
-        const maxDimension = 2560; // Higher max dimension for more clarity
-        const scaleFactor = Math.min(
-          maxDimension / img.width, 
-          maxDimension / img.height, 
-          1
-        );
-
-        const width = Math.round(img.width * scaleFactor);
-        const height = Math.round(img.height * scaleFactor);
-
-        // High-quality rendering settings
-        canvas.width = width;
-        canvas.height = height;
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-
-        // Use higher bit depth for color preservation
-        ctx.globalCompositeOperation = 'source-over';
-
-        // Draw image with high-quality scaling
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Advanced compression with multiple quality attempts
-        const qualities = [1, 0.95, 0.92, 0.90, 0.85];
-        
-        for (let quality of qualities) {
-          const compressedImage = canvas.toDataURL("image/webp", quality);
-          const size = new Blob([compressedImage]).size;
-
-          if (size <= 5 * 1024 * 1024) {
-            resolve(compressedImage);
-            return;
-          }
-        }
-
-        // Fallback to last compression attempt
-        resolve(canvas.toDataURL("image/webp", 0.85));
-      };
-
-      img.onerror = () => reject(new Error("Image load failed"));
-      img.src = event.target.result;
-    };
-
-    reader.readAsDataURL(file);
-  });
-};
 
 // Create an in-memory storage for images instead of using localStorage
 const memoryStorage = {
   images: {},
   metadata: {},
   textData: {}
-};
-
-// Replace the ImageStorageService with in-memory storage
-const ImageStorageService = {
-  saveImage: async (key, imageData) => {
-    try {
-      // Store image in memory instead of localStorage
-      memoryStorage.images[key] = imageData;
-      return true;
-    } catch (error) {
-      console.error("Error saving image:", error);
-      return false;
-    }
-  },
-
-  getImage: async (key) => {
-    try {
-      // Get image from memory
-      return memoryStorage.images[key] || null;
-    } catch (error) {
-      console.error("Error getting image:", error);
-      return null;
-    }
-  },
-
-  removeImage: async (key) => {
-    try {
-      // Remove image from memory
-      if (memoryStorage.images[key]) {
-        delete memoryStorage.images[key];
-      }
-      return true;
-    } catch (error) {
-      console.error("Error removing image:", error);
-      return false;
-    }
-  },
 };
 
 const BirthdayCard = () => {
@@ -199,66 +106,12 @@ const BirthdayCard = () => {
     preloadFonts();
   }, []);
 
-  // Handle input changes
-  const handleInputChange = useCallback(
-    (name, value) => {
-      if (name === "birthday_date") {
-        setInputValues((prev) => ({
-          ...prev,
-          birthday_date: value,
-        }));
-
-        if (value) {
-          const date = new Date(value);
-          const dayName = date.toLocaleString("en-US", { weekday: "long" });
-          const monthName = date.toLocaleString("en-US", { month: "long" });
-          const day = date.getDate();
-          const formattedDate = `${dayName}, ${monthName} ${day}`;
-
-          setCustomText((prev) => ({
-            ...prev,
-            birthday_date: formattedDate,
-          }));
-        }
-      } else if (name === "birthday_time") {
-        setInputValues((prev) => ({
-          ...prev,
-          birthday_time: value,
-        }));
-
-        if (value) {
-          const [hours, minutes] = value.split(":");
-          const time = new Date();
-          time.setHours(hours, minutes);
-          const formattedTime = time
-            .toLocaleTimeString("en-US", {
-              hour: "numeric",
-              minute: "2-digit",
-              hour12: true,
-            })
-            .toLowerCase();
-
-          setCustomText((prev) => ({
-            ...prev,
-            birthday_time: formattedTime,
-          }));
-        }
-      } else {
-        setCustomText((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
-      }
-    },
-    []
-  );
-
   // Download handler
   const handleDownload = useCallback(() => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
 
-    // Display a loading indicator
+    // Add a loading indicator
     const loadingIndicator = document.createElement('div');
     loadingIndicator.style.position = 'fixed';
     loadingIndicator.style.top = '50%';
@@ -272,122 +125,150 @@ const BirthdayCard = () => {
     loadingIndicator.textContent = 'Creating your image...';
     document.body.appendChild(loadingIndicator);
 
-    // Hide selection indicators for clean capture
-    const selectedElements = document.querySelectorAll('.selected');
-    const selectionBorders = document.querySelectorAll('.selection-border');
+    // Hide all UI controls and selection indicators
     const saveButtons = document.querySelectorAll('.save-button');
+    const selectionBorders = document.querySelectorAll('.selection-border');
+    const selectedElements = document.querySelectorAll('.selected');
+    const zoomControls = document.querySelectorAll('.image-controls, .react-transform-component__content--bottom-right');
     
-    // Store original states
+    // Store original states to restore later
     const originalStates = [];
     
-    // Get exact dimensions
-    const width = captureDiv.offsetWidth;
-    const height = captureDiv.offsetHeight;
-    
-    // Store original transform styles
-    const originalTransform = captureDiv.style.transform;
-    const originalZoom = captureDiv.style.zoom;
-    
-    // Hide all selection indicators
-    selectionBorders.forEach(border => {
-      if (border.style.display !== 'none') {
+    // Hide any UI controls that shouldn't be in the image
+    [...saveButtons, ...selectionBorders, ...zoomControls].forEach(element => {
+      if (element && element.style.display !== 'none') {
         originalStates.push({
-          element: border,
-          display: border.style.display
+          element,
+          display: element.style.display
         });
-        border.style.display = 'none';
+        element.style.display = 'none';
       }
     });
     
-    // Hide save buttons
-    saveButtons.forEach(button => {
-      if (button.style.display !== 'none') {
-        originalStates.push({
-          element: button,
-          display: button.style.display
-        });
-        button.style.display = 'none';
-      }
-    });
-    
-    // Reset selection classes
+    // Remove selection styling
     selectedElements.forEach(element => {
       originalStates.push({
-        element: element,
+        element,
         className: element.className
       });
       element.classList.remove('selected');
     });
     
-    // Temporarily remove transforms that might affect rendering
-    captureDiv.style.transform = 'none';
-    captureDiv.style.zoom = '100%';
+    // Capture current transform states of all zoomed content
+    const transformComponents = document.querySelectorAll('.react-transform-component');
+    const zoomableContainers = document.querySelectorAll('.zoomable-container');
+    const transformStates = [];
+    
+    // First process transform components (react-zoom-pan-pinch)
+    transformComponents.forEach(element => {
+      const style = window.getComputedStyle(element);
+      const img = element.querySelector('img');
+      
+      if (img) {
+        const imgStyle = window.getComputedStyle(img);
+        transformStates.push({
+          element,
+          transform: style.transform,
+          transformOrigin: style.transformOrigin,
+          img,
+          imgTransform: imgStyle.transform,
+          imgTransformOrigin: imgStyle.transformOrigin,
+          imgWidth: imgStyle.width,
+          imgHeight: imgStyle.height,
+          imgObjectFit: imgStyle.objectFit,
+          imgObjectPosition: imgStyle.objectPosition
+        });
+      }
+    });
+    
+    // Also process zoomable containers
+    zoomableContainers.forEach(container => {
+      originalStates.push({
+        element: container,
+        className: container.className
+      });
+      // Add a special class to identify this container during capture
+      container.classList.add('capturing');
+    });
 
-    // Create a direct, immediate capture with exact dimensions
+    // Create a direct capture with exact styles without any HTML changes
     const options = {
-      scale: 1,
+      scale: 2,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#FFFFFF',
       logging: false,
       imageTimeout: 0,
-      removeContainer: false,
-      width: width,
-      height: height,
+      ignoreElements: (element) => {
+        // Ignore any remaining UI elements that shouldn't be in the image
+        return element.classList.contains('save-button') || 
+               element.classList.contains('selection-border') ||
+               element.classList.contains('image-controls') ||
+               element.classList.contains('react-transform-component__content--bottom-right');
+      },
       onclone: (clonedDoc) => {
-        const clonedElement = clonedDoc.querySelector(".template-content");
-        if (clonedElement) {
-          // Set background color explicitly
-          clonedElement.style.backgroundColor = '#FFFFFF';
-          
-          // Ensure proper color rendering
-          const images = clonedElement.querySelectorAll("img");
-          images.forEach(img => {
-            img.style.filter = 'none';
-            img.style.webkitFilter = 'none';
-            img.style.mixBlendMode = 'normal';
-          });
-        }
+        // Add a temporary stylesheet to the cloned document to ensure transforms are preserved
+        const style = clonedDoc.createElement('style');
+        style.innerHTML = `
+          .react-transform-component {
+            transform-style: preserve-3d !important;
+          }
+          .capturing img {
+            object-fit: cover !important;
+            transform-origin: center !important;
+          }
+        `;
+        clonedDoc.head.appendChild(style);
+        
+        // For react-zoom-pan-pinch, we need to preserve exact transforms
+        const clonedTransformComponents = clonedDoc.querySelectorAll('.react-transform-component');
+        
+        clonedTransformComponents.forEach((element, index) => {
+          if (index < transformStates.length) {
+            const state = transformStates[index];
+            // Apply exact transform to ensure it matches the current view
+            element.style.transform = state.transform;
+            element.style.transformOrigin = state.transformOrigin;
+            
+            const img = element.querySelector('img');
+            if (img && state.img) {
+              // Apply exact image styles
+              img.style.transform = state.imgTransform;
+              img.style.transformOrigin = state.imgTransformOrigin;
+              img.style.width = state.imgWidth;
+              img.style.height = state.imgHeight;
+              img.style.objectFit = state.imgObjectFit;
+              img.style.objectPosition = state.imgObjectPosition;
+              img.style.maxWidth = 'none';
+              img.style.maxHeight = 'none';
+            }
+          }
+        });
       }
     };
 
     html2canvas(captureDiv, options)
       .then((canvas) => {
-        // Create a new canvas with white background
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = canvas.width;
-        finalCanvas.height = canvas.height;
-        const ctx = finalCanvas.getContext('2d', { alpha: false });
+        // Convert to JPEG with high quality
+        const jpgDataUrl = canvas.toDataURL("image/jpeg", 0.95);
         
-        // Fill with white background
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-        
-        // Draw the original canvas on top with proper color handling
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(canvas, 0, 0);
-        
-        // Use PNG format for better color preservation
-        const dataUrl = finalCanvas.toDataURL("image/png");
-        
-        // Direct download without notifications
+        // Create download link
         const downloadLink = document.createElement("a");
-        downloadLink.href = dataUrl;
-        downloadLink.download = "birthday-invitation.png";
+        downloadLink.href = jpgDataUrl;
+        downloadLink.download = "birthday-invitation.jpg";
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
         
-        // Restore original states
+        // Restore original UI states
         originalStates.forEach(state => {
-          if (state.display !== undefined) state.element.style.display = state.display;
-          if (state.className) state.element.className = state.className;
+          if (state.display !== undefined) {
+            state.element.style.display = state.display;
+          }
+          if (state.className) {
+            state.element.className = state.className;
+          }
         });
-        
-        // Restore original transform styles
-        captureDiv.style.transform = originalTransform;
-        captureDiv.style.zoom = originalZoom;
         
         // Remove loading indicator
         document.body.removeChild(loadingIndicator);
@@ -395,21 +276,18 @@ const BirthdayCard = () => {
       .catch((error) => {
         console.error("Error generating image:", error);
         
-        // Restore original states in case of error
+        // Restore original UI states
         originalStates.forEach(state => {
-          if (state.display !== undefined) state.element.style.display = state.display;
-          if (state.className) state.element.className = state.className;
+          if (state.display !== undefined) {
+            state.element.style.display = state.display;
+          }
+          if (state.className) {
+            state.element.className = state.className;
+          }
         });
         
-        // Restore original transform styles
-        captureDiv.style.transform = originalTransform;
-        captureDiv.style.zoom = originalZoom;
-        
-        // Remove loading indicator
         document.body.removeChild(loadingIndicator);
-        
-        // Show error notification
-        alert("Failed to generate image. Please try again.");
+        alert("Error generating image. Please try again.");
       });
   }, []);
 
