@@ -38,6 +38,7 @@
 
 .template-content {
   position: relative;
+  top:40px;
   width: fit-content;
   height: fit-content;
   z-index: 10;

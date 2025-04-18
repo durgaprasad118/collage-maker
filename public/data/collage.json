@@ -66,5 +66,156 @@
         }
       }
     ]
+  },
+  "id_4": {
+    "images": [
+      {
+        "thumbnail": "/Collage-Templates/templetes-thumbnail/3.jpeg",
+        "template": "../Collage-Templates/templetes/5.png",
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample.jpg",
+        "coordinates": {
+          "width_in_px": 394,
+          "height_in_px": 430,
+          "top_in_px": 408,
+          "left_in_px": 126,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 49.27,
+          "left": 15,
+          "z_index": 1,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample2.jpg",
+        "coordinates": {
+          "width_in_px": 351,
+          "height_in_px": 431,
+          "top_in_px": 412,
+          "left_in_px": 505,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 10,
+          "left": 15,
+          "z_index": 2,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample3.jpg",
+        "coordinates": {
+          "width_in_px": 358,
+          "height_in_px": 393,
+          "top_in_px": 822,
+          "left_in_px": 163,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 15,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample4.jpg",
+        "coordinates": {
+          "width_in_px": 358,
+          "height_in_px": 393,
+          "top_in_px": 821,
+          "left_in_px": 504,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 50,
+          "type": "box"
+        }
+      }
+    ]
+  },
+  "id_5": {
+    "images": [
+      {
+        "thumbnail": "/Collage-Templates/templetes-thumbnail/3.jpeg",
+        "template": "../Collage-Templates/templetes/6.png",
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample.jpg",
+        "coordinates": {
+          "width_in_px": 422,
+          "height_in_px": 444,
+          "top_in_px": 384,
+          "left_in_px": 47,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 49.27,
+          "left": 15,
+          "z_index": 1,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample2.jpg",
+        "coordinates": {
+          "width_in_px": 422,
+          "height_in_px": 431,
+          "top_in_px": 391,
+          "left_in_px": 471,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 10,
+          "left": 15,
+          "z_index": 2,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample3.jpg",
+        "coordinates": {
+          "width_in_px": 419,
+          "height_in_px": 400,
+          "top_in_px": 798,
+          "left_in_px": 49,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 15,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample4.jpg",
+        "coordinates": {
+          "width_in_px": 419,
+          "height_in_px": 399,
+          "top_in_px": 803,
+          "left_in_px": 456,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 50,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Collage-Templates/default-images/Sample2.jpg",
+        "coordinates": {
+          "width_in_px": 459,
+          "height_in_px": 387,
+          "top_in_px": 1149,
+          "left_in_px": 239,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 50,
+          "type": "box"
+        }
+      }
+    ]
   }
 }
