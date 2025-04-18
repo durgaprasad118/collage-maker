@@ -4,7 +4,6 @@ import { ArrowLeft } from "lucide-react";
 import "./BirthdayCard.css";
 import { useImageUpload } from "../../utils/ImageUploadManager";
 import {
-  renderTemplateGallery,
   renderModal,
   renderTemplateContent,
   handleDownload,
@@ -27,7 +26,6 @@ const BirthdayCard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [showTemplateGallery, setShowTemplateGallery] = useState(false);
 
   // Initialize states
   const [customText, setCustomText] = useState({
@@ -166,26 +164,9 @@ const BirthdayCard = () => {
     return <div className="error-screen">{error}</div>;
   }
 
-  // Handle template selection
-  const handleTemplateSelect = (index) => {
-    setCurrentIndex(index);
-    setCurrentTemplate(allTemplates[index]);
-    navigate(`/birthday/${index + 1}`, { replace: true });
-    setShowTemplateGallery(false);
-  };
-
   // Main render
   return (
     <div className={`main-container ${isEditModalOpen ? "modal-open" : ""}`}>
-      {renderTemplateGallery({
-        showTemplateGallery,
-        setShowTemplateGallery,
-        allTemplates,
-        currentIndex,
-        handleTemplateSelect,
-        cardType: "birthday"
-      })}
-      
       <div ref={containerRef} className="template-wrapper">
         <div className="template-positioning">
           {currentTemplate && renderTemplateContent({
@@ -218,12 +199,12 @@ const BirthdayCard = () => {
 
       {/* Action buttons */}
       {renderActionButtons({
-        setShowTemplateGallery,
         setIsEditModalOpen,
         handleWhatsAppShare: handleShareOnWhatsApp,
         handleDownload: handleDownloadCard,
         editIcon,
-        downloadIcon
+        downloadIcon,
+        cardType: "birthday"
       })}
     </div>
   );

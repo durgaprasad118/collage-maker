@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import "../BirthdayCard/BirthdayCard.css"; // Reuse the same CSS
 import { useImageUpload } from "../../utils/ImageUploadManager";
 import {
-  renderTemplateGallery,
   renderModal,
   renderTemplateContent,
   handleDownload,
@@ -19,7 +18,6 @@ const CollageCard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [showTemplateGallery, setShowTemplateGallery] = useState(false);
 
   const [allTemplates, setAllTemplates] = useState([]);
   const [currentTemplate, setCurrentTemplate] = useState(null);
@@ -107,26 +105,9 @@ const CollageCard = () => {
     return <div className="error-screen">{error}</div>;
   }
 
-  // Handle template selection
-  const handleTemplateSelect = (index) => {
-    setCurrentIndex(index);
-    setCurrentTemplate(allTemplates[index]);
-    navigate(`/collage/${index + 1}`, { replace: true });
-    setShowTemplateGallery(false);
-  };
-
   // Main render
   return (
-    <div className={`main-container ${isEditModalOpen ? "modal-open" : ""}`}>
-      {renderTemplateGallery({
-        showTemplateGallery,
-        setShowTemplateGallery,
-        allTemplates,
-        currentIndex,
-        handleTemplateSelect,
-        cardType: "collage"
-      })}
-      
+    <div className={`main-container ${isEditModalOpen ? "modal-open" : ""}`}>      
       <div ref={containerRef} className="template-wrapper">
         <div className="template-positioning">
           {currentTemplate && renderTemplateContent({
@@ -159,12 +140,12 @@ const CollageCard = () => {
 
       {/* Action buttons */}
       {renderActionButtons({
-        setShowTemplateGallery,
         setIsEditModalOpen,
         handleWhatsAppShare: handleShareOnWhatsApp,
         handleDownload: handleDownloadCard,
         editIcon,
-        downloadIcon
+        downloadIcon,
+        cardType: "collage"
       })}
     </div>
   );

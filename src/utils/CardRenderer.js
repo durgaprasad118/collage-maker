@@ -447,50 +447,88 @@ export const handleWhatsAppShare = async (customText = {}) => {
  * Renders action buttons for card manipulation
  */
 export const renderActionButtons = ({
-  setShowTemplateGallery,
   setIsEditModalOpen,
   handleWhatsAppShare,
   handleDownload,
   editIcon,
-  downloadIcon
+  cardType
 }) => {
   return (
-    <div className="button-container">
-      <button
-        className="action-button gallery-button"
-        onClick={() => setShowTemplateGallery(true)}
-      >
-        <Grid size={20} />
-        <span>Templates</span>
-      </button>
-      <button
-        className="action-button edit-button"
-        onClick={() => setIsEditModalOpen(true)}
-      >
-        <img src={editIcon} alt="Edit" className="icon" />
-        <span>Upload</span>
-      </button>
-      <button
-        className="action-button share-button"
-        onClick={handleWhatsAppShare}
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-          alt="WhatsApp"
-          className="icon"
-          style={{ width: "20px", height: "20px" }}
-        />
-        <span>Share</span>
-      </button>
-      <button
-        className="action-button download-button"
-        onClick={handleDownload}
-      >
-        <img src={downloadIcon} alt="Download" className="icon" />
-        <span>Download</span>
-      </button>
+    <div className="fixed bottom-0 z-50 md:w-full w-[98%] h-16 max-w-lg -translate-x-1/2 bg-gray-700 border border-gray-600 rounded-md  left-1/2">
+      <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
+        <button 
+          data-tooltip-target="tooltip-templates" 
+          type="button" 
+          className="inline-flex flex-col items-center justify-center px-5 rounded-s-full hover:bg-gray-800 group"
+          onClick={() => {
+            if (cardType === "birthday") {
+              window.location.href = "/BirthdayLibrary";
+            } else {
+              window.location.href = "/CollageLibrary";
+            }
+          }}
+        >
+          <Grid className="w-5 h-5 mb-1 text-white group-hover:text-blue-500" />
+          <span className="sr-only">Templates</span>
+        </button>
+        <div id="tooltip-templates" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+          Templates
+          <div className="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        
+        <button 
+          data-tooltip-target="tooltip-upload" 
+          type="button" 
+          className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-800 group"
+          onClick={() => setIsEditModalOpen(true)}
+        >
+          <img 
+            src={editIcon} 
+            alt="Upload" 
+            className="w-5 h-5 mb-1 filter brightness-0 invert group-hover:text-blue-500" 
+          />
+          <span className="sr-only">Upload</span>
+        </button>
+        <div id="tooltip-upload" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+          Upload
+          <div className="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        
+        <div className="flex items-center justify-center">
+          <button 
+            data-tooltip-target="tooltip-download" 
+            type="button" 
+            className="inline-flex items-center justify-center w-10 h-10 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-800 focus:outline-none"
+            onClick={handleDownload}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span className="sr-only">Download</span>
+          </button>
+        </div>
+        <div id="tooltip-download" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+          Download
+          <div className="tooltip-arrow" data-popper-arrow></div>
+        </div>
+        
+        <button 
+          data-tooltip-target="tooltip-share" 
+          type="button" 
+          className="inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-800 group"
+          onClick={handleWhatsAppShare}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mb-1 text-white group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          <span className="sr-only">Share</span>
+        </button>
+        <div id="tooltip-share" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip">
+          Share
+          <div className="tooltip-arrow" data-popper-arrow></div>
+        </div>
+      </div>
     </div>
   );
 };
 
-// Import at the top of this file
