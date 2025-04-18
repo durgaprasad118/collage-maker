@@ -267,12 +267,100 @@ const CollageCard = () => {
     }
   }, []);
 
-  // Download handler
   const handleDownload = useCallback(() => {
     const captureDiv = document.querySelector(".template-content");
     if (!captureDiv) return;
-    downloadCanvas(captureDiv, "collage.jpg");
+  
+    // Create loading indicator
+    const loadingIndicator = document.createElement('div');
+    Object.assign(loadingIndicator.style, {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      background: 'rgba(0, 0, 0, 0.7)',
+      color: 'white',
+      padding: '15px 20px',
+      borderRadius: '10px',
+      zIndex: '9999'
+    });
+    loadingIndicator.textContent = 'Creating your image...';
+    document.body.appendChild(loadingIndicator);
+  
+    // Hide UI controls
+    const uiControls = document.querySelectorAll(
+      '.save-button, .selection-border, .image-controls, .react-transform-component__content--bottom-right'
+    );
+    const selectedElements = document.querySelectorAll('.selected');
+    const originalStates = [];
+  
+    uiControls.forEach(element => {
+      if (element && element.style.display !== 'none') {
+        originalStates.push({ element, display: element.style.display });
+        element.style.display = 'none';
+      }
+    });
+  
+    selectedElements.forEach(element => {
+      originalStates.push({ element, className: element.className });
+      element.classList.remove('selected');
+    });
+  
+    // Delay to allow UI updates before capture
+    setTimeout(() => {
+      html2canvas(captureDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+        imageTimeout: 0,
+        backgroundColor: null, // Transparent background
+        scrollY: -window.scrollY,
+        windowWidth: captureDiv.scrollWidth,
+        windowHeight: captureDiv.scrollHeight
+      })
+        .then(canvas => {
+          const ctx = canvas.getContext('2d');
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+  
+          // Replace pure white pixels with transparency
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i] === 255 && data[i + 1] === 255 && data[i + 2] === 255 && data[i + 3] === 255) {
+              data[i + 3] = 0;
+            }
+          }
+          ctx.putImageData(imageData, 0, 0);
+  
+          // Download as PNG
+          const pngDataUrl = canvas.toDataURL("image/png", 1.0);
+          const downloadLink = document.createElement("a");
+          downloadLink.href = pngDataUrl;
+          downloadLink.download = "collage.png";
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        })
+        .catch(err => {
+          console.error("html2canvas error:", err);
+          alert("Could not generate the image. Please try again.");
+        })
+        .finally(() => {
+          // Restore UI state
+          originalStates.forEach(state => {
+            if (state.display !== undefined) {
+              state.element.style.display = state.display;
+            }
+            if (state.className) {
+              state.element.className = state.className;
+            }
+          });
+  
+          document.body.removeChild(loadingIndicator);
+        });
+    }, 100);
   }, []);
+  
 
   // Template rendering logic
   const renderTemplateContent = useCallback(

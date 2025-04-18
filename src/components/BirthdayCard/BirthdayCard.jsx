@@ -5,8 +5,6 @@ import html2canvas from "html2canvas";
 import "./BirthdayCard.css";
 import ZoomableImage from "../shared/ZoomableImage"; // Using shared component
 import { useImageUpload, renderImageUploadModal } from "../../utils/ImageUploadManager";
-
-// Font imports
 import TinosRegular from "../../assets/fonts/Tinos-Regular.ttf";
 import MontserratSemiBold from "../../assets/fonts/Montserrat-SemiBold.ttf";
 import MontserratRegular from "../../assets/fonts/Montserrat-Regular.ttf";
@@ -14,7 +12,6 @@ import AbrilFatface from "../../assets/fonts/AbrilFatface-Regular.ttf";
 import Allura from "../../assets/fonts/Allura-Regular.ttf";
 import TimesNewRoman from "../../assets/fonts/Times-New-Roman-Regular.ttf";
 
-// Icon imports
 import downloadIcon from "../../assets/icons/Download_Icon.svg";
 import editIcon from "../../assets/icons/Edit_Icon.svg";
 
