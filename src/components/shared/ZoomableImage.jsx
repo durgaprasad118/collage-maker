@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import './ZoomableImage.css';
 
@@ -55,6 +55,8 @@ const ZoomableImage = ({
   const [isSelected, setIsSelected] = useState(false);
   const [showSaveButton, setShowSaveButton] = useState(false);
   const [isSaved, setIsSaved] = useState(!!savedTransform);
+  const [isExporting, setIsExporting] = useState(false);
+  const imageContainerRef = useRef(null);
 
   // Debug logs for image data
   useEffect(() => {
@@ -124,6 +126,23 @@ const ZoomableImage = ({
       document.head.removeChild(style);
     };
   }, []);
+
+  // Check if currently being captured by html2canvas for download
+  useEffect(() => {
+    const checkIfExporting = () => {
+      // Check for our custom export flag
+      const isCurrentlyExporting = document.body.getAttribute('data-card-exporting') === 'true';
+      
+      if (isCurrentlyExporting !== isExporting) {
+        setIsExporting(isCurrentlyExporting);
+      }
+    };
+    
+    // Check regularly
+    const interval = setInterval(checkIfExporting, 50);
+    
+    return () => clearInterval(interval);
+  }, [isExporting]);
 
   // Ensure image stays within bounds after scale changes
   useEffect(() => {
@@ -261,6 +280,134 @@ const ZoomableImage = ({
       }
     }
   };
+
+  // Special rendering for when being captured for download
+  if (isExporting && savedTransform) {
+    return (
+      <div 
+        className="zoomable-container"
+        ref={imageContainerRef}
+        style={{
+          position: 'absolute',
+          width: `${coordinates?.width_in_px || 0}px`,
+          height: `${coordinates?.height_in_px || 0}px`,
+          top: `${coordinates?.top_in_px || 0}px`,
+          left: `${coordinates?.left_in_px || 0}px`,
+          overflow: 'hidden',
+          borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            backgroundColor: backgroundImage ? 'transparent' : '#f0f0f0',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+            position: "relative"
+          }}
+        >
+          {backgroundImage ? (
+            <div style={{
+              width: "100%",
+              height: "100%",
+              overflow: "hidden",
+              borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+              position: "relative"
+            }}>
+              <img
+                src={backgroundImage}
+                alt=""
+                style={{
+                  position: "absolute",
+                  width: `${100 * savedTransform.scale}%`,
+                  height: `${100 * savedTransform.scale}%`,
+                  left: "50%",
+                  top: "50%",
+                  objectFit: "cover",
+                  imageRendering: "high-quality",
+                  transform: `translate(-50%, -50%) translate(${savedTransform.position.x / savedTransform.scale}px, ${savedTransform.position.y / savedTransform.scale}px)`,
+                  transformOrigin: "center center",
+                  borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                }}
+                crossOrigin="anonymous"
+                loading="eager"
+                decoding="sync"
+                data-high-quality="true"
+                draggable="false"
+              />
+            </div>
+          ) : image?.sample_image ? (
+            <div style={{
+              width: "100%",
+              height: "100%",
+              overflow: "hidden",
+              borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+              position: "relative"
+            }}>
+              <img 
+                src={image.sample_image}
+                alt="Sample"
+                style={{
+                  position: "absolute",
+                  width: `${100 * savedTransform.scale}%`,
+                  height: `${100 * savedTransform.scale}%`,
+                  left: "50%",
+                  top: "50%",
+                  objectFit: "cover",
+                  imageRendering: "high-quality",
+                  transform: `translate(-50%, -50%) translate(${savedTransform.position.x / savedTransform.scale}px, ${savedTransform.position.y / savedTransform.scale}px)`,
+                  transformOrigin: "center center",
+                  borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                }}
+                crossOrigin="anonymous"
+                loading="eager"
+                decoding="sync"
+                data-high-quality="true"
+                draggable="false"
+              />
+            </div>
+          ) : (
+            <div 
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(93, 95, 239, 0.05)',
+                borderRadius: image?.shape === 'circle' ? '50%' : '8px',
+                border: '1px dashed #5D5FEF',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'rgba(93, 95, 239, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '6px'
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5D5FEF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+              <span style={{ color: '#aaa', fontSize: '11px', fontWeight: '500' }}>Add image</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 

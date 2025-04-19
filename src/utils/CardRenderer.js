@@ -246,6 +246,9 @@ export const handleDownload = () => {
   });
   loadingIndicator.textContent = 'Creating your image...';
   document.body.appendChild(loadingIndicator);
+  
+  // Set export flag for ZoomableImage components to detect
+  document.body.setAttribute('data-card-exporting', 'true');
 
   // Hide UI controls
   const uiControls = document.querySelectorAll(
@@ -269,13 +272,25 @@ export const handleDownload = () => {
   // Small delay before rendering to canvas
   setTimeout(() => {
     html2canvas(captureDiv, {
-      scale: 2, // High resolution output
+      scale: 3, // Higher resolution output (increased from 2)
       useCORS: true, // To allow cross-origin images
       allowTaint: false,
       logging: false,
       imageTimeout: 0,
       backgroundColor: "#ffffff", // Force white background to fix mobile grayscale issue
-      scrollY: -window.scrollY
+      scrollY: -window.scrollY,
+      onclone: (documentClone) => {
+        // Add special class to cloned document for extra styling if needed
+        documentClone.documentElement.classList.add('html2canvas-document');
+        
+        // Find all images in zoomable containers and ensure they have proper rendering settings
+        const allImages = documentClone.querySelectorAll('.zoomable-container img');
+        allImages.forEach(img => {
+          img.style.imageRendering = 'high-quality';
+          // Ensure smooth rendering
+          img.style.willChange = 'transform';
+        });
+      }
     })
       .then(canvas => {
         // Explicit fix for mobile grayscale issue: force full alpha channel
@@ -289,8 +304,8 @@ export const handleDownload = () => {
         }
         ctx.putImageData(imageData, 0, 0);
 
-        // Export PNG
-        const pngDataUrl = canvas.toDataURL("image/png");
+        // Export PNG with higher quality
+        const pngDataUrl = canvas.toDataURL("image/png", 1.0);
         const downloadLink = document.createElement("a");
         downloadLink.href = pngDataUrl;
         downloadLink.download = "card-maker-export.png";
@@ -313,6 +328,8 @@ export const handleDownload = () => {
           }
         });
 
+        // Remove export flag
+        document.body.removeAttribute('data-card-exporting');
         document.body.removeChild(loadingIndicator);
       });
   }, 100);
@@ -338,6 +355,9 @@ export const handleWhatsAppShare = async (customText = {}) => {
   loadingIndicator.style.zIndex = '9999';
   loadingIndicator.textContent = 'Creating your image for sharing...';
   document.body.appendChild(loadingIndicator);
+  
+  // Set export flag for ZoomableImage components to detect
+  document.body.setAttribute('data-card-exporting', 'true');
 
   // Store original states
   const originalStates = [];
@@ -388,15 +408,27 @@ export const handleWhatsAppShare = async (customText = {}) => {
       allowTaint: true,
       logging: false,
       imageTimeout: 0,
-      backgroundColor: '#FFFFFF'
+      backgroundColor: '#FFFFFF',
+      onclone: (documentClone) => {
+        // Add special class to cloned document for extra styling if needed
+        documentClone.documentElement.classList.add('html2canvas-document');
+        
+        // Find all images in zoomable containers and ensure they have proper rendering settings
+        const allImages = documentClone.querySelectorAll('.zoomable-container img');
+        allImages.forEach(img => {
+          img.style.imageRendering = 'high-quality';
+          // Ensure smooth rendering
+          img.style.willChange = 'transform';
+        });
+      }
     };
 
     const canvas = await html2canvas(captureDiv, options);
     
-    // Convert data URL to blob
-    const blob = await fetch(canvas.toDataURL('image/jpeg', 0.95)).then(res => res.blob());
+    // Convert data URL to blob with max quality
+    const blob = await fetch(canvas.toDataURL('image/jpeg', 1.0)).then(res => res.blob());
     
-    // Create file from blob
+    // Create file from blob with high quality
     const file = new File([blob], "card-maker-image.jpg", {
       type: "image/jpeg",
       lastModified: Date.now()
@@ -439,6 +471,8 @@ export const handleWhatsAppShare = async (customText = {}) => {
       if (state.className) state.element.className = state.className;
     });
     
+    // Remove export flag
+    document.body.removeAttribute('data-card-exporting');
     document.body.removeChild(loadingIndicator);
   }
 };
