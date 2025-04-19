@@ -74,6 +74,19 @@ const ZoomableImage = ({
   // Reference to the transform wrapper instance
   const transformRef = React.useRef(null);
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Add CSS for high-quality image rendering during export
   useEffect(() => {
     // Create style element for high-res images during export
@@ -153,7 +166,14 @@ const ZoomableImage = ({
   // Toggle selection state for panning only, without visual selection indicators
   const toggleSelect = (e) => {
     e.stopPropagation();
-    // Enable panning functionality only, without visual styling changes
+    
+    // On mobile, always keep selected state true for easier manipulation
+    if (isMobile) {
+      setIsSelected(true);
+      return;
+    }
+    
+    // Desktop behavior
     setIsSelected(!isSelected);
     
     if (!isSelected) {
@@ -286,29 +306,39 @@ const ZoomableImage = ({
           }
         }}
         panning={{
-          disabled: !isSelected,
-          velocityDisabled: true,
+          disabled: !isSelected && !isMobile, // Enable panning on mobile regardless of selection
+          velocityDisabled: false, // Enable velocity for smoother mobile experience
           lockAxisY: false,
           lockAxisX: false,
+          activationKeys: ['Alt'], // Use Alt key on desktop
+          excluded: ['button', 'a'], // Don't trigger panning on buttons
           padPinch: false,
-          bounds: "parent"
+          bounds: "parent",
+          touchPadding: 50 // Larger touch area for better mobile experience
         }}
         velocityAnimation={{
-          disabled: true
+          disabled: false, // Enable for smoother mobile experience
+          sensitivity: 1,
+          animationTime: 300,
+          equalToMove: true
         }}
         wheel={{
-          step: 0.1
+          step: 0.1,
+          touchPadding: isMobile ? 100 : 50 // More sensitive on mobile
         }}
         pinch={{
-          step: 5
+          step: isMobile ? 10 : 5, // More sensitive pinch zoom on mobile
+          disabled: false
         }}
         scalePadding={{
-          disabled: true
+          disabled: false,
+          animationTime: 300,
+          animationType: "easeOut"
         }}
         alignmentAnimation={{
-          sizeX: 0,
-          sizeY: 0,
-          velocityAlignmentTime: 0
+          sizeX: coordinates?.width_in_px || 0,
+          sizeY: coordinates?.height_in_px || 0,
+          velocityAlignmentTime: 300
         }}
         onTransformed={handleTransformChange}
         onTransforming={({ state, instance }) => constrainPosition(state, instance)}
@@ -354,7 +384,7 @@ const ZoomableImage = ({
                 position: "relative"
               }}
             >
-              {isSelected && (
+              {isSelected && !isMobile && (
                 <div 
                   className="image-controls"
                   style={{
@@ -416,7 +446,8 @@ const ZoomableImage = ({
                     objectFit: "cover",
                     objectPosition: "center",
                     imageRendering: "high-quality",
-                    borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                    borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+                    touchAction: "none" // Prevents browser handling of gestures
                   }}
                   crossOrigin="anonymous"
                   loading="eager"
@@ -436,7 +467,8 @@ const ZoomableImage = ({
                     objectFit: "cover",
                     objectPosition: "center",
                     imageRendering: "high-quality",
-                    borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                    borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+                    touchAction: "none" // Prevents browser handling of gestures
                   }}
                   crossOrigin="anonymous"
                   loading="eager"
