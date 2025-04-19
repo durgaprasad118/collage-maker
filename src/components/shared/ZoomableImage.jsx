@@ -167,14 +167,8 @@ const ZoomableImage = ({
   const toggleSelect = (e) => {
     e.stopPropagation();
     
-    // On mobile, always keep selected state true for easier manipulation
-    if (isMobile) {
-      setIsSelected(true);
-      return;
-    }
-    
-    // Desktop behavior
-    setIsSelected(!isSelected);
+    // Always enable panning on all devices
+    setIsSelected(true);
     
     if (!isSelected) {
       const handleOutsideClick = (event) => {
@@ -292,7 +286,7 @@ const ZoomableImage = ({
         minScale={1}
         maxScale={3}
         limitToBounds={true}
-        boundsTolerance={0.1} // Adds slight tolerance to bounds
+        boundsTolerance={0.1}
         centerOnInit={true}
         centerZoomedOut={true}
         doubleClick={{
@@ -306,15 +300,15 @@ const ZoomableImage = ({
           }
         }}
         panning={{
-          disabled: !isSelected && !isMobile, // Enable panning on mobile regardless of selection
-          velocityDisabled: false, // Enable velocity for smoother mobile experience
+          disabled: !isSelected, // Enable panning when selected, regardless of device
+          velocityDisabled: false, // Enable velocity for smoother experience on all devices
           lockAxisY: false,
           lockAxisX: false,
-          activationKeys: ['Alt'], // Use Alt key on desktop
-          excluded: ['button', 'a'], // Don't trigger panning on buttons
+          activationKeys: [], // Remove Alt key requirement to make it work on all devices
+          excluded: ['button', 'a'],
           padPinch: false,
           bounds: "parent",
-          touchPadding: 50 // Larger touch area for better mobile experience
+          touchPadding: 50 // Touch area for better experience
         }}
         velocityAnimation={{
           disabled: false, // Enable for smoother mobile experience
