@@ -257,6 +257,24 @@ export const handleDownload = () => {
   const selectedElements = document.querySelectorAll('.selected');
   const originalStates = [];
 
+  // Store original template-content styles
+  const originalCaptureDivStyles = {
+    padding: captureDiv.style.padding,
+    margin: captureDiv.style.margin,
+    border: captureDiv.style.border,
+    boxSizing: captureDiv.style.boxSizing,
+    position: captureDiv.style.position,
+    overflow: captureDiv.style.overflow
+  };
+
+  // Apply temporary styles to fix white borders
+  captureDiv.style.padding = '0';
+  captureDiv.style.margin = '0';
+  captureDiv.style.border = 'none';
+  captureDiv.style.boxSizing = 'border-box';
+  captureDiv.style.position = 'relative';
+  captureDiv.style.overflow = 'hidden';
+
   uiControls.forEach(element => {
     if (element && element.style.display !== 'none') {
       originalStates.push({ element, display: element.style.display });
@@ -272,22 +290,40 @@ export const handleDownload = () => {
   // Small delay before rendering to canvas
   setTimeout(() => {
     html2canvas(captureDiv, {
-      scale: 3, // Higher resolution output (increased from 2)
+      scale: 3, // Higher resolution output
       useCORS: true, // To allow cross-origin images
       allowTaint: false,
       logging: false,
       imageTimeout: 0,
-      backgroundColor: "#ffffff", // Force white background to fix mobile grayscale issue
+      backgroundColor: "#ffffff",
       scrollY: -window.scrollY,
+      removeContainer: false,
+      x: 0,
+      y: 0,
+      windowWidth: document.documentElement.offsetWidth,
+      windowHeight: document.documentElement.offsetHeight,
+      foreignObjectRendering: false, // Disable to fix potential border issues
       onclone: (documentClone) => {
         // Add special class to cloned document for extra styling if needed
         documentClone.documentElement.classList.add('html2canvas-document');
+        
+        // Get the cloned element
+        const clonedCaptureDiv = documentClone.querySelector('.template-content');
+        if (clonedCaptureDiv) {
+          // Apply additional styles to ensure no borders
+          clonedCaptureDiv.style.padding = '0';
+          clonedCaptureDiv.style.margin = '0';
+          clonedCaptureDiv.style.border = 'none';
+          clonedCaptureDiv.style.borderRadius = '0';
+          clonedCaptureDiv.style.boxShadow = 'none';
+          clonedCaptureDiv.style.overflow = 'hidden';
+          clonedCaptureDiv.style.inset = '0';
+        }
         
         // Find all images in zoomable containers and ensure they have proper rendering settings
         const allImages = documentClone.querySelectorAll('.zoomable-container img');
         allImages.forEach(img => {
           img.style.imageRendering = 'high-quality';
-          // Ensure smooth rendering
           img.style.willChange = 'transform';
         });
       }
@@ -304,8 +340,11 @@ export const handleDownload = () => {
         }
         ctx.putImageData(imageData, 0, 0);
 
+        // Remove potential transparent border by cropping
+        const cropCanvas = cropWhitespace(canvas);
+
         // Export PNG with higher quality
-        const pngDataUrl = canvas.toDataURL("image/png", 1.0);
+        const pngDataUrl = cropCanvas.toDataURL("image/png", 1.0);
         const downloadLink = document.createElement("a");
         downloadLink.href = pngDataUrl;
         downloadLink.download = "card-maker-export.png";
@@ -328,12 +367,68 @@ export const handleDownload = () => {
           }
         });
 
+        // Restore original captureDiv styles
+        Object.entries(originalCaptureDivStyles).forEach(([prop, value]) => {
+          captureDiv.style[prop] = value;
+        });
+
         // Remove export flag
         document.body.removeAttribute('data-card-exporting');
         document.body.removeChild(loadingIndicator);
       });
   }, 100);
 };
+
+// Helper function to crop any transparent/white borders
+function cropWhitespace(canvas) {
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imgData.data;
+  
+  // Find the bounds of the content
+  let left = canvas.width, right = 0, top = canvas.height, bottom = 0;
+  
+  // Use a small threshold to determine what constitutes a "white" pixel
+  const isWhiteOrTransparent = (idx) => {
+    return data[idx + 3] < 10 || (data[idx] > 240 && data[idx + 1] > 240 && data[idx + 2] > 240);
+  };
+  
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      const idx = (y * canvas.width + x) * 4;
+      if (!isWhiteOrTransparent(idx)) {
+        left = Math.min(left, x);
+        right = Math.max(right, x);
+        top = Math.min(top, y);
+        bottom = Math.max(bottom, y);
+      }
+    }
+  }
+  
+  // Add a small padding
+  left = Math.max(0, left - 1);
+  top = Math.max(0, top - 1);
+  right = Math.min(canvas.width - 1, right + 1);
+  bottom = Math.min(canvas.height - 1, bottom + 1);
+  
+  // If the image has content, crop it
+  if (left < right && top < bottom) {
+    const width = right - left + 1;
+    const height = bottom - top + 1;
+    
+    const cropCanvas = document.createElement('canvas');
+    cropCanvas.width = width;
+    cropCanvas.height = height;
+    
+    const cropCtx = cropCanvas.getContext('2d');
+    cropCtx.drawImage(canvas, left, top, width, height, 0, 0, width, height);
+    
+    return cropCanvas;
+  }
+  
+  // If nothing was found, return the original canvas
+  return canvas;
+}
 
 /**
  * Handles sharing the card via WhatsApp
