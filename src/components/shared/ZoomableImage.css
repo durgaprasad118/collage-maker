@@ -1,5 +1,12 @@
 .zoomable-container {
-  position: absolute;
+  position: relative;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   cursor: pointer;
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
   z-index: 1;
@@ -29,34 +36,24 @@
   box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
-/* Image save toast notification */
-.image-save-toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  z-index: 1000;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: opacity 0.3s ease;
+.zoomable-container img {
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  pointer-events: none;
 }
 
-.image-save-toast-hidden {
-  opacity: 0;
-}
-
-/* React Zoom Pan Pinch overrides */
-.react-transform-wrapper {
+.zoomable-container .react-transform-wrapper {
+  touch-action: none !important;
   width: 100% !important;
   height: 100% !important;
 }
 
-.react-transform-component {
+.zoomable-container .react-transform-component {
+  touch-action: none !important;
   width: 100% !important;
   height: 100% !important;
 }
@@ -75,4 +72,60 @@
   font-size: 10px;
   pointer-events: none;
   opacity: 0.7;
+}
+
+/* Image save toast notification */
+.image-save-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 4px;
+  z-index: 1000;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+
+.image-save-toast-hidden {
+  opacity: 0;
+}
+
+/* Export-specific styles to prevent cropping */
+.zoomable-container.export-mode {
+  overflow: visible !important;
+  z-index: auto !important;
+}
+
+.zoomable-container.export-mode * {
+  overflow: visible !important;
+}
+
+/* Force high-quality rendering during export */
+@media print, (min-resolution: 300dpi) {
+  .zoomable-container.export-mode img {
+    image-rendering: crisp-edges !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    transform-origin: center center !important;
+  }
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+  .zoomable-container .react-transform-wrapper {
+    will-change: transform;
+  }
+  
+  .zoomable-container img {
+    will-change: transform;
+  }
+  
+  /* Increase size of control buttons on mobile */
+  .image-controls button {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
 } 

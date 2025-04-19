@@ -285,7 +285,7 @@ const ZoomableImage = ({
   if (isExporting && savedTransform) {
     return (
       <div 
-        className="zoomable-container"
+        className="zoomable-container export-mode"
         ref={imageContainerRef}
         style={{
           position: 'absolute',
@@ -293,7 +293,7 @@ const ZoomableImage = ({
           height: `${coordinates?.height_in_px || 0}px`,
           top: `${coordinates?.top_in_px || 0}px`,
           left: `${coordinates?.left_in_px || 0}px`,
-          overflow: 'hidden',
+          overflow: 'visible',
           borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
           boxSizing: 'border-box'
         }}
@@ -306,7 +306,7 @@ const ZoomableImage = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            overflow: "hidden",
+            overflow: 'visible',
             borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
             position: "relative"
           }}
@@ -315,7 +315,7 @@ const ZoomableImage = ({
             <div style={{
               width: "100%",
               height: "100%",
-              overflow: "hidden",
+              overflow: 'visible',
               borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
               position: "relative"
             }}>
@@ -345,7 +345,7 @@ const ZoomableImage = ({
             <div style={{
               width: "100%",
               height: "100%",
-              overflow: "hidden",
+              overflow: 'visible',
               borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
               position: "relative"
             }}>
@@ -455,20 +455,21 @@ const ZoomableImage = ({
           excluded: ['button', 'a'],
           padPinch: false,
           bounds: "parent",
-          touchPadding: 50 // Touch area for better experience
+          touchPadding: 50, // Touch area for better experience
+          panningFactor: isMobile ? 1.5 : 1 // Increase sensitivity on mobile
         }}
         velocityAnimation={{
           disabled: false, // Enable for smoother mobile experience
-          sensitivity: 1,
+          sensitivity: isMobile ? 1.5 : 1, // Higher sensitivity on mobile
           animationTime: 300,
           equalToMove: true
         }}
         wheel={{
-          step: 0.1,
+          step: isMobile ? 0.15 : 0.1, // More sensitive on mobile
           touchPadding: isMobile ? 100 : 50 // More sensitive on mobile
         }}
         pinch={{
-          step: isMobile ? 10 : 5, // More sensitive pinch zoom on mobile
+          step: isMobile ? 15 : 5, // More sensitive pinch zoom on mobile
           disabled: false
         }}
         scalePadding={{
@@ -499,17 +500,20 @@ const ZoomableImage = ({
             wrapperStyle={{
               width: '100%',
               height: '100%',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              touchAction: 'none' // Prevent default touch actions
             }}
             contentStyle={{
               width: '100%',
               height: '100%',
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
+              touchAction: 'none' // Prevent default touch actions
             }}
             wrapperProps={{
-              'data-high-res': 'true'
+              'data-high-res': 'true',
+              'touch-action': 'none' // Additional attribute for older browsers
             }}
           >
             <div
@@ -588,7 +592,9 @@ const ZoomableImage = ({
                     objectPosition: "center",
                     imageRendering: "high-quality",
                     borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
-                    touchAction: "none" // Prevents browser handling of gestures
+                    touchAction: "none", // Prevents browser handling of gestures
+                    WebkitUserSelect: "none", // Prevent selection on iOS
+                    WebkitTouchCallout: "none" // Prevent callout on iOS
                   }}
                   crossOrigin="anonymous"
                   loading="eager"
@@ -609,7 +615,9 @@ const ZoomableImage = ({
                     objectPosition: "center",
                     imageRendering: "high-quality",
                     borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
-                    touchAction: "none" // Prevents browser handling of gestures
+                    touchAction: "none", // Prevents browser handling of gestures
+                    WebkitUserSelect: "none", // Prevent selection on iOS
+                    WebkitTouchCallout: "none" // Prevent callout on iOS
                   }}
                   crossOrigin="anonymous"
                   loading="eager"
