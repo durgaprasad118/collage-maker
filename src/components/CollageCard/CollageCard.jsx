@@ -19,6 +19,10 @@ const CollageCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  // Text states
+  const [customText, setCustomText] = useState({});
+  const [inputValues, setInputValues] = useState({});
+
   const [allTemplates, setAllTemplates] = useState([]);
   const [currentTemplate, setCurrentTemplate] = useState(null);
   const [error, setError] = useState(null);
@@ -41,6 +45,64 @@ const CollageCard = () => {
     handleMultipleImageDrop,
     handleMultipleImageSelect,
   } = useImageUpload(currentTemplate);
+
+  // Input change handler
+  const handleInputChange = useCallback((name, value) => {
+    if (name.includes('date')) {
+      setInputValues(prev => ({
+        ...prev,
+        [name]: value
+      }));
+
+      if (value) {
+        const date = new Date(value);
+        const dayName = date.toLocaleString('en-US', { weekday: 'long' });
+        const monthName = date.toLocaleString('en-US', { month: 'long' });
+        const day = date.getDate();
+        
+        // Get ordinal suffix
+        let ordinalSuffix = 'th';
+        if (day === 1 || day === 21 || day === 31) ordinalSuffix = 'st';
+        else if (day === 2 || day === 22) ordinalSuffix = 'nd';
+        else if (day === 3 || day === 23) ordinalSuffix = 'rd';
+        
+        const formattedDate = `${dayName}, ${monthName} ${day}${ordinalSuffix}`;
+        
+        setCustomText(prev => ({
+          ...prev,
+          [name]: formattedDate
+        }));
+      }
+    } 
+    else if (name.includes('time')) {
+      setInputValues(prev => ({
+        ...prev,
+        [name]: value
+      }));
+
+      if (value) {
+        const [hours, minutes] = value.split(':');
+        const time = new Date();
+        time.setHours(hours, minutes);
+        const formattedTime = time.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }).toLowerCase();
+        
+        setCustomText(prev => ({
+          ...prev,
+          [name]: formattedTime
+        }));
+      }
+    } 
+    else {
+      setCustomText(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  }, []);
 
   // Template data fetching
   useEffect(() => {
@@ -94,12 +156,19 @@ const CollageCard = () => {
   // Handle image upload modal opening with auto-focus on file input
   const handleAddImageClick = useCallback(() => {
     setIsEditModalOpen(true);
-    // Focus on the file input field after modal opens
-    setTimeout(() => {
-      const fileInput = document.getElementById('multiple-photo-input');
-      if (fileInput) fileInput.click();
-    }, 300);
-  }, []);
+    // Check if template has text fields to prefill tab selection
+    const hasTextFields = currentTemplate?.texts && currentTemplate.texts.length > 0;
+    
+    // Store current active tab in session storage to remember user's preference
+    if (hasTextFields) {
+      try {
+        const lastTab = sessionStorage.getItem('lastActiveTab') || 'images';
+        sessionStorage.setItem('lastActiveTab', lastTab);
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+  }, [currentTemplate]);
 
   if (error) {
     return <div className="error-screen">{error}</div>;
@@ -113,6 +182,7 @@ const CollageCard = () => {
           {currentTemplate && renderTemplateContent({
             template: currentTemplate,
             photos,
+            customText,
             allTemplates,
             currentIndex,
             setCurrentIndex,
@@ -129,13 +199,16 @@ const CollageCard = () => {
         setIsEditModalOpen,
         currentTemplate,
         photos,
+        customText,
+        inputValues,
         uploadError,
         handleDrag,
         handleDrop,
         handlePhotoRemove,
         handlePhotoChange,
         handleMultipleImageDrop,
-        handleMultipleImageSelect
+        handleMultipleImageSelect,
+        handleInputChange
       })}
 
       {/* Action buttons */}

@@ -402,6 +402,9 @@ export const renderImageUploadModal = ({
   const isCollage = imageCount > 1;
   const cardType = isCollage ? "Collage" : "Birthday";
 
+  // Create a unique ID for the file input to prevent duplicates
+  const fileInputId = isCollage ? "multiple-photo-input" : "photo-input-0";
+
   return {
     isCollage,
     imageCount,
@@ -457,7 +460,7 @@ export const renderImageUploadModal = ({
         // Multiple image upload for collage
         return (
           <div className="collage-upload-container">
-            <label htmlFor="multiple-photo-input" className="file-drop-area" style={{
+            <label htmlFor={fileInputId} className="file-drop-area" style={{
               width: '100%',
               minHeight: '200px',
               borderRadius: '12px',
@@ -499,7 +502,7 @@ export const renderImageUploadModal = ({
                   className="upload-button" 
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById('multiple-photo-input').click();
+                    document.getElementById(fileInputId).click();
                   }}
                   style={{
                     background: '#5D5FEF',
@@ -522,7 +525,7 @@ export const renderImageUploadModal = ({
               </div>
             </label>
             <input
-              id="multiple-photo-input"
+              id={fileInputId}
               type="file"
               accept="image/*"
               multiple
@@ -536,7 +539,7 @@ export const renderImageUploadModal = ({
         return (
           <div className="file-upload-container" style={{ width: '100%' }}>
             {!photos.photo_0 ? (
-              <label htmlFor="photo-input-0" className="file-drop-area" style={{
+              <label htmlFor={fileInputId} className="file-drop-area" style={{
                 width: '100%',
                 minHeight: '200px',
                 borderRadius: '12px',
@@ -578,7 +581,7 @@ export const renderImageUploadModal = ({
                     className="upload-button" 
                     onClick={(e) => {
                       e.preventDefault();
-                      document.getElementById('photo-input-0').click();
+                      document.getElementById(fileInputId).click();
                     }}
                     style={{
                       background: '#5D5FEF',
@@ -633,7 +636,7 @@ export const renderImageUploadModal = ({
                 }}>
                   <button
                     className="action-button change-button"
-                    onClick={() => document.getElementById('photo-input-0').click()}
+                    onClick={() => document.getElementById(fileInputId).click()}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -683,7 +686,7 @@ export const renderImageUploadModal = ({
               </div>
             )}
             <input
-              id="photo-input-0"
+              id={fileInputId}
               type="file"
               accept="image/*"
               onChange={(e) => {
@@ -795,7 +798,7 @@ export const renderImageUploadModal = ({
                   border: '1px dashed #5D5FEF'
                 }}
                 onClick={() => {
-                  document.getElementById('multiple-photo-input').click();
+                  document.getElementById(fileInputId).click();
                 }}
                 >
                   <div className="image-number" style={{

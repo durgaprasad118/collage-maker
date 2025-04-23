@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Grid, ArrowLeft } from "lucide-react";
+import { X, Grid, ArrowLeft, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { renderImageUploadModal } from "./ImageUploadManager";
 import ZoomableImage from "../components/shared/ZoomableImage"; 
@@ -16,6 +16,11 @@ export const renderTemplateGallery = ({
 }) => {
   if (!showTemplateGallery) return null;
 
+  let cardTypeName = "Card";
+  if (cardType === "birthday") cardTypeName = "Card";
+  else if (cardType === "collage") cardTypeName = "Collage";
+  else if (cardType === "wedding") cardTypeName = "Wedding Card";
+
   return (
     <div className="template-gallery-overlay">
       <div className="template-gallery-header">
@@ -24,7 +29,7 @@ export const renderTemplateGallery = ({
           onClick={() => setShowTemplateGallery(false)}
         >
           <ArrowLeft size={24} />
-          <span>Back to {cardType === "birthday" ? "Card" : "Collage"}</span>
+          <span>Back to {cardTypeName}</span>
         </button>
         <h2>Select Template</h2>
       </div>
@@ -57,6 +62,8 @@ export const renderModal = ({
   setIsEditModalOpen,
   currentTemplate,
   photos,
+  customText = {},
+  inputValues = {},
   uploadError,
   handleDrag,
   handleDrop,
@@ -64,6 +71,7 @@ export const renderModal = ({
   handlePhotoChange,
   handleMultipleImageDrop,
   handleMultipleImageSelect,
+  handleInputChange
 }) => {
   if (!isEditModalOpen) return null;
 
@@ -82,7 +90,63 @@ export const renderModal = ({
     handleMultipleImageSelect,
   });
 
-  if (!uploadModal) return null;
+  // Determine if we should show tabs (if template has both images and texts)
+  const hasImages = currentTemplate?.images && currentTemplate.images.length > 0;
+  const hasTexts = currentTemplate?.texts && currentTemplate.texts.length > 0;
+  const hasNameTexts = currentTemplate?.texts?.some(text => 
+    text.name.includes('name') || text.name.includes('groom') || text.name.includes('bride')
+  );
+  const showTabs = hasImages && hasTexts;
+  
+  if (!uploadModal && !hasTexts) return null;
+  
+  // Instead of using hooks, create regular variables and render conditionally
+  let activeTab = 'images';
+  
+  // Try to get the last active tab from session storage
+  try {
+    const lastTab = sessionStorage.getItem('lastActiveTab');
+    if (lastTab && (lastTab === 'images' || lastTab === 'text')) {
+      activeTab = lastTab;
+    }
+  } catch (e) {
+    // Ignore storage errors
+  }
+  
+  // If template only has images, force the active tab to be 'images'
+  // If template only has texts, force the active tab to be 'text'
+  if (!hasImages && hasNameTexts) {
+    activeTab = 'text';
+  } else if (!hasNameTexts && hasImages) {
+    activeTab = 'images';
+  }
+
+  // Get the modal title based on active tab and card type
+  let modalTitle = "Edit Content";
+  if (currentTemplate) {
+    if (activeTab === 'images') {
+      modalTitle = uploadModal ? uploadModal.headerTitle : "Upload Images";
+    } else {
+      modalTitle = "Edit Text";
+    }
+  }
+
+  // Create a function to handle tab changes
+  const handleTabChange = (tab) => {
+    activeTab = tab;
+    
+    // Store the active tab in session storage
+    try {
+      sessionStorage.setItem('lastActiveTab', tab);
+    } catch (e) {
+      // Ignore storage errors
+    }
+    
+    // Force a re-render through the parent component
+    // by hiding/showing the modal
+    setIsEditModalOpen(false);
+    setTimeout(() => setIsEditModalOpen(true), 0);
+  };
 
   return (
     <div className="modal-overlay" style={{
@@ -95,18 +159,33 @@ export const renderModal = ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 1000
+      zIndex: 1000,
+      padding: '16px'
     }}>
       <div className="modal-content" style={{
-        ...uploadModal.modalStyles.content,
         width: '100%',
         maxWidth: '550px',
         maxHeight: '90vh',
+        borderRadius: '16px',
         overflow: 'hidden',
-        boxSizing: 'border-box'
+        display: 'flex',
+        flexDirection: 'column',
+        background: '#1E1E1E',
+        border: 'none',
+        boxSizing: 'border-box',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
       }}>
-        <div className="modal-header" style={uploadModal.modalStyles.header}>
-          <h2 style={{margin: 0, fontWeight: '600', fontSize: '20px'}}>{uploadModal.headerTitle}</h2>
+        <div className="modal-header" style={{
+          padding: '20px',
+          borderBottom: '1px solid #333',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: '#1E1E1E',
+          color: 'white',
+          boxSizing: 'border-box'
+        }}>
+          <h2 style={{margin: 0, fontWeight: '600', fontSize: '20px'}}>{modalTitle}</h2>
           <button
             className="close-button"
             onClick={() => setIsEditModalOpen(false)}
@@ -123,18 +202,110 @@ export const renderModal = ({
           </button>
         </div>
 
+        {showTabs && (
+          <div className="modal-tabs" style={{
+            display: 'flex',
+            borderBottom: '1px solid #333',
+            background: '#1E1E1E'
+          }}>
+            <button
+              className={`tab-button ${activeTab === 'images' ? 'active' : ''}`}
+              onClick={() => handleTabChange('images')}
+              style={{
+                flex: 1,
+                padding: '12px',
+                border: 'none',
+                background: activeTab === 'images' ? '#2A2A2A' : 'transparent',
+                color: activeTab === 'images' ? '#5D5FEF' : '#888',
+                fontWeight: activeTab === 'images' ? '600' : '400',
+                borderBottom: activeTab === 'images' ? '2px solid #5D5FEF' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Images
+            </button>
+            <button
+              className={`tab-button ${activeTab === 'text' ? 'active' : ''}`}
+              onClick={() => handleTabChange('text')}
+              style={{
+                flex: 1,
+                padding: '12px',
+                border: 'none',
+                background: activeTab === 'text' ? '#2A2A2A' : 'transparent',
+                color: activeTab === 'text' ? '#5D5FEF' : '#888',
+                fontWeight: activeTab === 'text' ? '600' : '400',
+                borderBottom: activeTab === 'text' ? '2px solid #5D5FEF' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Text
+            </button>
+          </div>
+        )}
+
         <div className="modal-body" style={{
-          ...uploadModal.modalStyles.body,
+          padding: '24px',
+          flex: '1 1 auto',
           overflowY: 'auto',
           overflowX: 'hidden',
           maxHeight: 'calc(90vh - 140px)',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          background: '#1E1E1E',
+          color: 'white'
         }}>
-          {uploadModal.renderUploadArea()}
-          {uploadModal.renderPreviewGrid()}
+          {showTabs ? (
+            // If we have tabs, show content based on active tab
+            activeTab === 'images' ? (
+              // Images tab content
+              hasImages && uploadModal && (
+                <>
+                  {uploadModal.renderUploadArea()}
+                  {uploadModal.renderPreviewGrid()}
+                </>
+              )
+            ) : (
+              // Text tab content - show all text fields
+              hasTexts && (
+                renderTextInputs({
+                  currentTemplate,
+                  customText,
+                  inputValues,
+                  handleInputChange
+                })
+              )
+            )
+          ) : (
+            // If no tabs, render the appropriate content directly
+            <>
+              {hasImages && uploadModal && (
+                <>
+                  {uploadModal.renderUploadArea()}
+                  {uploadModal.renderPreviewGrid()}
+                </>
+              )}
+              
+              {hasTexts && !hasImages && (
+                renderTextInputs({
+                  currentTemplate,
+                  customText,
+                  inputValues,
+                  handleInputChange
+                })
+              )}
+            </>
+          )}
         </div>
 
-        <div className="modal-footer" style={uploadModal.modalStyles.footer}>
+        <div className="modal-footer" style={{
+          padding: '20px',
+          borderTop: '1px solid #333',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          background: '#1E1E1E',
+          boxSizing: 'border-box'
+        }}>
           <button
             className="primary-button"
             onClick={() => setIsEditModalOpen(false)}
@@ -147,7 +318,9 @@ export const renderModal = ({
               fontSize: '16px',
               fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              width: '100%', // Make button full width on mobile
+              maxWidth: '180px' // Limit width on larger screens
             }}
           >
             Done
@@ -198,7 +371,7 @@ export const renderTemplateContent = ({
           />
         );
       })}
-      {cardType === "birthday" && template?.texts?.map((text, index) => (
+      {template?.texts && template.texts.length > 0 && template.texts.map((text, index) => (
         <div
           key={index}
           className="text-overlay"
@@ -215,6 +388,12 @@ export const renderTemplateContent = ({
               ".ttf",
               ""
             )}, sans-serif`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: text.text_configs.text_alignment.toLowerCase() === "center" ? "center" : 
+                          text.text_configs.text_alignment.toLowerCase() === "right" ? "flex-end" : "flex-start",
+            overflow: "hidden",
+            wordBreak: "break-word"
           }}
         >
           {customText[text.name] || text.text_configs.sample_text}
@@ -540,6 +719,16 @@ export const handleWhatsAppShare = async (customText = {}) => {
       }\n📍 ${
         customText.birthday_venue || "Venue TBA"
       }\n\nJoin us for this special celebration! 🎂`;
+    } else if (customText.bride_name || customText.groom_name) {
+      message = `💍 *Wedding Invitation* 💍\n\n${
+        customText.bride_name || "[Bride]"
+      } & ${
+        customText.groom_name || "[Groom]"
+      }\n\n📅 ${customText.wedding_date || "Date TBA"}\n⏰ ${
+        customText.wedding_time || "Time TBA"
+      }\n📍 ${
+        customText.wedding_venue || "Venue TBA"
+      }\n\nWe request the honor of your presence as we unite in marriage 💕`;
     } else {
       message = `✨ Check out this awesome creation I made with Card Maker! ✨`;
     }
@@ -590,10 +779,20 @@ export const renderActionButtons = ({
           type="button" 
           className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-600 transition-colors duration-200"
           onClick={() => {
-            if (cardType === "birthday") {
-              window.location.href = "/BirthdayLibrary";
-            } else {
-              window.location.href = "/CollageLibrary";
+            // Navigate to the appropriate library based on card type
+            switch(cardType) {
+              case "birthday":
+                window.location.href = "/BirthdayLibrary";
+                break;
+              case "collage":
+                window.location.href = "/CollageLibrary";
+                break;
+              case "wedding":
+                window.location.href = "/WeddingLibrary";
+                break;
+              default:
+                window.location.href = "/";
+                break;
             }
           }}
         >
@@ -655,6 +854,306 @@ export const renderActionButtons = ({
           <div className="tooltip-arrow" data-popper-arrow></div>
         </div>
       </div>
+    </div>
+  );
+};
+
+/**
+ * Renders text input fields based on template text configuration,
+ * with appropriate input types for different fields
+ */
+export const renderTextInputs = ({
+  currentTemplate,
+  customText = {},
+  inputValues = {},
+  handleInputChange
+}) => {
+  if (!currentTemplate?.texts || currentTemplate.texts.length === 0) {
+    return null;
+  }
+
+  // Group fields by their purpose for better organization
+  const nameFields = currentTemplate.texts.filter(text => 
+    text.name.includes('name') || text.name.includes('groom') || text.name.includes('bride'));
+  
+  const dateFields = currentTemplate.texts.filter(text => 
+    text.name.includes('date'));
+    
+  const timeFields = currentTemplate.texts.filter(text => 
+    text.name.includes('time'));
+    
+  const venueFields = currentTemplate.texts.filter(text => 
+    text.name.includes('venue') || text.name.includes('location'));
+    
+  const otherFields = currentTemplate.texts.filter(text => 
+    !text.name.includes('name') && 
+    !text.name.includes('groom') && 
+    !text.name.includes('bride') && 
+    !text.name.includes('date') && 
+    !text.name.includes('time') && 
+    !text.name.includes('venue') &&
+    !text.name.includes('location'));
+  
+  // Get placeholders from sample_text when available
+  const getPlaceholder = (field) => {
+    return field.text_configs.sample_text || 
+           `Enter ${field.name.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())}`;
+  };
+
+  // Get the field label text
+  const getFieldLabel = (field) => {
+    // Extract the main part of the name (e.g., "Groom" from "wedding_groom_name")
+    const nameParts = field.name.split('_');
+    
+    // Try to find a meaningful part of the name
+    for (const part of ['name', 'groom', 'bride', 'date', 'time', 'venue', 'location']) {
+      const partIndex = nameParts.findIndex(p => p === part);
+      if (partIndex >= 0) {
+        return nameParts[partIndex].charAt(0).toUpperCase() + nameParts[partIndex].slice(1);
+      }
+    }
+    
+    // Fallback to the full formatted name
+    return field.name.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+  };
+
+  // Determine if there are fields to display
+  const hasAnyFields = nameFields.length > 0 || dateFields.length > 0 || 
+                       timeFields.length > 0 || venueFields.length > 0 || 
+                       otherFields.length > 0;
+
+  if (!hasAnyFields) return null;
+
+  return (
+    <div className="input-sections" style={{ width: '100%', paddingTop: '10px' }}>
+      {/* Names Section */}
+      {nameFields.length > 0 && (
+        <div className="input-section" style={{ marginBottom: '24px' }}>
+          <div className="fields-grid" style={{
+            display: 'flex',
+            flexDirection: nameFields.length >= 2 ? 'row' : 'column',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            {nameFields.map((field, index) => (
+              <div key={index} className="input-group" style={{ 
+                marginBottom: '8px',
+                flex: nameFields.length >= 2 ? '1 1 calc(50% - 8px)' : '1 1 100%',
+                minWidth: '200px'
+              }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '15px',
+                  fontWeight: '500',
+                  color: '#e0e0e0'
+                }}>
+                  {getFieldLabel(field)}
+                </label>
+                <input
+                  type="text"
+                  value={customText[field.name] || ''}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  placeholder={getPlaceholder(field)}
+                  maxLength={field.text_configs.char_limit || 30}
+                  style={{
+                    fontSize: '16px',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #333',
+                    background: '#2A2A2A',
+                    color: 'white',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Date Fields Section */}
+      {dateFields.length > 0 && (
+        <div className="input-section" style={{ marginBottom: '24px' }}>
+          <div className="fields-grid" style={{
+            display: 'flex',
+            flexDirection: dateFields.length >= 2 ? 'row' : 'column',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            {dateFields.map((field, index) => (
+              <div key={index} className="input-group" style={{ 
+                marginBottom: '8px',
+                flex: dateFields.length >= 2 ? '1 1 calc(50% - 8px)' : '1 1 100%',
+                minWidth: '200px'
+              }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '15px',
+                  fontWeight: '500',
+                  color: '#e0e0e0'
+                }}>
+                  {getFieldLabel(field)}
+                </label>
+                <input
+                  type="date"
+                  value={inputValues[field.name] || ''}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  style={{
+                    fontSize: '16px',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #333',
+                    background: '#2A2A2A',
+                    color: 'white',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Time Fields Section */}
+      {timeFields.length > 0 && (
+        <div className="input-section" style={{ marginBottom: '24px' }}>
+          <div className="fields-grid" style={{
+            display: 'flex',
+            flexDirection: timeFields.length >= 2 ? 'row' : 'column',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            {timeFields.map((field, index) => (
+              <div key={index} className="input-group" style={{ 
+                marginBottom: '8px',
+                flex: timeFields.length >= 2 ? '1 1 calc(50% - 8px)' : '1 1 100%',
+                minWidth: '200px'
+              }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '15px',
+                  fontWeight: '500',
+                  color: '#e0e0e0'
+                }}>
+                  {getFieldLabel(field)}
+                </label>
+                <input
+                  type="time"
+                  value={inputValues[field.name] || ''}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  style={{
+                    fontSize: '16px',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #333',
+                    background: '#2A2A2A',
+                    color: 'white',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Venue Fields Section */}
+      {venueFields.length > 0 && (
+        <div className="input-section" style={{ marginBottom: '24px' }}>
+          <div className="fields-grid" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
+            {venueFields.map((field, index) => (
+              <div key={index} className="input-group" style={{ 
+                marginBottom: '8px'
+              }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '15px',
+                  fontWeight: '500',
+                  color: '#e0e0e0'
+                }}>
+                  {getFieldLabel(field)}
+                </label>
+                <textarea
+                  value={customText[field.name] || ''}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  placeholder={getPlaceholder(field)}
+                  maxLength={field.text_configs.char_limit || 100}
+                  style={{
+                    fontSize: '16px',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #333',
+                    background: '#2A2A2A',
+                    color: 'white',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    minHeight: '80px',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Other Fields Section */}
+      {otherFields.length > 0 && (
+        <div className="input-section" style={{ marginBottom: '24px' }}>
+          <div className="fields-grid" style={{
+            display: 'flex',
+            flexDirection: otherFields.length >= 2 ? 'row' : 'column',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            {otherFields.map((field, index) => (
+              <div key={index} className="input-group" style={{ 
+                marginBottom: '8px',
+                flex: otherFields.length >= 2 ? '1 1 calc(50% - 8px)' : '1 1 100%',
+                minWidth: '200px'
+              }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '15px',
+                  fontWeight: '500',
+                  color: '#e0e0e0'
+                }}>
+                  {getFieldLabel(field)}
+                </label>
+                <input
+                  type="text"
+                  value={customText[field.name] || ''}
+                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                  placeholder={getPlaceholder(field)}
+                  maxLength={field.text_configs.char_limit || 50}
+                  style={{
+                    fontSize: '16px',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '1px solid #333',
+                    background: '#2A2A2A',
+                    color: 'white',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

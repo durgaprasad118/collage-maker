@@ -7,9 +7,11 @@ import './App.css';
 const HomePage = React.lazy(() => import('./components/HomePage/HomePage'));
 const Card = React.lazy(() => import('./components/Card/Card'));
 const BirthdayCard = React.lazy(() => import('./components/BirthdayCard/BirthdayCard'));
+const WeddingCard = React.lazy(() => import('./components/WeddingCard/WeddingCard'));
 const TemplateLibrary = React.lazy(() => import('./components/TemplateLibrary/TemplateLibrary'));
 const BirthdayLibrary = React.lazy(() => import('./components/BirthdayLibrary/BirthdayLibrary'));
 const CollageLibrary = React.lazy(() => import('./components/CollageLibrary/CollageLibrary'));
+const WeddingLibrary = React.lazy(() => import('./components/WeddingLibrary/WeddingLibrary'));
 
 const LoadingFallback = () => (
   <div className="loading-screen">
@@ -28,9 +30,11 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/card/:id" element={<Card />} />
             <Route path="/birthday/:id" element={<BirthdayCard />} />
+            <Route path="/wedding/:id" element={<WeddingCard />} />
             <Route path="/TemplateLibrary" element={<TemplateLibrary />} />
             <Route path="/BirthdayLibrary" element={<BirthdayLibrary />} />
             <Route path="/CollageLibrary" element={<CollageLibrary />} />
+            <Route path="/WeddingLibrary" element={<WeddingLibrary />} />
             <Route path="/collage/:id" element={<CollageCard />} />
             <Route
               path="*"

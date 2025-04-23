@@ -9,21 +9,12 @@ const HomePage = () => {
 
   // Dummy image URLs as fallbacks
   const dummyImages = {
-    wedding: 'https://via.placeholder.com/400x600/141927/ffffff?text=Wedding+Cards',
     birthday: 'https://via.placeholder.com/400x600/141927/ffffff?text=Birthday+Cards',
-    collage: 'https://via.placeholder.com/400x600/141927/ffffff?text=Photo+Collages'
+    collage: 'https://via.placeholder.com/400x600/141927/ffffff?text=Photo+Collages',
+    wedding: 'https://via.placeholder.com/400x600/141927/ffffff?text=Wedding+Cards'
   };
 
   const categories = [
-    {
-      id: 'wedding',
-      title: 'Wedding Cards',
-      description: 'Beautiful cards for your special day',
-      image: '/Wedding-Templates/id_1/thumbnail.jpg',
-      fallbackImage: dummyImages.wedding,
-      path: '/TemplateLibrary',
-      icon: '💍'
-    },
     {
       id: 'birthday',
       title: 'Birthday Cards',
@@ -41,19 +32,28 @@ const HomePage = () => {
       fallbackImage: dummyImages.collage,
       path: '/CollageLibrary',
       icon: '📸'
+    },
+    {
+      id: 'wedding',
+      title: 'Wedding Cards',
+      description: 'Beautiful cards for your special day',
+      image: '/Wedding-Templates/id_1/thumbnail.jpg',
+      fallbackImage: dummyImages.wedding,
+      path: '/WeddingLibrary',
+      icon: '💍'
     }
   ];
 
   const handleCategoryClick = (category) => {
     switch(category.id) {
-      case 'wedding':
-        navigate('/TemplateLibrary');
-        break;
       case 'birthday':
         navigate('/BirthdayLibrary');
         break;
       case 'collage':
         navigate('/CollageLibrary');
+        break;
+      case 'wedding':
+        navigate('/WeddingLibrary');
         break;
       default:
         navigate('/');

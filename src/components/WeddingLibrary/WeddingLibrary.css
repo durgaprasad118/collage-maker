@@ -1,0 +1,10 @@
+/* Wedding Library specific styles */
+body.wedding-library {
+  background: linear-gradient(135deg, #f8f4ff 0%, #e2f0ff 100%);
+}
+
+.wedding-theme-bg {
+  background-color: rgba(144, 104, 190, 0.1);
+}
+
+/* Inherits most styles from the generic template library */ 

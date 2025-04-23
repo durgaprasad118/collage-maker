@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import "./BirthdayCard.css";
+import "../BirthdayCard/BirthdayCard.css"; // Reuse the same CSS
 import { useImageUpload } from "../../utils/ImageUploadManager";
 import {
   renderModal,
@@ -22,22 +22,23 @@ import downloadIcon from "../../assets/icons/Download_Icon.svg";
 import editIcon from "../../assets/icons/Edit_Icon.svg";
 
 
-const BirthdayCard = () => {
+const WeddingCard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
 
   // Initialize states
   const [customText, setCustomText] = useState({
-    birthday_name: "",
-    birthday_date: "",
-    birthday_time: "",
-    birthday_venue: "",
+    bride_name: "",
+    groom_name: "",
+    wedding_date: "",
+    wedding_time: "",
+    wedding_venue: "",
   });
 
   const [inputValues, setInputValues] = useState({
-    birthday_date: "",
-    birthday_time: "",
+    wedding_date: "",
+    wedding_time: "",
   });
 
   const [allTemplates, setAllTemplates] = useState([]);
@@ -173,8 +174,8 @@ const BirthdayCard = () => {
     const fetchTemplateData = async () => {
       setIsLoading(true);
       try {
-        console.log("Fetching birthday template data for ID:", id);
-        const response = await fetch("/data/birthday.json");
+        console.log("Fetching wedding template data for ID:", id);
+        const response = await fetch("/data/wedding.json");
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
 
@@ -208,13 +209,13 @@ const BirthdayCard = () => {
     fetchTemplateData();
   }, [id]);
 
-  // Add birthday-card-active class to body when component mounts
+  // Add wedding-card-active class to body when component mounts
   useEffect(() => {
-    document.body.classList.add('birthday-card-active');
+    document.body.classList.add('wedding-card-active');
     
     // Clean up function to remove the class when component unmounts
     return () => {
-      document.body.classList.remove('birthday-card-active');
+      document.body.classList.remove('wedding-card-active');
     };
   }, []);
 
@@ -235,7 +236,7 @@ const BirthdayCard = () => {
             currentIndex,
             setCurrentIndex,
             setCurrentTemplate,
-            cardType: "birthday"
+            cardType: "wedding"
           })}
         </div>
       </div>
@@ -265,10 +266,10 @@ const BirthdayCard = () => {
         handleDownload: handleDownloadCard,
         editIcon,
         downloadIcon,
-        cardType: "birthday"
+        cardType: "wedding"
       })}
     </div>
   );
 };
 
-export default BirthdayCard;
+export default WeddingCard; 
