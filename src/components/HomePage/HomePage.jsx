@@ -108,14 +108,14 @@ const HomePage = () => {
       <div className="hero-section">
         <div className="hero-content container mx-auto px-4">
           <h1 className="hero-title animate__animated animate__fadeInUp">
-            Design Beautiful <span className="text-highlight">Cards</span>
+            Make Stunning Photo Collages with Your Photos
           </h1>
           <div className="glowing-line animate__animated animate__fadeInUp animate__delay-1s"></div>
           <p className="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-            Express your emotions through our elegant designs
+            Choose from beautiful templates that fit your photos perfectly
           </p>
           <div className="hero-cta animate__animated animate__fadeInUp animate__delay-2s">
-            <p className="cta-text">Choose a category to begin creating</p>
+            <p className="cta-text">👉 Choose a category to begin creating</p>
           </div>
         </div>
       </div>
@@ -153,13 +153,13 @@ const HomePage = () => {
           <div className="features-grid">
             <div className="feature-item">
               <div className="feature-icon">✨</div>
-              <h3 className="feature-title">Stunning Templates</h3>
-              <p className="feature-description">Choose from our collection of professionally designed templates</p>
+              <h3 className="feature-title">Express Your Moments</h3>
+              <p className="feature-description">Express your moments, emotions, and memories with personalized designs</p>
             </div>
             <div className="feature-item">
-              <div className="feature-icon">🎨</div>
-              <h3 className="feature-title">Easy Customization</h3>
-              <p className="feature-description">Personalize every detail to match your style</p>
+              <div className="feature-icon">🔍</div>
+              <h3 className="feature-title">Perfect Template</h3>
+              <p className="feature-description">Start by selecting a template that brings your story to life</p>
             </div>
             <div className="feature-item">
               <div className="feature-icon">📱</div>

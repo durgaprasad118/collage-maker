@@ -3,14 +3,14 @@
     "images": [
       {
         "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
-        "template": "/Wedding-Templates/templetes/8.png",
+        "template": "/Wedding-Templates/templetes/12.png",
         "name": "wedding_groom_image",
         "sample_image": "/Wedding-Templates/default-images/couple.png",
         "coordinates": {
-          "width_in_px": 272,
-          "height_in_px": 308,
-          "top_in_px": 200,
-          "left_in_px": 4,
+          "width_in_px": 553,
+          "height_in_px": 586,
+          "top_in_px": 424,
+          "left_in_px": 3,
           "width": 74.81,
           "height": 25,
           "top": 50.31,
@@ -19,14 +19,11 @@
       },
       {
         "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
-        "template": "/Wedding-Templates/templetes/8.png",
+        "template": "/Wedding-Templates/templetes/12.png",
         "name": "wedding_groom_image",
         "sample_image": "/Wedding-Templates/default-images/couple.png",
         "coordinates": {
-          "width_in_px": 272,
-          "height_in_px": 308,
-          "top_in_px": 202,
-          "left_in_px":265,
+          "width_in_px": 553, "height_in_px": 586, "top_in_px": 424, "left_in_px": 517,
           "width": 74.81,
           "height": 25,
           "top": 50.31,
