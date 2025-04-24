@@ -7,13 +7,13 @@
         "name": "wedding_groom_image",
         "sample_image": "/Wedding-Templates/default-images/couple.png",
         "coordinates": {
-          "width_in_px": 553,
+          "width_in_px": 600,
           "height_in_px": 586,
           "top_in_px": 424,
           "left_in_px": 3,
-          "width": 74.81,
-          "height": 25,
-          "top": 50.31,
+          "width": 100,
+          "height": 100,
+          "top": 100,
           "left": 50.73
         }
       },
@@ -25,8 +25,8 @@
         "coordinates": {
           "width_in_px": 553, "height_in_px": 586, "top_in_px": 424, "left_in_px": 517,
           "width": 74.81,
-          "height": 25,
-          "top": 50.31,
+          "height": 100,
+          "top": 100,
           "left": 50.73
         }
       }
@@ -39,14 +39,14 @@
           "size": 40,
           "char_limit": 30,
           "text_alignment": "CENTER",
-          "color": "#efefef",
+          "color": "black",
           "sample_text": "Pawan"
         },
         "coordinates": {
-          "width_in_px": 185,
-          "height_in_px": 50,
-          "top_in_px": 621,
-          "left_in_px": 62,
+          "width_in_px": 397,
+          "height_in_px": 64,
+          "top_in_px": 972,
+          "left_in_px": 346,
           "width": 34.26,
           "height": 5.21,
           "top": 67.61,
@@ -60,14 +60,14 @@
           "size": 40,
           "char_limit": 30,
           "text_alignment": "CENTER",
-          "color": "#efefef",
+          "color": "black",
           "sample_text": "Samantha"
         },
         "coordinates": {
-          "width_in_px": 185,
-          "height_in_px": 50,
-          "top_in_px": 621,
-          "left_in_px": 294,
+          "width_in_px": 397,
+          "height_in_px": 64,
+          "top_in_px": 1122,
+          "left_in_px": 343,
           "width": 34.26,
           "height": 5.21,
           "top": 67.3,
@@ -78,17 +78,17 @@
         "name": "wedding_date",
         "text_configs": {
           "font_id": "Tinos-Regular.ttf",
-          "size": 27,
+          "size": 44,
           "char_limit": 30,
           "text_alignment": "CENTER",
-          "color": "#efefef",
-          "sample_text": "Hi Brochiller!!!"
+          "color": "black",
+          "sample_text": "20-01-2025"
         },
         "coordinates": {
-          "width_in_px": 282,
-          "height_in_px": 50,
-          "top_in_px": 762,
-          "left_in_px": 126,
+          "width_in_px": 397,
+          "height_in_px": 97,
+          "top_in_px": 1345,
+          "left_in_px": 318,
           "width": 52.22,
           "height": 5.21,
           "top": 81.98,
@@ -96,20 +96,20 @@
         }
       },
       {
-        "name": "wedding_time",
+        "name": "wedding_place",
         "text_configs": {
           "font_id": "Tinos-Regular.ttf",
-          "size": 27,
+          "size": 44,
           "char_limit": 30,
           "text_alignment": "CENTER",
-          "color": "#efefef",
-          "sample_text": "Hi Brochiller!!!"
+          "color": "black",
+          "sample_text": "Hyderabad"
         },
         "coordinates": {
-          "width_in_px": 174,
-          "height_in_px": 50,
-          "top_in_px": 830,
-          "left_in_px": 179,
+          "width_in_px": 397,
+          "height_in_px": 97,
+          "top_in_px": 1583,
+          "left_in_px": 335,
           "width": 32.22,
           "height": 5.21,
           "top": 89.06,

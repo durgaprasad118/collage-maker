@@ -69,7 +69,7 @@ const ZoomableImage = ({
   }, [backgroundImage, image, coordinates]);
 
   // Initialize with saved transform values if available
-  const initialScale = savedTransform?.scale || 1.3;
+  const initialScale = savedTransform?.scale || 1;
   const initialPositionX = savedTransform?.position?.x || 0;
   const initialPositionY = savedTransform?.position?.y || 0;
 
@@ -306,15 +306,15 @@ const ZoomableImage = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            overflow: 'visible',
+            overflow: 'hidden',
             borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
             position: "relative"
           }}
         >
           {backgroundImage ? (
             <div style={{
-              width: "100%",
               height: "100%",
+              width: "100%",
               overflow: 'visible',
               borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
               position: "relative"
@@ -504,7 +504,6 @@ const ZoomableImage = ({
               touchAction: 'none' // Prevent default touch actions
             }}
             contentStyle={{
-              width: '100%',
               height: '100%',
               display: 'flex',
               justifyContent: 'center',
@@ -518,13 +517,11 @@ const ZoomableImage = ({
           >
             <div
               style={{
-                width: "100%",
-                height: "100%",
                 backgroundColor: backgroundImage ? 'transparent' : '#f0f0f0',
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                overflow: "hidden",
+                overflow: 'visible',
                 borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
                 position: "relative"
               }}
@@ -609,7 +606,7 @@ const ZoomableImage = ({
                   style={{
                     minWidth: "100%",
                     minHeight: "100%",
-                    width: "100%",
+
                     height: "100%",
                     objectFit: "cover",
                     objectPosition: "center",
