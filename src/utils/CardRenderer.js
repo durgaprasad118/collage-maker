@@ -1,8 +1,144 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { X, Grid, ArrowLeft, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { renderImageUploadModal, validateTextFields, showTextFieldsAlert } from "./ImageUploadManager";
 import ZoomableImage from "../components/shared/ZoomableImage"; 
+/**
+ * Preloads all images for a template to ensure they load simultaneously
+ */
+export const preloadTemplateImages = (template, photos = {}, callback) => {
+  if (!template || !template.images || template.images.length === 0) {
+    callback();
+    return;
+  }
+
+  // Create a loading overlay
+  const loadingOverlay = document.createElement('div');
+  Object.assign(loadingOverlay.style, {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    zIndex: 9999,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column'
+  });
+
+  const loadingText = document.createElement('div');
+  loadingText.textContent = 'Loading template...';
+  Object.assign(loadingText.style, {
+    color: '#fff',
+    fontSize: '18px',
+    marginTop: '15px'
+  });
+
+  const spinner = document.createElement('div');
+  Object.assign(spinner.style, {
+    width: '40px',
+    height: '40px',
+    border: '4px solid rgba(255, 255, 255, 0.3)',
+    borderRadius: '50%',
+    borderTop: '4px solid #fff',
+    animation: 'spin 1s linear infinite'
+  });
+  
+  // Add keyframes for spinner animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  loadingOverlay.appendChild(spinner);
+  loadingOverlay.appendChild(loadingText);
+  document.body.appendChild(loadingOverlay);
+
+  // Create a generic image loader function
+  const loadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      if (!src) {
+        resolve(); // Skip if src is undefined
+        return;
+      }
+      
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => {
+        console.error(`Failed to load image: ${src}`);
+        resolve(); // Resolve anyway to prevent blocking
+      };
+      img.src = src;
+    });
+  };
+  
+  // Collect all images to preload
+  const promises = [];
+  
+  // 1. Load the base template image
+  promises.push(loadImage(template.images[0]?.template));
+  
+  // 2. Load all placeholder images if they exist
+  template.images.forEach((image, index) => {
+    if (image.placeholder) {
+      promises.push(loadImage(image.placeholder));
+    }
+  });
+  
+  // 3. Load all user-uploaded photos if they exist
+  Object.values(photos).forEach(photoUrl => {
+    if (photoUrl) {
+      promises.push(loadImage(photoUrl));
+    }
+  });
+  
+  // Track loading progress
+  let totalImages = promises.length;
+  let loadedImages = 0;
+  
+  const updateProgress = () => {
+    loadedImages++;
+    const percentage = Math.round((loadedImages / totalImages) * 100);
+    loadingText.textContent = `Loading template... ${percentage}%`;
+  };
+  
+  // Create wrapped promises that update progress
+  const trackedPromises = promises.map(promise => 
+    promise.then(() => {
+      updateProgress();
+      return promise;
+    })
+  );
+
+  // Wait for all images to load
+  Promise.all(trackedPromises)
+    .then(() => {
+      // Small delay for smooth transition
+      setTimeout(() => {
+        if (document.body.contains(loadingOverlay)) {
+          document.body.removeChild(loadingOverlay);
+          document.head.removeChild(style);
+        }
+        callback();
+      }, 300);
+    })
+    .catch(error => {
+      console.error("Error loading images:", error);
+      // Still remove the overlay and proceed even if there are errors
+      if (document.body.contains(loadingOverlay)) {
+        document.body.removeChild(loadingOverlay);
+        document.head.removeChild(style);
+      }
+      callback();
+    });
+};
+
 /**
  * Renders the template gallery overlay
  */
@@ -351,9 +487,9 @@ export const renderModal = ({
 };
 
 /**
- * Renders the template content with images
+ * Component that renders the template content with images
  */
-export const renderTemplateContent = ({
+const TemplateContent = ({
   template,
   photos,
   customText = {}, // Optional for collage cards
@@ -364,62 +500,126 @@ export const renderTemplateContent = ({
   cardType,
   onAddImageClick, // Optional callback for collage cards
 }) => {
-  return (
-    <div className="template-content">
-      <img
-        src={template?.images[0]?.template}
-        alt="Base Template"
-        className="base-template"
-      />
-      {template?.images.map((image, index) => {
-        const photoKey = `photo_${index}`;
-        return (
-          <ZoomableImage
-            key={index}
-            image={image}
-            coordinates={image.coordinates}
-            backgroundImage={photos[photoKey]}
-            allTemplates={allTemplates}
-            currentIndex={currentIndex}
-            setCurrentIndex={setCurrentIndex}
-            currentTemplate={template}
-            setCurrentTemplate={setCurrentTemplate}
-            cardType={cardType}
-            index={index}
-            onAddImageClick={onAddImageClick}
+  // Use state to track when content is ready to display
+  const [isLoading, setIsLoading] = useState(true);
+  const [templateContent, setTemplateContent] = useState(null);
+
+  // Add spinner animation style to document
+  useEffect(() => {
+    // Create style element for spinner animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 4px solid #fff;
+        animation: spin 1s linear infinite;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Cleanup function to remove style on unmount
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
+    
+    preloadTemplateImages(template, photos, () => {
+      // Create the template content once images are loaded
+      const content = (
+        <div className="template-content">
+          <img
+            src={template?.images[0]?.template}
+            alt="Base Template"
+            className="base-template"
           />
-        );
-      })}
-      {template?.texts && template.texts.length > 0 && template.texts.map((text, index) => (
-        <div
-          key={index}
-          className="text-overlay"
-          style={{
-            position: "absolute",
-            width: `${text.coordinates.width_in_px}px`,
-            height: `${text.coordinates.height_in_px}px`,
-            top: `${text.coordinates.top_in_px}px`,
-            left: `${text.coordinates.left_in_px}px`,
-            fontSize: `${text.text_configs.size}px`,
-            color: text.text_configs.color,
-            textAlign: text.text_configs.text_alignment.toLowerCase(),
-            fontFamily: `${text.text_configs.font_id.replace(
-              ".ttf",
-              ""
-            )}, sans-serif`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: text.text_configs.text_alignment.toLowerCase() === "center" ? "center" : 
-                          text.text_configs.text_alignment.toLowerCase() === "right" ? "flex-end" : "flex-start",
-            overflow: "hidden",
-            wordBreak: "break-word"
-          }}
-        >
-          {customText[text.name] || text.text_configs.sample_text}
+          {template?.images.map((image, index) => {
+            const photoKey = `photo_${index}`;
+            return (
+              <ZoomableImage
+                key={index}
+                image={image}
+                coordinates={image.coordinates}
+                backgroundImage={photos[photoKey]}
+                allTemplates={allTemplates}
+                currentIndex={currentIndex}
+                setCurrentIndex={setCurrentIndex}
+                currentTemplate={template}
+                setCurrentTemplate={setCurrentTemplate}
+                cardType={cardType}
+                index={index}
+                onAddImageClick={onAddImageClick}
+              />
+            );
+          })}
+          {template?.texts && template.texts.length > 0 && template.texts.map((text, index) => (
+            <div
+              key={index}
+              className="text-overlay"
+              style={{
+                position: "absolute",
+                width: `${text.coordinates.width_in_px}px`,
+                height: `${text.coordinates.height_in_px}px`,
+                top: `${text.coordinates.top_in_px}px`,
+                left: `${text.coordinates.left_in_px}px`,
+                fontSize: `${text.text_configs.size}px`,
+                color: text.text_configs.color,
+                textAlign: text.text_configs.text_alignment.toLowerCase(),
+                fontFamily: `${text.text_configs.font_id.replace(
+                  ".ttf",
+                  ""
+                )}, sans-serif`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: text.text_configs.text_alignment.toLowerCase() === "center" ? "center" : 
+                              text.text_configs.text_alignment.toLowerCase() === "right" ? "flex-end" : "flex-start",
+                overflow: "hidden",
+                wordBreak: "break-word"
+              }}
+            >
+              {customText[text.name] || text.text_configs.sample_text}
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  );
+      );
+      
+      setTemplateContent(content);
+      setIsLoading(false);
+    });
+  }, [template, photos, customText, currentIndex, allTemplates, setCurrentIndex, setCurrentTemplate, cardType, onAddImageClick]);
+
+  if (isLoading) {
+    return (
+      <div className="template-loading-placeholder" style={{
+        width: '100%',
+        height: '400px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#1e1e1e'
+      }}>
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  return templateContent;
+};
+
+/**
+ * Wrapper function to maintain backward compatibility
+ */
+export const renderTemplateContent = (props) => {
+  return <TemplateContent {...props} />;
 };
 
 /**
