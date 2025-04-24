@@ -13,14 +13,10 @@ const GenericTemplateLibrary = ({
   thumbnailProcessor
 }) => {
   const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set loading to true only when we're actually fetching
-    setLoading(true);
-    
     // Set viewport meta tag for mobile responsiveness
     const viewportMeta = document.querySelector('meta[name="viewport"]');
     if (viewportMeta) {
@@ -48,17 +44,10 @@ const GenericTemplateLibrary = ({
       } catch (err) {
         console.error('Fetch error:', err);
         setError(`Error fetching ${title.toLowerCase()} templates. Please try again.`);
-      } finally {
-        setLoading(false);
       }
     };
     
-    // Only fetch if we haven't loaded templates yet
-    if (templates.length === 0) {
-      fetchTemplates();
-    } else {
-      setLoading(false);
-    }
+    fetchTemplates();
     
     // Clean up function
     return () => {
@@ -68,13 +57,7 @@ const GenericTemplateLibrary = ({
     };
   }, [dataUrl, title, thumbnailProcessor]);
 
-  if (loading) return (
-    <div className="min-h-screen bg-[#0F1725] flex items-center justify-center">
-      {/* Hidden loading spinner to avoid duplicating the Suspense loader */}
-      <div className="hidden">Loading templates...</div>
-    </div>
-  );
-  
+  // Only show error state, skip the loading state since Suspense handles it
   if (error) return (
     <div className="min-h-screen bg-[#0F1725] flex items-center justify-center text-white">
       <div className="text-center">
