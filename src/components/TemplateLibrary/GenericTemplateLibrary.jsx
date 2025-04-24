@@ -83,18 +83,20 @@ const GenericTemplateLibrary = ({
     <div className="bg-[#0F1725] min-h-screen">
       {/* Back to Home Button */}
       <button 
-        className="back-button absolute top-4 left-4 z-50 flex items-center gap-2 bg-gray-800/60 text-white px-3 py-2 rounded-md"
+        className="back-button absolute md:fixed top-4 left-4 z-50 flex items-center gap-2 bg-gray-800/60 text-white px-3 py-2 rounded-md"
         onClick={() => navigate('/')}
       >
         <ArrowLeft size={20} />
         <span>Back</span>
       </button>
       
-      {logoComponent && logoComponent}
+      <div className="pt-2 md:pt-0">
+        {logoComponent && logoComponent}
+      </div>
       <div className="template-library">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center pt-8">{title}</h1>
+        <h1 className="text-3xl font-bold text-white mb-4 text-center pt-2">{title}</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 place-items-center">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3  gap-x-4 gap-y-6 md:gap-4 place-items-center px-1">
           {templates.map((template) => (
             <div 
               key={template.id} 
@@ -105,17 +107,12 @@ const GenericTemplateLibrary = ({
               <img
                 src={template.thumbnail}
                 alt={`${title} Template ${template.numericId}`}
-                className="w-full h-full object-cover rounded-lg"
+                className="w-[90%] h-[80%] md:w-[100%] md:h-[100%] object-cover rounded-lg"
                 onError={(e) => (e.target.src = `https://via.placeholder.com/400x600/1a2438/ffffff?text=${placeholderText}`)}
                 loading="lazy"
               />
             </div>
           ))}
-        </div>
-        
-        {/* Mobile helper text */}
-        <div className="text-center text-gray-400 text-sm mt-6 md:hidden">
-          {helperText || "Tap on any template to customize"}
         </div>
       </div>
     </div>

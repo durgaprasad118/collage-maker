@@ -1,4 +1,16 @@
 /* Birthday Template Gallery specific styles */
 /* In most cases, styles will be inherited from TemplateLibrary.css */
 
-/* Any birthday-specific styling can be added here */ 
+/* Any birthday-specific styling can be added here */
+
+@media (max-width: 480px) {
+  /* Better spacing for birthday templates on mobile */
+  .template-grid-item {
+    margin-bottom: 5px;
+  }
+  
+  /* Ensure proper spacing from edges */
+  .template-library {
+    padding: 10px 15px;
+  }
+} 

@@ -16,7 +16,7 @@ const CollageLibrary = () => {
       navigatePath="/collage"
       placeholderText="Photo+Collage"
       helperText="Tap on any template to create your collage"
-      logoComponent={<Logo type="collage" />}
+      logoComponent={<Logo />}
       thumbnailProcessor={processThumbnail}
     />
   );

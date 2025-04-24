@@ -19,7 +19,7 @@ body {
   font-size: 2rem;
   font-weight: bold;
   color: white;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -151,21 +151,21 @@ body {
 
 @media (max-width: 480px) {
   .template-library {
-    padding: 10px 8px;
+    padding: 10px 12px;
   }
   
   .template-library h1 {
     font-size: 1.6rem;
     color:white;
     font-family: 'Poppins', sans-serif;
-    padding-top: 60px; /* Account for fixed headers */
+    padding-top: 10px;
     margin-bottom: 15px;
   }
 
   .template-grid {
     grid-template-columns: repeat(2, 1fr); /* Ensure two images per row */
-    gap: 10px;
-    padding: 3px;
+    /* gap: 12px; */
+    /* padding: 5px; */
   }
 
   .template-grid div {
@@ -178,7 +178,12 @@ body {
   
   /* Back button on small mobile */
   .back-button {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 1000;
     padding: 0.4rem 0.6rem;
+    background-color: rgba(31, 41, 55, 0.8);
   }
   
   .back-button span {
