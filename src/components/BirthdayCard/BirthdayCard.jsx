@@ -225,6 +225,15 @@ const BirthdayCard = () => {
   // Main render
   return (
     <div className={`main-container ${isEditModalOpen ? "modal-open" : ""}`}>
+      {/* Back to Library Button */}
+      <button 
+        className="back-button absolute top-4 left-4 z-50 flex items-center gap-2 bg-gray-800/60 text-white px-3 py-2 rounded-md"
+        onClick={() => navigate('/BirthdayLibrary')}
+      >
+        <ArrowLeft size={20} />
+        <span>Back</span>
+      </button>
+
       <div ref={containerRef} className="template-wrapper">
         <div className="template-positioning">
           {currentTemplate && renderTemplateContent({
