@@ -102,7 +102,6 @@ const GenericTemplateLibrary = ({
                 alt={`${title} Template ${template.numericId}`}
                 className="w-[90%] h-[80%] md:w-[100%] md:h-[100%] object-cover rounded-lg"
                 onError={(e) => (e.target.src = `https://via.placeholder.com/400x600/1a2438/ffffff?text=${placeholderText}`)}
-                loading="lazy"
               />
             </div>
           ))}
