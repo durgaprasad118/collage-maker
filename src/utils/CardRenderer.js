@@ -1,7 +1,7 @@
 import React from "react";
 import { X, Grid, ArrowLeft, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
-import { renderImageUploadModal } from "./ImageUploadManager";
+import { renderImageUploadModal, validateTextFields, showTextFieldsAlert } from "./ImageUploadManager";
 import ZoomableImage from "../components/shared/ZoomableImage"; 
 /**
  * Renders the template gallery overlay
@@ -78,7 +78,23 @@ export const renderModal = ({
   // Get upload modal elements from shared utility
   const uploadModal = renderImageUploadModal({
     isOpen: isEditModalOpen,
-    onClose: () => setIsEditModalOpen(false),
+    onClose: (targetTab) => {
+      if (targetTab === 'text') {
+        // Store the active tab in session storage
+        try {
+          sessionStorage.setItem('lastActiveTab', 'text');
+        } catch (e) {
+          // Ignore storage errors
+        }
+        
+        // Force a re-render with the text tab active
+        setIsEditModalOpen(false);
+        setTimeout(() => setIsEditModalOpen(true), 0);
+      } else {
+        // Just close the modal
+        setIsEditModalOpen(false);
+      }
+    },
     currentTemplate,
     photos,
     uploadError,
@@ -89,7 +105,7 @@ export const renderModal = ({
     handleMultipleImageDrop,
     handleMultipleImageSelect,
   });
-
+  
   // Determine if we should show tabs (if template has both images and texts)
   const hasImages = currentTemplate?.images && currentTemplate.images.length > 0;
   const hasTexts = currentTemplate?.texts && currentTemplate.texts.length > 0;
@@ -146,6 +162,27 @@ export const renderModal = ({
     // by hiding/showing the modal
     setIsEditModalOpen(false);
     setTimeout(() => setIsEditModalOpen(true), 0);
+  };
+
+  // Function to handle the Done button click in the text tab
+  const handleTextDoneClick = () => {
+    // Check if all required text fields are filled
+    if (validateTextFields(currentTemplate, customText, inputValues)) {
+      // All fields are filled, close the modal
+      setIsEditModalOpen(false);
+    } else {
+      // Some fields are empty, show alert
+      showTextFieldsAlert(
+        () => {
+          // User confirmed to proceed with sample texts
+          setIsEditModalOpen(false);
+        },
+        () => {
+          // User declined, keep the modal open
+          console.log("User wants to fill in all text fields");
+        }
+      );
+    }
   };
 
   return (
@@ -250,82 +287,64 @@ export const renderModal = ({
           flex: '1 1 auto',
           overflowY: 'auto',
           overflowX: 'hidden',
-          maxHeight: 'calc(90vh - 140px)',
-          boxSizing: 'border-box',
           background: '#1E1E1E',
-          color: 'white'
-        }}>
-          {showTabs ? (
-            // If we have tabs, show content based on active tab
-            activeTab === 'images' ? (
-              // Images tab content
-              hasImages && uploadModal && (
-                <>
-                  {uploadModal.renderUploadArea()}
-                  {uploadModal.renderPreviewGrid()}
-                </>
-              )
-            ) : (
-              // Text tab content - show all text fields
-              hasTexts && (
-                renderTextInputs({
-                  currentTemplate,
-                  customText,
-                  inputValues,
-                  handleInputChange
-                })
-              )
-            )
-          ) : (
-            // If no tabs, render the appropriate content directly
-            <>
-              {hasImages && uploadModal && (
-                <>
-                  {uploadModal.renderUploadArea()}
-                  {uploadModal.renderPreviewGrid()}
-                </>
-              )}
-              
-              {hasTexts && !hasImages && (
-                renderTextInputs({
-                  currentTemplate,
-                  customText,
-                  inputValues,
-                  handleInputChange
-                })
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="modal-footer" style={{
-          padding: '20px',
-          borderTop: '1px solid #333',
-          display: 'flex',
-          justifyContent: 'flex-end',
-          background: '#1E1E1E',
+          color: 'white',
           boxSizing: 'border-box'
         }}>
-          <button
-            className="primary-button"
-            onClick={() => setIsEditModalOpen(false)}
-            style={{
-              background: '#5D5FEF',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '12px 48px',
-              fontSize: '16px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              width: '100%', // Make button full width on mobile
-              maxWidth: '180px' // Limit width on larger screens
-            }}
-          >
-            Done
-          </button>
+          {activeTab === 'images' && uploadModal && (
+            <>
+              {uploadModal.renderUploadArea()}
+              {uploadModal.renderPreviewGrid && uploadModal.renderPreviewGrid()}
+            </>
+          )}
+          
+          {activeTab === 'text' && (
+            <div className="text-inputs-container">
+              {renderTextInputs({ currentTemplate, customText, inputValues, handleInputChange })}
+            </div>
+          )}
         </div>
+        
+        {activeTab === 'images' && uploadModal && uploadModal.renderFooter && (
+          <div className="modal-footer" style={{
+            padding: '20px',
+            borderTop: '1px solid #333',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            background: '#1E1E1E',
+            boxSizing: 'border-box'
+          }}>
+            {uploadModal.renderFooter()}
+          </div>
+        )}
+        
+        {activeTab === 'text' && (
+          <div className="modal-footer" style={{
+            padding: '20px',
+            borderTop: '1px solid #333',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            background: '#1E1E1E',
+            boxSizing: 'border-box'
+          }}>
+            <button
+              onClick={handleTextDoneClick}
+              style={{
+                background: '#5D5FEF',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '10px 24px',
+                fontSize: '15px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Done
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -917,6 +936,11 @@ export const renderTextInputs = ({
     return field.name.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
   };
 
+  // Check if field is required (all fields are considered required for now)
+  const isFieldRequired = (field) => {
+    return true; // Making all fields required
+  };
+
   // Determine if there are fields to display
   const hasAnyFields = nameFields.length > 0 || dateFields.length > 0 || 
                        timeFields.length > 0 || venueFields.length > 0 || 
@@ -949,6 +973,7 @@ export const renderTextInputs = ({
                   color: '#e0e0e0'
                 }}>
                   {getFieldLabel(field)}
+                  {isFieldRequired(field) && <span style={{ color: '#FF4D4D', marginLeft: '4px' }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -996,6 +1021,7 @@ export const renderTextInputs = ({
                   color: '#e0e0e0'
                 }}>
                   {getFieldLabel(field)}
+                  {isFieldRequired(field) && <span style={{ color: '#FF4D4D', marginLeft: '4px' }}>*</span>}
                 </label>
                 <input
                   type="date"
@@ -1041,6 +1067,7 @@ export const renderTextInputs = ({
                   color: '#e0e0e0'
                 }}>
                   {getFieldLabel(field)}
+                  {isFieldRequired(field) && <span style={{ color: '#FF4D4D', marginLeft: '4px' }}>*</span>}
                 </label>
                 <input
                   type="time"
@@ -1083,6 +1110,7 @@ export const renderTextInputs = ({
                   color: '#e0e0e0'
                 }}>
                   {getFieldLabel(field)}
+                  {isFieldRequired(field) && <span style={{ color: '#FF4D4D', marginLeft: '4px' }}>*</span>}
                 </label>
                 <textarea
                   value={customText[field.name] || ''}
@@ -1131,6 +1159,7 @@ export const renderTextInputs = ({
                   color: '#e0e0e0'
                 }}>
                   {getFieldLabel(field)}
+                  {isFieldRequired(field) && <span style={{ color: '#FF4D4D', marginLeft: '4px' }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -1154,6 +1183,18 @@ export const renderTextInputs = ({
           </div>
         </div>
       )}
+
+      {/* Note about required fields */}
+      <div className="required-fields-note" style={{ 
+        marginTop: '16px', 
+        fontSize: '14px', 
+        color: '#aaa',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px'
+      }}>
+        <span style={{ color: '#FF4D4D' }}>*</span> Required fields
+      </div>
     </div>
   );
 };

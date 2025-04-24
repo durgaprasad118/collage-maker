@@ -8,6 +8,14 @@ export const memoryStorage = {
   textData: {}
 };
 
+// Add a custom modal state for alerts
+export const modalAlertState = {
+  isOpen: false,
+  message: '',
+  onConfirm: null,
+  onCancel: null
+};
+
 // Image Storage Service
 export const ImageStorageService = {
   saveImage: async (key, imageData) => {
@@ -252,12 +260,39 @@ export const useImageUpload = (currentTemplate) => {
     
     // Limit to the number of images in the template
     const imageCount = currentTemplate?.images?.length || 0;
+    
+    // If more images are dropped than required, limit to the first N
+    console.log(`Dropped ${files.length} images, template requires ${imageCount}`);
+    if (files.length > imageCount) {
+      console.log(`Limiting to first ${imageCount} images`);
+      showNotificationToast(`Using only the first ${imageCount} ${imageCount === 1 ? 'image' : 'images'} from your selection.`);
+    }
+    
     const filesToProcess = files.slice(0, imageCount);
+    
+    // Get the empty slots
+    const emptySlots = [];
+    for (let i = 0; i < imageCount; i++) {
+      const photoKey = `photo_${i}`;
+      if (!photos[photoKey]) {
+        emptySlots.push(i);
+      }
+    }
     
     // Process each file and save to the appropriate photo slot
     for (let i = 0; i < filesToProcess.length; i++) {
       const file = filesToProcess[i];
-      const photoKey = `photo_${i}`;
+      
+      // Find the first empty slot or use the next available slot in sequence
+      let targetIndex;
+      if (emptySlots.length > i) {
+        targetIndex = emptySlots[i];
+      } else {
+        // If no empty slots remain, we'll overwrite existing images starting from the beginning
+        targetIndex = i % imageCount;
+      }
+      
+      const photoKey = `photo_${targetIndex}`;
       
       if (validateImage(file)) {
         await handlePhotoChange(photoKey, file);
@@ -274,12 +309,39 @@ export const useImageUpload = (currentTemplate) => {
     
     // Limit to the number of images in the template
     const imageCount = currentTemplate?.images?.length || 0;
+    
+    // If more images are selected than required, limit to the first N
+    console.log(`Selected ${files.length} images, template requires ${imageCount}`);
+    if (files.length > imageCount) {
+      console.log(`Limiting to first ${imageCount} images`);
+      showNotificationToast(`Using only the first ${imageCount} ${imageCount === 1 ? 'image' : 'images'} from your selection.`);
+    }
+    
     const filesToProcess = files.slice(0, imageCount);
+    
+    // Get the empty slots
+    const emptySlots = [];
+    for (let i = 0; i < imageCount; i++) {
+      const photoKey = `photo_${i}`;
+      if (!photos[photoKey]) {
+        emptySlots.push(i);
+      }
+    }
     
     // Process each file and save to the appropriate photo slot
     for (let i = 0; i < filesToProcess.length; i++) {
       const file = filesToProcess[i];
-      const photoKey = `photo_${i}`;
+      
+      // Find the first empty slot or use the next available slot in sequence
+      let targetIndex;
+      if (emptySlots.length > i) {
+        targetIndex = emptySlots[i];
+      } else {
+        // If no empty slots remain, we'll overwrite existing images starting from the beginning
+        targetIndex = i % imageCount;
+      }
+      
+      const photoKey = `photo_${targetIndex}`;
       
       if (validateImage(file)) {
         await handlePhotoChange(photoKey, file);
@@ -381,6 +443,228 @@ export const useImageUpload = (currentTemplate) => {
   };
 };
 
+// Function to check if all required images are uploaded
+export const checkRequiredImages = (photos, imageCount) => {
+  if (!imageCount || imageCount <= 0) return true;
+  
+  // Count how many images are uploaded
+  let uploadedCount = 0;
+  for (let i = 0; i < imageCount; i++) {
+    if (photos[`photo_${i}`]) {
+      uploadedCount++;
+    }
+  }
+
+  // Return true if all images are uploaded, false otherwise
+  return uploadedCount === imageCount;
+};
+
+// Function to validate all required text fields
+export const validateTextFields = (currentTemplate, customText, inputValues) => {
+  if (!currentTemplate?.texts || currentTemplate.texts.length === 0) {
+    return true; // No text fields to validate
+  }
+  
+  // Check all text fields
+  for (const field of currentTemplate.texts) {
+    const isDateOrTime = field.name.includes('date') || field.name.includes('time');
+    const value = isDateOrTime ? inputValues[field.name] : customText[field.name];
+    
+    if (!value || value.trim() === '') {
+      return false; // Found an empty required field
+    }
+  }
+  
+  return true; // All fields are filled
+};
+
+// Function to show a modal alert for empty text fields
+export const showTextFieldsAlert = (onConfirm, onCancel) => {
+  const confirmMessage = `Some required text fields are empty. 
+Would you like to proceed with sample texts for the empty fields?`;
+  
+  showAlertModal(
+    confirmMessage,
+    () => {
+      console.log("User confirmed to use sample texts");
+      if (onConfirm) onConfirm();
+    },
+    () => {
+      console.log("User declined to use sample texts");
+      if (onCancel) onCancel();
+    }
+  );
+};
+
+// Function to directly create and show the alert modal
+export const showAlertModal = (message, onConfirm, onCancel) => {
+  console.log("showAlertModal called with message:", message);
+  
+  // Remove any existing modal first
+  const existingModal = document.getElementById('custom-alert-modal');
+  if (existingModal) {
+    document.body.removeChild(existingModal);
+  }
+  
+  // Create modal container
+  const modalContainer = document.createElement('div');
+  modalContainer.id = 'custom-alert-modal';
+  modalContainer.style.position = 'fixed';
+  modalContainer.style.top = '0';
+  modalContainer.style.left = '0';
+  modalContainer.style.right = '0';
+  modalContainer.style.bottom = '0';
+  modalContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+  modalContainer.style.display = 'flex';
+  modalContainer.style.alignItems = 'center';
+  modalContainer.style.justifyContent = 'center';
+  modalContainer.style.zIndex = '1100';
+  modalContainer.style.padding = '16px';
+  
+  // Create modal content
+  const modalContent = document.createElement('div');
+  modalContent.style.width = '100%';
+  modalContent.style.maxWidth = '400px';
+  modalContent.style.borderRadius = '16px';
+  modalContent.style.overflow = 'hidden';
+  modalContent.style.display = 'flex';
+  modalContent.style.flexDirection = 'column';
+  modalContent.style.background = '#1E1E1E';
+  modalContent.style.border = 'none';
+  modalContent.style.boxSizing = 'border-box';
+  modalContent.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+  
+  // Create header
+  const header = document.createElement('div');
+  header.style.padding = '20px';
+  header.style.borderBottom = '1px solid #333';
+  header.style.background = '#1E1E1E';
+  header.style.color = 'white';
+  header.style.boxSizing = 'border-box';
+  
+  const title = document.createElement('h2');
+  title.style.margin = '0';
+  title.style.fontWeight = '600';
+  title.style.fontSize = '18px';
+  title.textContent = 'Missing Images';
+  
+  header.appendChild(title);
+  
+  // Create body
+  const body = document.createElement('div');
+  body.style.padding = '24px';
+  body.style.background = '#1E1E1E';
+  body.style.color = 'white';
+  body.style.boxSizing = 'border-box';
+  body.style.fontSize = '15px';
+  body.style.lineHeight = '1.5';
+  body.textContent = message;
+  
+  // Create footer
+  const footer = document.createElement('div');
+  footer.style.padding = '20px';
+  footer.style.borderTop = '1px solid #333';
+  footer.style.display = 'flex';
+  footer.style.justifyContent = 'flex-end';
+  footer.style.gap = '12px';
+  footer.style.background = '#1E1E1E';
+  footer.style.boxSizing = 'border-box';
+  
+  // Create Cancel button
+  const cancelButton = document.createElement('button');
+  cancelButton.style.background = 'transparent';
+  cancelButton.style.color = '#fff';
+  cancelButton.style.border = '1px solid #5D5FEF';
+  cancelButton.style.borderRadius = '8px';
+  cancelButton.style.padding = '10px 24px';
+  cancelButton.style.fontSize = '15px';
+  cancelButton.style.fontWeight = '500';
+  cancelButton.style.cursor = 'pointer';
+  cancelButton.style.transition = 'all 0.2s ease';
+  cancelButton.textContent = 'Cancel';
+  
+  cancelButton.onclick = () => {
+    console.log("Cancel button clicked");
+    if (onCancel) onCancel();
+    document.body.removeChild(modalContainer);
+  };
+  
+  // Create Proceed button
+  const confirmButton = document.createElement('button');
+  confirmButton.style.background = '#5D5FEF';
+  confirmButton.style.color = 'white';
+  confirmButton.style.border = 'none';
+  confirmButton.style.borderRadius = '8px';
+  confirmButton.style.padding = '10px 24px';
+  confirmButton.style.fontSize = '15px';
+  confirmButton.style.fontWeight = '500';
+  confirmButton.style.cursor = 'pointer';
+  confirmButton.style.transition = 'all 0.2s ease';
+  confirmButton.textContent = 'Proceed';
+  
+  confirmButton.onclick = () => {
+    console.log("Proceed button clicked");
+    if (onConfirm) onConfirm();
+    document.body.removeChild(modalContainer);
+  };
+  
+  // Assemble modal
+  footer.appendChild(cancelButton);
+  footer.appendChild(confirmButton);
+  
+  modalContent.appendChild(header);
+  modalContent.appendChild(body);
+  modalContent.appendChild(footer);
+  
+  modalContainer.appendChild(modalContent);
+  
+  // Add to DOM
+  document.body.appendChild(modalContainer);
+  
+  console.log("Alert modal added to DOM");
+};
+
+// Function to handle the completion of the image upload process
+export const handleImageUploadCompletion = (photos, imageCount, onClose, currentTemplate) => {
+  console.log("handleImageUploadCompletion called", { photos, imageCount });
+  
+  if (checkRequiredImages(photos, imageCount)) {
+    // All images uploaded, close the modal
+    console.log("All images uploaded, closing modal");
+    const hasTextFields = currentTemplate?.texts && currentTemplate.texts.length > 0;
+    onClose(hasTextFields ? 'text' : null);
+    return true;
+  } else {
+    // Not all images uploaded, show alert
+    const uploadedCount = Object.values(photos).filter(Boolean).length;
+    const missingCount = imageCount - uploadedCount;
+    
+    console.log("Missing images", { uploadedCount, missingCount });
+    
+    const confirmMessage = `You've only uploaded ${uploadedCount} of ${imageCount} required images. 
+Would you like to proceed with default images for the remaining ${missingCount} ${missingCount === 1 ? 'slot' : 'slots'}?`;
+    
+    // Show the alert directly using our new function
+    showAlertModal(
+      confirmMessage,
+      () => {
+        console.log("User confirmed to use default images");
+        const hasTextFields = currentTemplate?.texts && currentTemplate.texts.length > 0;
+        onClose(hasTextFields ? 'text' : null);
+      },
+      () => {
+        console.log("User declined to use default images");
+      }
+    );
+    
+    return false;
+  }
+};
+
+// Replace the previous renderAlertModal with a simple empty implementation
+// since we're now directly manipulating the DOM
+export const renderAlertModal = () => null;
+
 // Shared upload modal component
 export const renderImageUploadModal = ({
   isOpen,
@@ -404,6 +688,41 @@ export const renderImageUploadModal = ({
 
   // Create a unique ID for the file input to prevent duplicates
   const fileInputId = isCollage ? "multiple-photo-input" : "photo-input-0";
+
+  // Function to handle clicking the Done button
+  const handleDoneClick = () => {
+    console.log("Done button clicked", { photos, imageCount });
+    
+    if (checkRequiredImages(photos, imageCount)) {
+      // All images uploaded, close the modal and switch to text tab if needed
+      console.log("All images uploaded, will check for text fields");
+      const hasTextFields = currentTemplate?.texts && currentTemplate.texts.length > 0;
+      onClose(hasTextFields ? 'text' : null); // Pass 'text' to switch to text tab if text fields exist
+      return true;
+    } else {
+      // Not all images uploaded, show custom alert modal
+      const uploadedCount = Object.values(photos).filter(Boolean).length;
+      const missingCount = imageCount - uploadedCount;
+      
+      const confirmMessage = `You've only uploaded ${uploadedCount} of ${imageCount} required images. 
+Would you like to proceed with default images for the remaining ${missingCount} ${missingCount === 1 ? 'slot' : 'slots'}?`;
+      
+      // Show the alert directly using our new function
+      showAlertModal(
+        confirmMessage,
+        () => {
+          console.log("User confirmed to use default images");
+          const hasTextFields = currentTemplate?.texts && currentTemplate.texts.length > 0;
+          onClose(hasTextFields ? 'text' : null); // Pass 'text' to switch to text tab if text fields exist
+        },
+        () => {
+          console.log("User declined to use default images");
+        }
+      );
+      
+      return false;
+    }
+  };
 
   return {
     isCollage,
@@ -454,6 +773,48 @@ export const renderImageUploadModal = ({
         background: '#1E1E1E',
         boxSizing: 'border-box'
       }
+    },
+    renderFooter: () => {
+      return (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: '12px'
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              color: '#fff',
+              border: '1px solid #5D5FEF',
+              borderRadius: '8px',
+              padding: '10px 24px',
+              fontSize: '15px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleDoneClick}
+            style={{
+              background: '#5D5FEF',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '10px 24px',
+              fontSize: '15px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            Done
+          </button>
+        </div>
+      );
     },
     renderUploadArea: () => {
       if (isCollage) {
@@ -623,66 +984,42 @@ export const renderImageUploadModal = ({
                     objectFit: 'cover'
                   }}
                 />
-                <div className="image-actions" style={{
-                  position: 'absolute',
-                  bottom: '0',
-                  left: '0',
-                  right: '0',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  backgroundColor: 'rgba(0, 0, 0, 0.7)'
-                }}>
-                  <button
-                    className="action-button change-button"
-                    onClick={() => document.getElementById(fileInputId).click()}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      background: '#5D5FEF',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '8px 16px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                    Change
-                  </button>
-                  <button
-                    className="action-button remove-button"
-                    onClick={() => handlePhotoRemove("photo_0")}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      background: '#FF4D4D',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '8px 16px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                    Remove
-                  </button>
-                </div>
+                <button
+                  className="single-remove-button"
+                  onClick={() => handlePhotoRemove("photo_0")}
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    backgroundColor: 'rgba(255, 0, 0, 0.7)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '28px',
+                    height: '28px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: 'white'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+                <div 
+                  className="image-click-area"
+                  onClick={() => document.getElementById(fileInputId).click()}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    cursor: 'pointer'
+                  }}
+                />
               </div>
             )}
             <input
@@ -846,4 +1183,58 @@ export const renderImageUploadModal = ({
       );
     }
   };
+};
+
+// Function to show a notification toast
+export const showNotificationToast = (message) => {
+  console.log("Showing notification:", message);
+  
+  // Remove any existing notification first
+  const existingToast = document.getElementById('notification-toast');
+  if (existingToast) {
+    document.body.removeChild(existingToast);
+  }
+  
+  // Create toast container
+  const toastContainer = document.createElement('div');
+  toastContainer.id = 'notification-toast';
+  toastContainer.style.position = 'fixed';
+  toastContainer.style.bottom = '20px';
+  toastContainer.style.left = '50%';
+  toastContainer.style.transform = 'translateX(-50%)';
+  toastContainer.style.backgroundColor = 'rgba(30, 30, 30, 0.95)';
+  toastContainer.style.color = 'white';
+  toastContainer.style.padding = '12px 20px';
+  toastContainer.style.borderRadius = '8px';
+  toastContainer.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.3)';
+  toastContainer.style.zIndex = '2000';
+  toastContainer.style.fontSize = '14px';
+  toastContainer.style.border = '1px solid #444';
+  toastContainer.style.display = 'flex';
+  toastContainer.style.alignItems = 'center';
+  toastContainer.style.gap = '8px';
+  
+  // Add info icon
+  const infoIcon = document.createElement('span');
+  infoIcon.innerHTML = '&#9432;'; // Info symbol
+  infoIcon.style.fontSize = '16px';
+  infoIcon.style.color = '#5D5FEF';
+  
+  // Add message
+  const messageEl = document.createElement('div');
+  messageEl.textContent = message;
+  
+  // Assemble toast
+  toastContainer.appendChild(infoIcon);
+  toastContainer.appendChild(messageEl);
+  
+  // Add to DOM
+  document.body.appendChild(toastContainer);
+  
+  // Automatically remove after 5 seconds
+  setTimeout(() => {
+    if (document.body.contains(toastContainer)) {
+      document.body.removeChild(toastContainer);
+    }
+  }, 5000);
 }; 
