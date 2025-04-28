@@ -28,14 +28,6 @@ export const preloadTemplateImages = (template, photos = {}, callback) => {
     flexDirection: 'column'
   });
 
-  const loadingText = document.createElement('div');
-  loadingText.textContent = 'Loading template...';
-  Object.assign(loadingText.style, {
-    color: '#fff',
-    fontSize: '18px',
-    marginTop: '15px'
-  });
-
   const spinner = document.createElement('div');
   Object.assign(spinner.style, {
     width: '40px',
@@ -57,7 +49,6 @@ export const preloadTemplateImages = (template, photos = {}, callback) => {
   document.head.appendChild(style);
   
   loadingOverlay.appendChild(spinner);
-  loadingOverlay.appendChild(loadingText);
   document.body.appendChild(loadingOverlay);
 
   // Create a generic image loader function
@@ -105,7 +96,6 @@ export const preloadTemplateImages = (template, photos = {}, callback) => {
   const updateProgress = () => {
     loadedImages++;
     const percentage = Math.round((loadedImages / totalImages) * 100);
-    loadingText.textContent = `Loading template... ${percentage}%`;
   };
   
   // Create wrapped promises that update progress
