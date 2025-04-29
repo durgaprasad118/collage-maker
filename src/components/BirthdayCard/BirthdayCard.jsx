@@ -26,6 +26,7 @@ const BirthdayCard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
+  const hasFetchedData = useRef(false);
 
   // Initialize states
   const [customText, setCustomText] = useState({
@@ -171,6 +172,9 @@ const BirthdayCard = () => {
   // Template data fetching
   useEffect(() => {
     const fetchTemplateData = async () => {
+      if (hasFetchedData.current) return;
+      hasFetchedData.current = true;
+      
       setIsLoading(true);
       try {
         console.log("Fetching birthday template data for ID:", id);
