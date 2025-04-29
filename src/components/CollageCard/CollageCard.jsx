@@ -171,6 +171,14 @@ const CollageCard = () => {
     }
   }, [currentTemplate]);
 
+  if (isLoading) {
+    return (
+      <div className="loading-spinner-container">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
   if (error) {
     return <div className="error-screen">{error}</div>;
   }
