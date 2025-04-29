@@ -1,16 +1,16 @@
 {
-  "id_2": {
+  "id_1": {
     "images": [
       {
-        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
-        "template": "/Wedding-Templates/templetes/12.png",
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/13.jpeg",
+        "template": "/Wedding-Templates/templetes/13.png",
         "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/couple.png",
+        "sample_image": "/Wedding-Templates/default-images/one.jpg",
         "coordinates": {
-          "width_in_px": 600,
-          "height_in_px": 586,
-          "top_in_px": 424,
-          "left_in_px": 3,
+          "width_in_px": 524,
+          "height_in_px": 619,
+          "top_in_px": 166,
+          "left_in_px": 1,
           "width": 100,
           "height": 100,
           "top": 100,
@@ -21,9 +21,48 @@
         "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
         "template": "/Wedding-Templates/templetes/12.png",
         "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/couple.png",
+        "sample_image": "/Wedding-Templates/default-images/two.jpg",
         "coordinates": {
-          "width_in_px": 553, "height_in_px": 586, "top_in_px": 424, "left_in_px": 517,
+          "width_in_px": 524, "height_in_px": 619, "top_in_px": 168, "left_in_px": 491,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/three.jpg",
+        "coordinates": {
+          "width_in_px": 524, "height_in_px": 619, "top_in_px": 168, "left_in_px": 491,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/four.jpg",
+        "coordinates": {
+          "width_in_px": 503, "height_in_px": 605, "top_in_px": 804, "left_in_px": 31,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/five.jpg",
+        "coordinates": {
+          "width_in_px": 503, "height_in_px": 605, "top_in_px": 806, "left_in_px": 503,
           "width": 74.81,
           "height": 100,
           "top": 100,
@@ -31,726 +70,273 @@
         }
       }
     ],
-    "texts": [
-      {
-        "name": "wedding_groom_name",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 40,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "black",
-          "sample_text": "Pawan"
-        },
-        "coordinates": {
-          "width_in_px": 397,
-          "height_in_px": 64,
-          "top_in_px": 972,
-          "left_in_px": 346,
-          "width": 34.26,
-          "height": 5.21,
-          "top": 67.61,
-          "left": 28.61
-        }
-      },
-      {
-        "name": "wedding_bride_name",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 40,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "black",
-          "sample_text": "Samantha"
-        },
-        "coordinates": {
-          "width_in_px": 397,
-          "height_in_px": 64,
-          "top_in_px": 1122,
-          "left_in_px": 343,
-          "width": 34.26,
-          "height": 5.21,
-          "top": 67.3,
-          "left": 71.57
-        }
-      },
-      {
-        "name": "wedding_date",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 44,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "black",
-          "sample_text": "20-01-2025"
-        },
-        "coordinates": {
-          "width_in_px": 397,
-          "height_in_px": 97,
-          "top_in_px": 1345,
-          "left_in_px": 318,
-          "width": 52.22,
-          "height": 5.21,
-          "top": 81.98,
-          "left": 49.44
-        }
-      },
-      {
-        "name": "wedding_place",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 44,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "black",
-          "sample_text": "Hyderabad"
-        },
-        "coordinates": {
-          "width_in_px": 397,
-          "height_in_px": 97,
-          "top_in_px": 1583,
-          "left_in_px": 335,
-          "width": 32.22,
-          "height": 5.21,
-          "top": 89.06,
-          "left": 49.26
-        }
-      }
-    ]
+    "texts":[]
   },
-  "id_3": {
+  "id_2": {
     "images": [
       {
-        "thumbnail": "/Wedding-Templates/templetes-thumbnail/3.jpeg",
-        "template": "/Wedding-Templates/templetes/3.png",
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/14.jpeg",
+        "template": "/Wedding-Templates/templetes/14.png",
         "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/couple.png",
+        "sample_image": "/Wedding-Templates/default-images/one.jpg",
         "coordinates": {
-          "width_in_px": 404,
-          "height_in_px": 240,
-          "top_in_px": 363,
-          "left_in_px": 80,
+          "width_in_px": 503,
+          "height_in_px": 546,
+          "top_in_px": 267,
+          "left_in_px": 13,
+          "width": 100,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/two.jpg",
+        "coordinates": {
+          "width_in_px": 503, "height_in_px": 546, "top_in_px": 267, "left_in_px": 497,
           "width": 74.81,
-          "height": 25,
-          "top": 50.31,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/three.jpg",
+        "coordinates": {
+          "width_in_px": 503, "height_in_px": 546, "top_in_px": 835, "left_in_px": 16,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/four.jpg",
+        "coordinates": {
+          "width_in_px": 503, "height_in_px": 546, "top_in_px": 835, "left_in_px": 489,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/five.jpg",
+        "coordinates": {
+          "width_in_px": 503, "height_in_px": 605, "top_in_px": 806, "left_in_px": 503,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
           "left": 50.73
         }
       }
     ],
-    "texts": [
-      {
-        "name": "wedding_groom_name",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 40,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#efefef",
-          "sample_text": "Pawan"
-        },
-        "coordinates": {
-          "width_in_px": 185,
-          "height_in_px": 50,
-          "top_in_px": 621,
-          "left_in_px": 62,
-          "width": 34.26,
-          "height": 5.21,
-          "top": 67.61,
-          "left": 28.61
-        }
-      },
-      {
-        "name": "wedding_bride_name",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 40,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#efefef",
-          "sample_text": "Samantha"
-        },
-        "coordinates": {
-          "width_in_px": 185,
-          "height_in_px": 50,
-          "top_in_px": 621,
-          "left_in_px": 294,
-          "width": 34.26,
-          "height": 5.21,
-          "top": 67.3,
-          "left": 71.57
-        }
-      },
-      {
-        "name": "wedding_date",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 27,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#efefef",
-          "sample_text": "Hi Brochiller!!!"
-        },
-        "coordinates": {
-          "width_in_px": 282,
-          "height_in_px": 50,
-          "top_in_px": 762,
-          "left_in_px": 126,
-          "width": 52.22,
-          "height": 5.21,
-          "top": 81.98,
-          "left": 49.44
-        }
-      },
-      {
-        "name": "wedding_time",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 27,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#efefef",
-          "sample_text": "Hi Brochiller!!!"
-        },
-        "coordinates": {
-          "width_in_px": 174,
-          "height_in_px": 50,
-          "top_in_px": 830,
-          "left_in_px": 179,
-          "width": 32.22,
-          "height": 5.21,
-          "top": 89.06,
-          "left": 49.26
-        }
-      }
-    ]
+    "texts":[]
   },
-  "id_4": {
+  "id_3": {
     "images": [
       {
-        "thumbnail": "/Wedding-Templates/templetes-thumbnail/4.jpeg",
-        "template": "/Wedding-Templates/templetes/4.png",
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/15.jpeg",
+        "template": "/Wedding-Templates/templetes/15.png",
         "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/groom.jpg",
+        "sample_image": "/Wedding-Templates/default-images/one.jpg",
         "coordinates": {
-          "width_in_px": 159,
-          "height_in_px": 345,
-          "top_in_px": 338,
-          "left_in_px": 120,
-          "width": 29.44,
-          "height": 35.94,
-          "top": 53.18,
-          "left": 36.94
+          "width_in_px": 461,
+          "height_in_px": 498,
+          "top_in_px": 240,
+          "left_in_px": 9,
+          "width": 100,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
         }
       },
       {
-        "name": "wedding_bride_image",
-        "sample_image": "/Wedding-Templates/default-images/bride.jpg",
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/two.jpg",
         "coordinates": {
-          "width_in_px": 159,
-          "height_in_px": 345,
-          "top_in_px": 338,
-          "left_in_px": 282,
-          "width": 29.44,
-          "height": 35.94,
-          "top": 53.18,
-          "left": 66.94
+          "width_in_px": 461, "height_in_px": 498, "top_in_px": 240, "left_in_px": 550,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/three.jpg",
+        "coordinates": {
+          "width_in_px": 437, "height_in_px": 413, "top_in_px": 1047, "left_in_px": 23,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/four.jpg",
+        "coordinates": {
+          "width_in_px": 437, "height_in_px": 413, "top_in_px": 1047, "left_in_px": 586,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/five.jpg",
+        "coordinates": {
+          "width_in_px": 437, "height_in_px": 339, "top_in_px": 735, "left_in_px": 299,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
         }
       }
     ],
-    "texts": [
+    "texts":[]
+  }
+  ,
+  "id_4": {
+    "images": [
       {
-        "name": "wedding_groom_name",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 30,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#ffffff",
-          "sample_text": "vishwa nath"
-        },
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/16.jpeg",
+        "template": "/Wedding-Templates/templetes/16.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/one.jpg",
         "coordinates": {
-          "width_in_px": 184,
-          "height_in_px": 50,
-          "top_in_px": 701,
-          "left_in_px": 74,
-          "width": 34.07,
-          "height": 5.21,
-          "top": 75.63,
-          "left": 30.73
+          "width_in_px": 481,
+          "height_in_px": 539,
+          "top_in_px": 176,
+          "left_in_px": 58,
+          "width": 100,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
         }
       },
       {
-        "name": "wedding_bride_name",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 30,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#efefef",
-          "sample_text": "deepika"
-        },
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/two.jpg",
         "coordinates": {
-          "width_in_px": 184,
-          "height_in_px": 50,
-          "top_in_px": 699,
-          "left_in_px": 302,
-          "width": 34.07,
-          "height": 5.21,
-          "top": 75.42,
-          "left": 72.97
+          "width_in_px": 481, "height_in_px": 539, "top_in_px": 182, "left_in_px": 529,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
         }
       },
       {
-        "name": "wedding_date",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 28,
-          "char_limit": 10,
-          "text_alignment": "right",
-          "color": "#efefef",
-          "sample_text": "20-01-2025"
-        },
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/three.jpg",
         "coordinates": {
-          "width_in_px": 276,
-          "height_in_px": 50,
-          "top_in_px": 832,
-          "left_in_px": 125,
-          "width": 51.11,
-          "height": 5.21,
-          "top": 88.86,
-          "left": 50.92
+          "width_in_px": 480, "height_in_px": 519, "top_in_px": 777, "left_in_px": 13,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
         }
       },
       {
-        "name": "wedding_venue",
-        "text_configs": {
-          "font_id": "Tinos-Regular.ttf",
-          "size": 30,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#ffffff",
-          "sample_text": "kavuri hills madhapur"
-        },
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/four.jpg",
         "coordinates": {
-          "width_in_px": 276,
-          "height_in_px": 50,
-          "top_in_px": 891,
-          "left_in_px": 137,
-          "width": 51.11,
-          "height": 5.21,
-          "top": 88.86,
-          "left": 50.92
+          "width_in_px": 480, "height_in_px": 519, "top_in_px": 777, "left_in_px": 524,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
         }
       }
-    ]
+    ],
+    "texts":[]
   },
   "id_5": {
     "images": [
       {
-        "thumbnail": "/Wedding-Templates/templetes-thumbnail/5.jpeg",
-        "template": "/Wedding-Templates/templetes/5.png",
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/17.jpeg",
+        "template": "/Wedding-Templates/templetes/17.png",
         "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/couple.png",
+        "sample_image": "/Wedding-Templates/default-images/one.jpg",
         "coordinates": {
-          "width_in_px": 290,
-          "height_in_px": 216,
-          "top_in_px": 364,
-          "left_in_px": 127,
-          "width": 43.89,
-          "height": 20.83,
-          "top": 32.19,
-          "left": 26.75
+          "width_in_px": 475,
+          "height_in_px": 496,
+          "top_in_px": 136,
+          "left_in_px": 15,
+          "width": 100,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/two.jpg",
+        "coordinates": {
+          "width_in_px": 475, "height_in_px": 496, "top_in_px": 136, "left_in_px": 519,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/three.jpg",
+        "coordinates": {
+          "width_in_px": 475, "height_in_px": 469, "top_in_px": 711, "left_in_px": 20,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
+        }
+      },
+      {
+        "thumbnail": "/Wedding-Templates/templetes-thumbnail/8.jpg",
+        "template": "/Wedding-Templates/templetes/12.png",
+        "name": "wedding_groom_image",
+        "sample_image": "/Wedding-Templates/default-images/four.jpg",
+        "coordinates": {
+          "width_in_px": 475, "height_in_px": 469, "top_in_px": 711, "left_in_px": 525,
+          "width": 74.81,
+          "height": 100,
+          "top": 100,
+          "left": 50.73
         }
       }
     ],
-    "texts": [
-      {
-        "name": "wedding_groom_name",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 30,
-          "char_limit": 10,
-          "text_alignment": "CENTER",
-          "color": "#c74251",
-          "sample_text": "Raj"
-        },
-        "coordinates": {
-          "width_in_px": 96,
-          "height_in_px": 42,
-          "top_in_px": 600,
-          "left_in_px": 124,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 47.08,
-          "left": 24.25
-        }
-      },
-      {
-        "name": "wedding_bride_name",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 30,
-          "char_limit": 10,
-          "text_alignment": "CENTER",
-          "color": "#c74251",
-          "sample_text": "Vaishu"
-        },
-        "coordinates": {
-          "width_in_px": 140,
-          "height_in_px": 42,
-          "top_in_px": 600,
-          "left_in_px": 290,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 46.77,
-          "left": 75.56
-        }
-      },
-      {
-        "name": "wedding_date",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 25,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#4c3826",
-          "sample_text": "20-01-2025"
-        },
-        "coordinates": {
-          "width_in_px": 245,
-          "height_in_px": 52,
-          "top_in_px": 664,
-          "left_in_px": 158,
-          "width": 32.96,
-          "height": 5.21,
-          "top": 72.92,
-          "left": 50
-        }
-      },
-      {
-        "name": "wedding_time",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 25,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#4c3826",
-          "sample_text": "23:00"
-        },
-        "coordinates": {
-          "width_in_px": 216,
-          "height_in_px": 45,
-          "top_in_px": 705,
-          "left_in_px": 170,
-          "width": 60,
-          "height": 5.21,
-          "top": 81.98,
-          "left": 50.74
-        }
-      },
-      {
-        "name": "wedding_venue",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 25,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#4c3826",
-          "sample_text": "kavuri hills madhapur"
-        },
-        "coordinates": {
-          "width_in_px": 183,
-          "height_in_px": 51,
-          "top_in_px": 760,
-          "left_in_px": 190,
-          "width": 60,
-          "height": 5.21,
-          "top": 92.61,
-          "left": 51.3
-        }
-      }
-    ]
-  },
-  "id_6": {
-    "images": [
-      {
-        "thumbnail": "/Wedding-Templates/templetes-thumbnail/6.jpeg",
-        "template": "/Wedding-Templates/templetes/6.png",
-        "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/groom.jpg",
-        "coordinates": {
-          "width_in_px": 182,
-          "height_in_px": 183,
-          "top_in_px": 444,
-          "left_in_px": 86,
-          "width": 43.89,
-          "height": 20.83,
-          "top": 32.19,
-          "left": 26.75
-        }
-      },
-      {
-        "name": "wedding_bride_image",
-        "sample_image": "/Wedding-Templates/default-images/bride.jpg",
-        "coordinates": {
-          "width_in_px": 179,
-          "height_in_px": 181,
-          "top_in_px": 444,
-          "left_in_px": 286,
-          "width": 43.89,
-          "height": 20.83,
-          "top": 32.39,
-          "left": 74.35
-        }
-      }
-    ],
-    "texts": [
-      {
-        "name": "wedding_groom_name",
-        "text_configs": {
-          "font_id": "Montserrat-SemiBold.ttf",
-          "size": 30,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#ffffff",
-          "sample_text": "Venkat"
-        },
-        "coordinates": {
-          "width_in_px": 266,
-          "height_in_px": 74,
-          "top_in_px": 632,
-          "left_in_px": 10,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 47.08,
-          "left": 24.25
-        }
-      },
-      {
-        "name": "wedding_bride_name",
-        "text_configs": {
-          "font_id": "Montserrat-SemiBold.ttf",
-          "size": 30,
-          "char_limit": 30,
-          "text_alignment": "Start",
-          "color": "#ffffff",
-          "sample_text": "Priya"
-        },
-        "coordinates": {
-          "width_in_px": 223,
-          "height_in_px": 47,
-          "top_in_px": 650,
-          "left_in_px": 270,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 46.77,
-          "left": 75.56
-        }
-      },
-      {
-        "name": "wedding_date",
-        "text_configs": {
-          "font_id": "Montserrat-Regular",
-          "size": 25,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#ffffff",
-          "sample_text": "Hi Brochiller!!!"
-        },
-        "coordinates": {
-          "width_in_px": 335,
-          "height_in_px": 30,
-          "top_in_px": 759,
-          "left_in_px": 120,
-          "width": 32.96,
-          "height": 5.21,
-          "top": 72.92,
-          "left": 50
-        }
-      },
-      {
-        "name": "wedding_time",
-        "text_configs": {
-          "font_id": "Montserrat-Regular",
-          "size": 25,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#ffffff",
-          "sample_text": "23:00"
-        },
-        "coordinates": {
-          "width_in_px": 311,
-          "height_in_px": 28,
-          "top_in_px": 794,
-          "left_in_px": 129,
-          "width": 60,
-          "height": 5.21,
-          "top": 81.98,
-          "left": 50.74
-        }
-      },
-      {
-        "name": "wedding_venue",
-        "text_configs": {
-          "font_id": "Montserrat-Regular",
-          "size": 26,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#ffffff",
-          "sample_text": "kavuri hills madhapur"
-        },
-        "coordinates": {
-          "width_in_px": 364,
-          "height_in_px": 75,
-          "top_in_px": 847,
-          "left_in_px": 102,
-          "width": 60,
-          "height": 5.21,
-          "top": 92.61,
-          "left": 51.3
-        }
-      }
-    ]
-  },
-  "id_7": {
-    "images": [
-      {
-        "thumbnail": "/Wedding-Templates/templetes-thumbnail/7.jpeg",
-        "template": "/Wedding-Templates/templetes/7.png",
-        "name": "wedding_groom_image",
-        "sample_image": "/Wedding-Templates/default-images/groom.jpg",
-        "coordinates": {
-          "width_in_px": 170,
-          "height_in_px": 340,
-          "top_in_px": 186,
-          "left_in_px": 92,
-          "width": 43.89,
-          "height": 20.83,
-          "top": 32.19,
-          "left": 26.75
-        }
-      },
-      {
-        "name": "wedding_bride_image",
-        "sample_image": "/Wedding-Templates/default-images/bride.jpg",
-        "coordinates": {
-          "width_in_px": 173,
-          "height_in_px": 338,
-          "top_in_px": 186,
-          "left_in_px": 290,
-          "width": 43.89,
-          "height": 20.83,
-          "top": 32.39,
-          "left": 74.35
-        }
-      }
-    ],
-    "texts": [
-      {
-        "name": "wedding_groom_name",
-        "text_configs": {
-          "font_id": "Allura-Regular.ttf",
-          "size": 45,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#d0203c",
-          "sample_text": "Sureshwasham"
-        },
-        "coordinates": {
-          "width_in_px": 307,
-          "height_in_px": 74,
-          "top_in_px": 540,
-          "left_in_px": 163,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 47.08,
-          "left": 24.25
-        }
-      },
-      {
-        "name": "wedding_bride_name",
-        "text_configs": {
-          "font_id": "Allura-Regular.ttf",
-          "size": 45,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#d0203c",
-          "sample_text": "Savanthi"
-        },
-        "coordinates": {
-          "width_in_px": 288,
-          "height_in_px": 60,
-          "top_in_px": 660,
-          "left_in_px": 148,
-          "width": 41.11,
-          "height": 5.21,
-          "top": 46.77,
-          "left": 75.56
-        }
-      },
-      {
-        "name": "wedding_date",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 22,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#5e450b",
-          "sample_text": "20-01-2025"
-        },
-        "coordinates": {
-          "width_in_px": 269,
-          "height_in_px": 32,
-          "top_in_px": 780,
-          "left_in_px": 141,
-          "width": 32.96,
-          "height": 5.21,
-          "top": 72.92,
-          "left": 50
-        }
-      },
-      {
-        "name": "wedding_time",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 22,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#5e450b",
-          "sample_text": "23:00"
-        },
-        "coordinates": {
-          "width_in_px": 248,
-          "height_in_px": 26,
-          "top_in_px": 811,
-          "left_in_px": 150,
-          "width": 60,
-          "height": 5.21,
-          "top": 81.98,
-          "left": 50.74
-        }
-      },
-      {
-        "name": "wedding_venue",
-        "text_configs": {
-          "font_id": "Times-New-Roman-Regular.ttf",
-          "size": 25,
-          "char_limit": 30,
-          "text_alignment": "CENTER",
-          "color": "#5e450b",
-          "sample_text": "kavuri hills madhapur"
-        },
-        "coordinates": {
-          "width_in_px": 279,
-          "height_in_px": 70,
-          "top_in_px": 860,
-          "left_in_px": 132,
-          "width": 60,
-          "height": 5.21,
-          "top": 92.61,
-          "left": 51.3
-        }
-      }
-    ]
+    "texts":[]
   }
 }

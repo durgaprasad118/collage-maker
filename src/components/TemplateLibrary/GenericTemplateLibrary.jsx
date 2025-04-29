@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import './TemplateLibrary.css';
 
 const GenericTemplateLibrary = ({
@@ -74,28 +75,40 @@ const GenericTemplateLibrary = ({
 
   return (
     <div className="bg-[#0F1725] min-h-screen">
-      {/* Back to Home Button */}
-      <button 
-        className="back-button absolute md:fixed top-4 left-4 z-50 flex items-center gap-2 bg-gray-800/60 text-white px-3 py-2 rounded-md"
-        onClick={() => navigate('/')}
-      >
-        <ArrowLeft size={20} />
-        <span>Back</span>
-      </button>
-      
-      <div className="pt-2 md:pt-0">
-        {logoComponent && logoComponent}
+      <div className="flex justify-center pt-8">
+        <h1 className="text-3xl font-bold mb-4 relative inline-block" style={{ 
+          background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
+          {title}
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            style={{
+              height: '2px',
+              background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4)',
+              position: 'absolute',
+              bottom: '-8px',
+              left: 0
+            }}
+          />
+        </h1>
       </div>
-      <div className="template-library">
-        <h1 className="text-3xl font-bold text-white mb-4 text-center pt-2">{title}</h1>
-        
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3  gap-x-4 gap-y-6 md:gap-4 place-items-center px-1">
+      <div className="template-library pt-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6 md:gap-8 place-items-center px-1">
           {templates.map((template) => (
-            <div 
+            <motion.div 
               key={template.id} 
               onClick={() => navigate(`${navigatePath}/${template.numericId}`)}
               aria-label={`${title} Template ${template.numericId}`}
-              className="template-grid-item"
+              className="template-grid-item cursor-pointer"
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                transition: { duration: 0.2 }
+              }}
             >
               <img
                 src={template.thumbnail}
@@ -103,7 +116,7 @@ const GenericTemplateLibrary = ({
                 className="w-[90%] h-[80%] md:w-[100%] md:h-[100%] object-cover rounded-lg"
                 onError={(e) => (e.target.src = `https://via.placeholder.com/400x600/1a2438/ffffff?text=${placeholderText}`)}
               />
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

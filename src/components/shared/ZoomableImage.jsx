@@ -69,7 +69,7 @@ const ZoomableImage = ({
   }, [backgroundImage, image, coordinates]);
 
   // Initialize with saved transform values if available
-  const initialScale = savedTransform?.scale || 1;
+  const initialScale = savedTransform?.scale || 1.2;
   const initialPositionX = savedTransform?.position?.x || 0;
   const initialPositionY = savedTransform?.position?.y || 0;
 
