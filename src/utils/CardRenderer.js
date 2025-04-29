@@ -12,45 +12,6 @@ export const preloadTemplateImages = (template, photos = {}, callback) => {
     return;
   }
 
-  // Create a loading overlay
-  const loadingOverlay = document.createElement('div');
-  Object.assign(loadingOverlay.style, {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    zIndex: 9999,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column'
-  });
-
-  const spinner = document.createElement('div');
-  Object.assign(spinner.style, {
-    width: '40px',
-    height: '40px',
-    border: '4px solid rgba(255, 255, 255, 0.3)',
-    borderRadius: '50%',
-    borderTop: '4px solid #fff',
-    animation: 'spin 1s linear infinite'
-  });
-  
-  // Add keyframes for spinner animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-  
-  loadingOverlay.appendChild(spinner);
-  document.body.appendChild(loadingOverlay);
-
   // Create a generic image loader function
   const loadImage = (src) => {
     return new Promise((resolve, reject) => {
@@ -89,42 +50,13 @@ export const preloadTemplateImages = (template, photos = {}, callback) => {
     }
   });
   
-  // Track loading progress
-  let totalImages = promises.length;
-  let loadedImages = 0;
-  
-  const updateProgress = () => {
-    loadedImages++;
-    const percentage = Math.round((loadedImages / totalImages) * 100);
-  };
-  
-  // Create wrapped promises that update progress
-  const trackedPromises = promises.map(promise => 
-    promise.then(() => {
-      updateProgress();
-      return promise;
-    })
-  );
-
   // Wait for all images to load
-  Promise.all(trackedPromises)
+  Promise.all(promises)
     .then(() => {
-      // Small delay for smooth transition
-      setTimeout(() => {
-        if (document.body.contains(loadingOverlay)) {
-          document.body.removeChild(loadingOverlay);
-          document.head.removeChild(style);
-        }
-        callback();
-      }, 300);
+      callback();
     })
     .catch(error => {
       console.error("Error loading images:", error);
-      // Still remove the overlay and proceed even if there are errors
-      if (document.body.contains(loadingOverlay)) {
-        document.body.removeChild(loadingOverlay);
-        document.head.removeChild(style);
-      }
       callback();
     });
 };
