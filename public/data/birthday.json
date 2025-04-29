@@ -261,5 +261,72 @@
         }
       }
     ]
+  },
+  "id_4": {
+    "images": [
+      {
+        "thumbnail": "/Birthday-Templates/templetes-thumbnail/9.jpeg",
+        "template": "../Birthday-Templates/templetes/8.png",
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/one.jpg",
+        "coordinates": {
+          "width_in_px": 494,
+          "height_in_px": 527,
+          "top_in_px": 230,
+          "left_in_px": 37,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 49.27,
+          "left": 15,
+          "z_index": 1,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/two.jpg",
+        "coordinates": {
+          "width_in_px": 466,
+          "height_in_px": 492,
+          "top_in_px": 335,
+          "left_in_px": 521,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 15,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/three.jpg",
+        "coordinates": {
+          "width_in_px": 466,
+          "height_in_px": 500,
+          "top_in_px": 740,
+          "left_in_px": 58,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 50,
+          "type": "box"
+        }
+      },
+      {
+        "name": "birthday_person",
+        "sample_image": "/Birthday-Templates/default-images/four.jpg",
+        "coordinates": {
+          "width_in_px": 540,
+          "height_in_px": 582,
+          "top_in_px": 863,
+          "left_in_px": 510,
+          "width": 31.3,
+          "height": 25.83,
+          "top": 45,
+          "left": 15,
+          "type": "box"
+        }
+      }
+    ]
   }
 }
