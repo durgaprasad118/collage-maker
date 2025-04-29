@@ -426,32 +426,6 @@ const TemplateContent = ({
   const [isLoading, setIsLoading] = useState(true);
   const [templateContent, setTemplateContent] = useState(null);
 
-  // Add spinner animation style to document
-  useEffect(() => {
-    // Create style element for spinner animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top: 4px solid #fff;
-        animation: spin 1s linear infinite;
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Cleanup function to remove style on unmount
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
   useEffect(() => {
     setIsLoading(true);
     
@@ -520,18 +494,7 @@ const TemplateContent = ({
   }, [template, photos, customText, currentIndex, allTemplates, setCurrentIndex, setCurrentTemplate, cardType, onAddImageClick]);
 
   if (isLoading) {
-    return (
-      <div className="template-loading-placeholder" style={{
-        width: '100%',
-        height: '400px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#1e1e1e'
-      }}>
-        <div className="loading-spinner"></div>
-      </div>
-    );
+    return null;
   }
 
   return templateContent;
