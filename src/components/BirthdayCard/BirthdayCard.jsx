@@ -226,6 +226,14 @@ const BirthdayCard = () => {
     return <div className="error-screen">{error}</div>;
   }
 
+  if (isLoading) {
+    return (
+      <div className="loading-spinner-container">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
   // Main render
   return (
     <div className={`main-container ${isEditModalOpen ? "modal-open" : ""}`}>
