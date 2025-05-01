@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Grid, ArrowLeft, Trash2 } from "lucide-react";
+import { X, Grid, ArrowLeft, Trash2, Home } from "lucide-react";
 import html2canvas from "html2canvas";
 import { renderImageUploadModal, validateTextFields, showTextFieldsAlert } from "./ImageUploadManager";
 import ZoomableImage from "../components/shared/ZoomableImage"; 
@@ -883,7 +883,6 @@ export const renderActionButtons = ({
           type="button" 
           className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-600 transition-colors duration-200"
           onClick={() => {
-            // Navigate to the appropriate library based on card type
             switch(cardType) {
               case "birthday":
                 window.location.href = "/BirthdayLibrary";
@@ -900,8 +899,8 @@ export const renderActionButtons = ({
             }
           }}
         >
-          <Grid className="w-5 h-5 mb-1 text-white group-hover:text-blue-400" />
-          <span className="text-xs text-white">Templates</span>
+          <Home className="w-5 h-5 mb-1 text-white group-hover:text-blue-400" />
+          <span className="text-xs text-white">Home</span>
         </button>
         <div id="tooltip-templates" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-md shadow-sm opacity-0 tooltip">
           Templates

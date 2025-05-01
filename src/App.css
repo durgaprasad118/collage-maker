@@ -198,6 +198,17 @@ button:hover {
   }
   
 }
+@media screen and (max-width: 420px) {
+  .template-content {
+    transform: scale(0.38); 
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .template-content {
+    transform: scale(0.3); 
+  }
+}
 
 @media screen and (min-width: 1024px) {
   .card {

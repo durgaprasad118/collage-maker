@@ -58,15 +58,6 @@ const ZoomableImage = ({
   const [isExporting, setIsExporting] = useState(false);
   const imageContainerRef = useRef(null);
 
-  // Debug logs for image data
-  useEffect(() => {
-    console.log("ZoomableImage props:", {
-      backgroundImage: backgroundImage ? "Present" : "Missing",
-      sampleImage: image?.sample_image ? "Present" : "Missing",
-      imageShape: image?.shape || "Default",
-      coordinates
-    });
-  }, [backgroundImage, image, coordinates]);
 
   // Initialize with saved transform values if available
   const initialScale = savedTransform?.scale || 1.2;
