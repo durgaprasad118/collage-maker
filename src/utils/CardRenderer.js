@@ -533,132 +533,162 @@ export const handleDownload = () => {
   // Set export flag for ZoomableImage components to detect
   document.body.setAttribute('data-card-exporting', 'true');
 
-  // Hide UI controls
-  const uiControls = document.querySelectorAll(
-    '.save-button, .selection-border, .image-controls, .react-transform-component__content--bottom-right'
-  );
-  const selectedElements = document.querySelectorAll('.selected');
-  const originalStates = [];
-
-  // Store original template-content styles
-  const originalCaptureDivStyles = {
-    padding: captureDiv.style.padding,
-    margin: captureDiv.style.margin,
-    border: captureDiv.style.border,
-    boxSizing: captureDiv.style.boxSizing,
-    position: captureDiv.style.position,
-    overflow: captureDiv.style.overflow
-  };
-
-  // Apply temporary styles to fix white borders
-  captureDiv.style.padding = '0';
-  captureDiv.style.margin = '0';
-  captureDiv.style.border = 'none';
-  captureDiv.style.boxSizing = 'border-box';
-  captureDiv.style.position = 'relative';
-  captureDiv.style.overflow = 'hidden';
-
-  uiControls.forEach(element => {
-    if (element && element.style.display !== 'none') {
-      originalStates.push({ element, display: element.style.display });
-      element.style.display = 'none';
+  // Store original dimensions
+  const originalWidth = captureDiv.offsetWidth;
+  const originalHeight = captureDiv.offsetHeight;
+  
+  // Create a hidden container for the cloned content
+  const hiddenContainer = document.createElement('div');
+  hiddenContainer.style.position = 'absolute';
+  hiddenContainer.style.left = '-9999px';
+  hiddenContainer.style.top = '-9999px';
+  hiddenContainer.style.width = `${originalWidth}px`;
+  hiddenContainer.style.height = `${originalHeight}px`;
+  hiddenContainer.style.overflow = 'hidden';
+  hiddenContainer.style.zIndex = '-1';
+  document.body.appendChild(hiddenContainer);
+  
+  // Clone the element to capture
+  const clonedDiv = captureDiv.cloneNode(true);
+  
+  // Apply styles to cloned div
+  clonedDiv.style.padding = '0';
+  clonedDiv.style.margin = '0';
+  clonedDiv.style.border = 'none';
+  clonedDiv.style.boxSizing = 'border-box';
+  clonedDiv.style.position = 'relative';
+  clonedDiv.style.overflow = 'hidden';
+  clonedDiv.style.width = `${originalWidth}px`;
+  clonedDiv.style.height = `${originalHeight}px`;
+  clonedDiv.style.transform = 'none';
+  clonedDiv.style.maxWidth = 'none';
+  clonedDiv.style.maxHeight = 'none';
+  clonedDiv.style.minWidth = `${originalWidth}px`;
+  clonedDiv.style.minHeight = `${originalHeight}px`;
+  clonedDiv.style.backgroundColor = '#ffffff';
+  clonedDiv.style.borderRadius = '0';
+  clonedDiv.style.boxShadow = 'none';
+  clonedDiv.style.outline = 'none';
+  clonedDiv.style.zoom = '1';
+  clonedDiv.style.transformOrigin = 'top left';
+  
+  // Fix all nested images and elements to maintain their exact size
+  clonedDiv.querySelectorAll('img, .text-overlay, .zoomable-container').forEach(el => {
+    // Preserve original dimensions and positions
+    if (el.style.transform && el.style.transform !== 'none') {
+      // Keep transform as is - don't reset it
+    } else {
+      el.style.transform = 'none';
+    }
+    el.style.margin = '0';
+    el.style.boxSizing = 'border-box';
+    if (el.classList.contains('base-template')) {
+      // Ensure base template has fixed dimensions matching parent
+      el.style.width = '100%';
+      el.style.height = '100%';
+      el.style.objectFit = 'contain';
     }
   });
-
-  selectedElements.forEach(element => {
-    originalStates.push({ element, className: element.className });
-    element.classList.remove('selected');
+  
+  // Hide UI controls in cloned div
+  clonedDiv.querySelectorAll('.save-button, .selection-border, .image-controls, .react-transform-component__content--bottom-right').forEach(el => {
+    el.style.display = 'none';
   });
-
-  // Small delay before rendering to canvas
+  
+  // Remove selected classes
+  clonedDiv.querySelectorAll('.selected').forEach(el => {
+    el.classList.remove('selected');
+  });
+  
+  // Add cloned div to hidden container
+  hiddenContainer.appendChild(clonedDiv);
+  
+  // Small delay to ensure DOM updates
   setTimeout(() => {
-    html2canvas(captureDiv, {
-      scale: 3, // Higher resolution output
-      useCORS: true, // To allow cross-origin images
+    // Use fixed scale of 1 to prevent size changes
+    html2canvas(clonedDiv, {
+      scale: window.devicePixelRatio || 2, // Use device pixel ratio for better quality
+      useCORS: true,
       allowTaint: false,
       logging: false,
       imageTimeout: 0,
       backgroundColor: "#ffffff",
-      scrollY: -window.scrollY,
-      removeContainer: false,
+      width: originalWidth, // Explicitly set dimensions
+      height: originalHeight,
+      windowWidth: originalWidth,
+      windowHeight: originalHeight,
       x: 0,
       y: 0,
-      windowWidth: document.documentElement.offsetWidth,
-      windowHeight: document.documentElement.offsetHeight,
-      foreignObjectRendering: false, // Disable to fix potential border issues
+      scrollX: 0,
+      scrollY: 0,
+      foreignObjectRendering: false,
+      letterRendering: true,
+      ignoreElements: (element) => {
+        // Ignore elements that shouldn't be captured
+        return element.classList.contains('save-button') || 
+               element.classList.contains('selection-border') || 
+               element.classList.contains('image-controls') ||
+               element.classList.contains('react-transform-component__content--bottom-right');
+      },
       onclone: (documentClone) => {
-        // Add special class to cloned document for extra styling if needed
-        documentClone.documentElement.classList.add('html2canvas-document');
-        
-        // Get the cloned element
-        const clonedCaptureDiv = documentClone.querySelector('.template-content');
-        if (clonedCaptureDiv) {
-          // Apply additional styles to ensure no borders
-          clonedCaptureDiv.style.padding = '0';
-          clonedCaptureDiv.style.margin = '0';
-          clonedCaptureDiv.style.border = 'none';
-          clonedCaptureDiv.style.borderRadius = '0';
-          clonedCaptureDiv.style.boxShadow = 'none';
-          clonedCaptureDiv.style.overflow = 'hidden';
-          clonedCaptureDiv.style.inset = '0';
+        // Final adjustments to cloned document
+        const clonedContent = documentClone.querySelector('.template-content');
+        if (clonedContent) {
+          // Ensure fixed dimensions and no scaling
+          clonedContent.style.width = `${originalWidth}px`;
+          clonedContent.style.height = `${originalHeight}px`;
+          clonedContent.style.transform = 'none';
+          clonedContent.style.maxWidth = 'none';
+          clonedContent.style.maxHeight = 'none';
+          
+          // Fix all image elements in the clone
+          documentClone.querySelectorAll('img').forEach(img => {
+            img.style.imageRendering = 'high-quality';
+          });
         }
-        
-        // Find all images in zoomable containers and ensure they have proper rendering settings
-        const allImages = documentClone.querySelectorAll('.zoomable-container img');
-        allImages.forEach(img => {
-          img.style.imageRendering = 'high-quality';
-          img.style.willChange = 'transform';
-        });
       }
     })
-      .then(canvas => {
-        // Explicit fix for mobile grayscale issue: force full alpha channel
-        const ctx = canvas.getContext('2d');
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
+    .then(canvas => {
+      // Create a new canvas at desired quality/resolution
+      const qualityCanvas = document.createElement('canvas');
+      // Use a fixed scaling factor that won't distort the image
+      qualityCanvas.width = canvas.width;
+      qualityCanvas.height = canvas.height;
+      
+      const qualityCtx = qualityCanvas.getContext('2d');
+      // Enable smooth rendering
+      qualityCtx.imageSmoothingEnabled = true;
+      qualityCtx.imageSmoothingQuality = 'high';
+      // Draw the original canvas without scaling
+      qualityCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+      
+      // Normalize alpha channel
+      const imageData = qualityCtx.getImageData(0, 0, qualityCanvas.width, qualityCanvas.height);
+      const data = imageData.data;
+      for (let i = 3; i < data.length; i += 4) {
+        data[i] = 255; // Set alpha to 255
+      }
+      qualityCtx.putImageData(imageData, 0, 0);
 
-        // Optionally normalize alpha (fully opaque)
-        for (let i = 3; i < data.length; i += 4) {
-          data[i] = 255; // Set alpha to 255
-        }
-        ctx.putImageData(imageData, 0, 0);
-
-        // Remove potential transparent border by cropping
-        const cropCanvas = cropWhitespace(canvas);
-
-        // Export PNG with higher quality
-        const pngDataUrl = cropCanvas.toDataURL("image/png", 1.0);
-        const downloadLink = document.createElement("a");
-        downloadLink.href = pngDataUrl;
-        downloadLink.download = "card-maker-export.png";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-      })
-      .catch(err => {
-        console.error("html2canvas error:", err);
-        alert("Could not generate the image. Please try again.");
-      })
-      .finally(() => {
-        // Restore UI state
-        originalStates.forEach(state => {
-          if (state.display !== undefined) {
-            state.element.style.display = state.display;
-          }
-          if (state.className) {
-            state.element.className = state.className;
-          }
-        });
-
-        // Restore original captureDiv styles
-        Object.entries(originalCaptureDivStyles).forEach(([prop, value]) => {
-          captureDiv.style[prop] = value;
-        });
-
-        // Remove export flag
-        document.body.removeAttribute('data-card-exporting');
-        document.body.removeChild(loadingIndicator);
-      });
+      // Export PNG with higher quality
+      const pngDataUrl = qualityCanvas.toDataURL("image/png", 1.0);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pngDataUrl;
+      downloadLink.download = "card-maker-export.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    })
+    .catch(err => {
+      console.error("html2canvas error:", err);
+      alert("Could not generate the image. Please try again.");
+    })
+    .finally(() => {
+      // Clean up
+      document.body.removeChild(hiddenContainer);
+      document.body.removeAttribute('data-card-exporting');
+      document.body.removeChild(loadingIndicator);
+    });
   }, 100);
 };
 
@@ -671,11 +701,13 @@ function cropWhitespace(canvas) {
   // Find the bounds of the content
   let left = canvas.width, right = 0, top = canvas.height, bottom = 0;
   
-  // Use a small threshold to determine what constitutes a "white" pixel
+  // Use a more aggressive threshold to determine what constitutes a "white" pixel
+  // Lower the threshold to catch more white-ish pixels
   const isWhiteOrTransparent = (idx) => {
-    return data[idx + 3] < 10 || (data[idx] > 240 && data[idx + 1] > 240 && data[idx + 2] > 240);
+    return data[idx + 3] < 5 || (data[idx] > 245 && data[idx + 1] > 245 && data[idx + 2] > 245);
   };
   
+  // First scan: Find the content bounds
   for (let y = 0; y < canvas.height; y++) {
     for (let x = 0; x < canvas.width; x++) {
       const idx = (y * canvas.width + x) * 4;
@@ -688,17 +720,58 @@ function cropWhitespace(canvas) {
     }
   }
   
-  // Add a small padding
-  left = Math.max(0, left - 1);
-  top = Math.max(0, top - 1);
-  right = Math.min(canvas.width - 1, right + 1);
-  bottom = Math.min(canvas.height - 1, bottom + 1);
+  // If no non-white content was found, check for off-white content
+  if (left === canvas.width || right === 0 || top === canvas.height || bottom === 0) {
+    left = canvas.width;
+    right = 0;
+    top = canvas.height;
+    bottom = 0;
+    
+    // More permissive check for "almost white" pixels
+    const isAlmostWhite = (idx) => {
+      return data[idx + 3] < 5 || (data[idx] > 230 && data[idx + 1] > 230 && data[idx + 2] > 230);
+    };
+    
+    for (let y = 0; y < canvas.height; y++) {
+      for (let x = 0; x < canvas.width; x++) {
+        const idx = (y * canvas.width + x) * 4;
+        if (!isAlmostWhite(idx)) {
+          left = Math.min(left, x);
+          right = Math.max(right, x);
+          top = Math.min(top, y);
+          bottom = Math.max(bottom, y);
+        }
+      }
+    }
+  }
   
-  // If the image has content, crop it
+  // If content is detected, crop it with padding
   if (left < right && top < bottom) {
+    // Add a small padding to the content
+    left = Math.max(0, left - 2);
+    top = Math.max(0, top - 2);
+    right = Math.min(canvas.width - 1, right + 2);
+    bottom = Math.min(canvas.height - 1, bottom + 2);
+    
     const width = right - left + 1;
     const height = bottom - top + 1;
     
+    // If the crop would be too aggressive (removing more than 15% of the width/height),
+    // just use the original canvas to preserve the template's intended dimensions
+    if (width < canvas.width * 0.85 || height < canvas.height * 0.85) {
+      return canvas;
+    }
+    
+    // Calculate aspect ratio of the original and cropped content
+    const originalAspectRatio = canvas.width / canvas.height;
+    const croppedAspectRatio = width / height;
+    
+    // Only crop if the aspect ratio isn't changed significantly
+    if (Math.abs(originalAspectRatio - croppedAspectRatio) > 0.1) {
+      return canvas; // Return original if aspect ratio would change too much
+    }
+    
+    // Create a new canvas with the cropped dimensions
     const cropCanvas = document.createElement('canvas');
     cropCanvas.width = width;
     cropCanvas.height = height;
