@@ -95,12 +95,31 @@
 
 /* Export-specific styles to prevent cropping */
 .zoomable-container.export-mode {
-  overflow: visible !important;
-  z-index: auto !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.zoomable-container.export-mode * {
-  overflow: visible !important;
+.zoomable-container.export-mode img {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.zoomable-container.export-mode::before,
+.zoomable-container.export-mode::after {
+  display: none !important;
+  content: none !important;
+}
+
+.zoomable-container.export-mode div {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* Force high-quality rendering during export */

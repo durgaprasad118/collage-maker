@@ -286,7 +286,11 @@ const ZoomableImage = ({
           left: `${coordinates?.left_in_px || 0}px`,
           overflow: 'visible',
           borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          padding: 0,
+          margin: 0,
+          border: 'none',
+          outline: 'none'
         }}
       >
         <div
@@ -299,16 +303,24 @@ const ZoomableImage = ({
             justifyContent: "center",
             overflow: 'hidden',
             borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
-            position: "relative"
+            position: "relative",
+            padding: 0,
+            margin: 0,
+            border: 'none',
+            outline: 'none'
           }}
         >
           {backgroundImage ? (
             <div style={{
               height: "100%",
               width: "100%",
-              overflow: 'visible',
+              overflow: 'hidden',
               borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
-              position: "relative"
+              position: "relative",
+              padding: 0,
+              margin: 0,
+              border: 'none',
+              outline: 'none'
             }}>
               <img
                 src={backgroundImage}
@@ -323,7 +335,11 @@ const ZoomableImage = ({
                   imageRendering: "high-quality",
                   transform: `translate(-50%, -50%) translate(${savedTransform.position.x / savedTransform.scale}px, ${savedTransform.position.y / savedTransform.scale}px)`,
                   transformOrigin: "center center",
-                  borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                  borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+                  padding: 0,
+                  margin: 0,
+                  border: 'none',
+                  outline: 'none'
                 }}
                 crossOrigin="anonymous"
                 loading="eager"
@@ -336,9 +352,13 @@ const ZoomableImage = ({
             <div style={{
               width: "100%",
               height: "100%",
-              overflow: 'visible',
+              overflow: 'hidden',
               borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
-              position: "relative"
+              position: "relative",
+              padding: 0,
+              margin: 0,
+              border: 'none',
+              outline: 'none'
             }}>
               <img 
                 src={image.sample_image}
@@ -353,7 +373,11 @@ const ZoomableImage = ({
                   imageRendering: "high-quality",
                   transform: `translate(-50%, -50%) translate(${savedTransform.position.x / savedTransform.scale}px, ${savedTransform.position.y / savedTransform.scale}px)`,
                   transformOrigin: "center center",
-                  borderRadius: image?.shape === 'circle' ? '50%' : 'inherit'
+                  borderRadius: image?.shape === 'circle' ? '50%' : 'inherit',
+                  padding: 0,
+                  margin: 0,
+                  border: 'none',
+                  outline: 'none'
                 }}
                 crossOrigin="anonymous"
                 loading="eager"

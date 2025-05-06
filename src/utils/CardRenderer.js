@@ -581,7 +581,27 @@ export const handleDownload = () => {
       el.style.transform = 'none';
     }
     el.style.margin = '0';
+    el.style.padding = '0';
+    el.style.border = 'none';
     el.style.boxSizing = 'border-box';
+    
+    // Specifically handle framelike decorators that might have white borders
+    if (el.classList.contains('zoomable-container')) {
+      el.style.boxShadow = 'none';
+      el.style.outline = 'none';
+      el.style.border = 'none';
+      el.style.overflow = 'hidden';
+      
+      // Also fix any internal divs that might have borders
+      el.querySelectorAll('div').forEach(div => {
+        div.style.border = 'none';
+        div.style.margin = '0';
+        div.style.padding = '0';
+        div.style.boxShadow = 'none';
+        div.style.outline = 'none';
+      });
+    }
+    
     if (el.classList.contains('base-template')) {
       // Ensure base template has fixed dimensions matching parent
       el.style.width = '100%';
@@ -640,10 +660,39 @@ export const handleDownload = () => {
           clonedContent.style.transform = 'none';
           clonedContent.style.maxWidth = 'none';
           clonedContent.style.maxHeight = 'none';
+          clonedContent.style.border = 'none';
+          clonedContent.style.outline = 'none';
+          clonedContent.style.boxShadow = 'none';
+          clonedContent.style.margin = '0';
+          clonedContent.style.padding = '0';
+          
+          // Fix all zoomable containers to prevent white borders
+          documentClone.querySelectorAll('.zoomable-container').forEach(container => {
+            container.style.border = 'none';
+            container.style.margin = '0';
+            container.style.padding = '0';
+            container.style.boxShadow = 'none';
+            container.style.outline = 'none';
+            container.style.overflow = 'hidden';
+            
+            // Fix all divs inside containers
+            container.querySelectorAll('div').forEach(div => {
+              div.style.border = 'none';
+              div.style.margin = '0';
+              div.style.padding = '0';
+              div.style.boxShadow = 'none';
+              div.style.outline = 'none';
+            });
+          });
           
           // Fix all image elements in the clone
           documentClone.querySelectorAll('img').forEach(img => {
             img.style.imageRendering = 'high-quality';
+            img.style.border = 'none';
+            img.style.margin = '0';
+            img.style.padding = '0';
+            img.style.boxShadow = 'none';
+            img.style.outline = 'none';
           });
         }
       }
@@ -665,9 +714,77 @@ export const handleDownload = () => {
       // Normalize alpha channel
       const imageData = qualityCtx.getImageData(0, 0, qualityCanvas.width, qualityCanvas.height);
       const data = imageData.data;
+      
+      // Post-processing to remove white borders
+      // This will replace any very light pixels (potential borders) that are next to non-white pixels
+      const width = qualityCanvas.width;
+      const height = qualityCanvas.height;
+      const isLightPixel = (r, g, b) => r > 240 && g > 240 && b > 240;
+      
+      // First pass: scan the image and identify border pixels
+      const borderPixels = [];
+      for (let y = 1; y < height-1; y++) {
+        for (let x = 1; x < width-1; x++) {
+          const idx = (y * width + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          
+          // Check if this is a light pixel
+          if (isLightPixel(r, g, b)) {
+            // Check neighboring pixels (up, down, left, right)
+            const up = ((y - 1) * width + x) * 4;
+            const down = ((y + 1) * width + x) * 4;
+            const left = (y * width + (x - 1)) * 4;
+            const right = (y * width + (x + 1)) * 4;
+            
+            // If any neighbor is not a light pixel, mark this as a border pixel
+            if (!isLightPixel(data[up], data[up+1], data[up+2]) ||
+                !isLightPixel(data[down], data[down+1], data[down+2]) ||
+                !isLightPixel(data[left], data[left+1], data[left+2]) ||
+                !isLightPixel(data[right], data[right+1], data[right+2])) {
+              borderPixels.push(idx);
+            }
+          }
+        }
+      }
+      
+      // Second pass: fix border pixels by sampling colors from adjacent non-light pixels
+      borderPixels.forEach(idx => {
+        const x = (idx / 4) % width;
+        const y = Math.floor((idx / 4) / width);
+        
+        // Look at all 8 surrounding pixels to find a non-light one
+        const neighbors = [];
+        for (let j = -1; j <= 1; j++) {
+          for (let i = -1; i <= 1; i++) {
+            if (i === 0 && j === 0) continue; // Skip center pixel (self)
+            
+            const nx = x + i;
+            const ny = y + j;
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue; // Skip out of bounds
+            
+            const nidx = (ny * width + nx) * 4;
+            if (!isLightPixel(data[nidx], data[nidx+1], data[nidx+2])) {
+              neighbors.push(nidx);
+            }
+          }
+        }
+        
+        // If we found non-light neighbors, use the first one's color
+        if (neighbors.length > 0) {
+          const nidx = neighbors[0];
+          data[idx] = data[nidx]; // R
+          data[idx+1] = data[nidx+1]; // G
+          data[idx+2] = data[nidx+2]; // B
+        }
+      });
+      
+      // Apply all changes to alpha
       for (let i = 3; i < data.length; i += 4) {
         data[i] = 255; // Set alpha to 255
       }
+      
       qualityCtx.putImageData(imageData, 0, 0);
 
       // Export PNG with higher quality
