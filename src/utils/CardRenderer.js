@@ -494,7 +494,12 @@ const TemplateContent = ({
   }, [template, photos, customText, currentIndex, allTemplates, setCurrentIndex, setCurrentTemplate, cardType, onAddImageClick]);
 
   if (isLoading) {
-    return null;
+    return (
+      <div className="template-loading">
+        <div className="spinner"></div>
+        <p>Loading template...</p>
+      </div>
+    );
   }
 
   return templateContent;

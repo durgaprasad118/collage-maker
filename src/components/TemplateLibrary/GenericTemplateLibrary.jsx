@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './TemplateLibrary.css';
+import ShimmerTemplates from '../ShimmerTemplates/ShimmerTemplates';
 
 const GenericTemplateLibrary = ({
   title,
@@ -15,6 +16,7 @@ const GenericTemplateLibrary = ({
 }) => {
   const [templates, setTemplates] = useState([]);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +27,7 @@ const GenericTemplateLibrary = ({
     }
     
     const fetchTemplates = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch(dataUrl);
         if (!response.ok) {
@@ -45,6 +48,8 @@ const GenericTemplateLibrary = ({
       } catch (err) {
         console.error('Fetch error:', err);
         setError(`Error fetching ${title.toLowerCase()} templates. Please try again.`);
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -57,6 +62,36 @@ const GenericTemplateLibrary = ({
       }
     };
   }, [dataUrl, title, thumbnailProcessor]);
+
+  // Show loading state with the ShimmerTemplates component
+  if (isLoading) {
+    return (
+      <div className="bg-[#0F1725] min-h-screen">
+        <div className="flex justify-center pt-8">
+          <h1 className="text-3xl font-bold mb-4 relative inline-block" style={{ 
+            background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            {title}
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              style={{
+                height: '2px',
+                background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4)',
+                position: 'absolute',
+                bottom: '-8px',
+                left: 0
+              }}
+            />
+          </h1>
+        </div>
+        <ShimmerTemplates />
+      </div>
+    );
+  }
 
   // Only show error state, skip the loading state since Suspense handles it
   if (error) return (
